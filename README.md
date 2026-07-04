@@ -81,7 +81,6 @@ GitHub Actions builds release packages for:
 Release builds are triggered by tags such as:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
-
