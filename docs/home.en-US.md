@@ -32,7 +32,7 @@ The product principle is simple: AI writes structure, humans make decisions, and
 - Open, save, and save as `.ppt.html` files in the desktop app
 - Starter templates for product pitches, lessons, and project updates
 - Visual editing for titles, text, images, comparisons, cards, data, charts, tables, and code
-- Main-editor component palette for clicking or dragging text, images, video, audio, charts, tables, cards, metrics, timelines, quotes, and code
+- Main-editor component palette for clicking or dragging text, images, video, audio, plus multiple comparison, chart, table, card, metric, and timeline variants
 - Canvas double-click editing, draggable and resizable element geometry, keyboard nudging, image drop onto the stage, and thumbnail drag reordering
 - Images support local embedding, cover/contain fit, captions, full-image slides, and image-background slides
 - Video supports local embedding, URL / Data URI sources, posters, captions, and cover/contain fit

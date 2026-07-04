@@ -8,6 +8,7 @@ const vm = require("node:vm");
 const root = path.join(__dirname, "..");
 const rendererPath = path.join(root, "renderer.js");
 const code = fs.readFileSync(rendererPath, "utf8");
+const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const context = { window: {}, console };
 
 vm.runInNewContext(code, context, { filename: rendererPath });
@@ -17,6 +18,17 @@ const ppt = context.window.PPTHtml;
 assert.equal(ppt.version, "0.1");
 assert.ok(Array.isArray(ppt.deckTemplates));
 assert.ok(ppt.deckTemplates.length >= 4);
+[
+  /data-insert="compare" data-variant="decision"/,
+  /data-insert="chart" data-variant="line"/,
+  /data-insert="chart" data-variant="donut"/,
+  /data-insert="table" data-variant="checklist"/,
+  /data-insert="cards" data-variant="features"/,
+  /data-insert="metrics" data-variant="progress"/,
+  /data-insert="timeline" data-variant="process"/
+].forEach((pattern) => {
+  assert.match(indexHtml, pattern);
+});
 
 ppt.deckTemplates.forEach((template) => {
   const deck = ppt.createTemplateDeck(template.id);

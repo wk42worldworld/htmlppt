@@ -200,15 +200,35 @@
           <span data-i18n="insert.title">插入</span>
         </div>
         <div class="insert-tools">
+          <div class="insert-group-label" data-i18n="insert.group.basic">基础</div>
           <button type="button" class="insert-tool" draggable="true" data-insert="text" data-i18n-title="insert.text.title"><svg><use href="#icon-text"></use></svg><span data-i18n="insert.text">文本</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="image" data-i18n-title="insert.image.title"><svg><use href="#icon-image"></use></svg><span data-i18n="insert.image">图片</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="video" data-i18n-title="insert.video.title"><svg><use href="#icon-video"></use></svg><span data-i18n="insert.video">视频</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="audio" data-i18n-title="insert.audio.title"><svg><use href="#icon-audio"></use></svg><span data-i18n="insert.audio">音频</span></button>
-          <button type="button" class="insert-tool" draggable="true" data-insert="chart" data-i18n-title="insert.chart.title"><svg><use href="#icon-chart"></use></svg><span data-i18n="insert.chart">图表</span></button>
-          <button type="button" class="insert-tool" draggable="true" data-insert="table" data-i18n-title="insert.table.title"><svg><use href="#icon-table"></use></svg><span data-i18n="insert.table">表格</span></button>
-          <button type="button" class="insert-tool" draggable="true" data-insert="cards" data-i18n-title="insert.cards.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.cards">卡片</span></button>
-          <button type="button" class="insert-tool" draggable="true" data-insert="metrics" data-i18n-title="insert.metrics.title"><svg><use href="#icon-data"></use></svg><span data-i18n="insert.metrics">数据</span></button>
-          <button type="button" class="insert-tool" draggable="true" data-insert="timeline" data-i18n-title="insert.timeline.title"><svg><use href="#icon-timeline"></use></svg><span data-i18n="insert.timeline">时间线</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.compare">对比</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="compare" data-variant="beforeAfter" data-i18n-title="insert.compare.beforeAfter.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.compare.beforeAfter">前后</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="compare" data-variant="decision" data-i18n-title="insert.compare.decision.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.compare.decision">决策</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.chart">图表</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="chart" data-variant="bar" data-i18n-title="insert.chart.bar.title"><svg><use href="#icon-chart"></use></svg><span data-i18n="insert.chart.bar">柱状</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="chart" data-variant="line" data-i18n-title="insert.chart.line.title"><svg><use href="#icon-chart"></use></svg><span data-i18n="insert.chart.line">趋势</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="chart" data-variant="donut" data-i18n-title="insert.chart.donut.title"><svg><use href="#icon-chart"></use></svg><span data-i18n="insert.chart.donut">占比</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.table">表格</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="table" data-variant="plan" data-i18n-title="insert.table.plan.title"><svg><use href="#icon-table"></use></svg><span data-i18n="insert.table.plan">项目表</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="table" data-variant="compare" data-i18n-title="insert.table.compare.title"><svg><use href="#icon-table"></use></svg><span data-i18n="insert.table.compare">对比表</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="table" data-variant="checklist" data-i18n-title="insert.table.checklist.title"><svg><use href="#icon-table"></use></svg><span data-i18n="insert.table.checklist">检查表</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.cards">卡片</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="cards" data-variant="core" data-i18n-title="insert.cards.core.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.cards.core">三要点</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="cards" data-variant="features" data-i18n-title="insert.cards.features.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.cards.features">功能</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="cards" data-variant="prosCons" data-i18n-title="insert.cards.prosCons.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.cards.prosCons">优劣</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.metrics">数据</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="metrics" data-variant="kpi" data-i18n-title="insert.metrics.kpi.title"><svg><use href="#icon-data"></use></svg><span data-i18n="insert.metrics.kpi">KPI</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="metrics" data-variant="progress" data-i18n-title="insert.metrics.progress.title"><svg><use href="#icon-data"></use></svg><span data-i18n="insert.metrics.progress">进度</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="metrics" data-variant="beforeAfter" data-i18n-title="insert.metrics.beforeAfter.title"><svg><use href="#icon-data"></use></svg><span data-i18n="insert.metrics.beforeAfter">前后</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.timeline">流程</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="timeline" data-variant="roadmap" data-i18n-title="insert.timeline.roadmap.title"><svg><use href="#icon-timeline"></use></svg><span data-i18n="insert.timeline.roadmap">路线图</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="timeline" data-variant="process" data-i18n-title="insert.timeline.process.title"><svg><use href="#icon-timeline"></use></svg><span data-i18n="insert.timeline.process">流程</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="timeline" data-variant="milestones" data-i18n-title="insert.timeline.milestones.title"><svg><use href="#icon-timeline"></use></svg><span data-i18n="insert.timeline.milestones">里程碑</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.other">其他</div>
           <button type="button" class="insert-tool" draggable="true" data-insert="quote" data-i18n-title="insert.quote.title"><svg><use href="#icon-quote"></use></svg><span data-i18n="insert.quote">引用</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="code" data-i18n-title="insert.code.title"><svg><use href="#icon-code"></use></svg><span data-i18n="insert.code">代码</span></button>
         </div>

@@ -1315,6 +1315,20 @@ button[hidden] {
   scrollbar-width: thin;
 }
 
+.insert-group-label {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 880;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.insert-group-label:first-child {
+  margin-top: 0;
+}
+
 .insert-tool {
   display: grid;
   grid-template-columns: 1fr;
@@ -1398,6 +1412,13 @@ button[hidden] {
     overflow-x: auto;
     padding: 8px 10px 11px;
     scrollbar-width: none;
+  }
+
+  .insert-group-label {
+    align-self: center;
+    flex: 0 0 auto;
+    margin: 0 2px;
+    writing-mode: vertical-rl;
   }
 
   .insert-tools::-webkit-scrollbar {

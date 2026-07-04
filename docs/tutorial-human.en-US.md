@@ -144,7 +144,10 @@ The main editor now includes an `Insert` component palette beside the canvas. Yo
 - `Image`: adds an image slide and opens the local image picker. If you cancel, the image placeholder slide remains so you can add a URL later.
 - `Video`: adds a video slide and opens the local video picker. If you cancel, the video placeholder slide remains.
 - `Audio`: adds an audio slide and opens the local audio picker. If you cancel, the audio placeholder slide remains.
-- `Chart`, `Table`, `Cards`, `Data`, `Timeline`, `Quote`, and `Code`: add a new matching layout slide after the current slide with editable starter content, without overwriting the current slide.
+- `Before` and `Decision`: add comparison slides for before/after stories or option decisions.
+- `Bars`, `Trend`, and `Share`: add chart slides for category comparison, trend changes, or composition share.
+- `Plan`, `Compare`, and `Checklist`: add table slides for project plans, option comparison, or launch checks.
+- `3 Points`, `Features`, `Pros`, `KPI`, `Progress`, `Roadmap`, `Process`, `Milestones`, `Quote`, and `Code`: add matching layout slides after the current slide with editable starter content, without overwriting the current slide.
 
 After inserting a component, continue editing it in the right panel, or double-click text, drag components, and resize them directly on the canvas.
 

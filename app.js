@@ -922,6 +922,530 @@
     "sample.textBox": "새 텍스트 상자"
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "insert.group.basic": "基础",
+    "insert.group.compare": "对比",
+    "insert.group.chart": "图表",
+    "insert.group.table": "表格",
+    "insert.group.cards": "卡片",
+    "insert.group.metrics": "数据",
+    "insert.group.timeline": "流程",
+    "insert.group.other": "其他",
+    "insert.compare": "对比",
+    "insert.compare.beforeAfter": "前后",
+    "insert.compare.beforeAfter.title": "插入前后对比页，适合展示改版、优化、转型效果",
+    "insert.compare.decision": "决策",
+    "insert.compare.decision.title": "插入决策对比页，适合比较两个方案",
+    "insert.chart.bar": "柱状",
+    "insert.chart.bar.title": "插入柱状图，适合季度、类别、团队对比",
+    "insert.chart.line": "趋势",
+    "insert.chart.line.title": "插入趋势折线图，适合增长、留存、进度变化",
+    "insert.chart.donut": "占比",
+    "insert.chart.donut.title": "插入占比环形图，适合预算、渠道、结构比例",
+    "insert.table.plan": "项目表",
+    "insert.table.plan.title": "插入项目计划表",
+    "insert.table.compare": "对比表",
+    "insert.table.compare.title": "插入方案对比表",
+    "insert.table.checklist": "检查表",
+    "insert.table.checklist.title": "插入上线或交付检查表",
+    "insert.cards.core": "三要点",
+    "insert.cards.core.title": "插入三个核心观点卡片",
+    "insert.cards.features": "功能",
+    "insert.cards.features.title": "插入三个功能卡片",
+    "insert.cards.prosCons": "优劣",
+    "insert.cards.prosCons.title": "插入优点、限制和下一步卡片",
+    "insert.metrics.kpi": "KPI",
+    "insert.metrics.kpi.title": "插入关键指标页",
+    "insert.metrics.progress": "进度",
+    "insert.metrics.progress.title": "插入项目进度数据页",
+    "insert.metrics.beforeAfter": "前后",
+    "insert.metrics.beforeAfter.title": "插入优化前后数据页",
+    "insert.timeline.roadmap": "路线图",
+    "insert.timeline.roadmap.title": "插入路线图时间线",
+    "insert.timeline.process": "流程",
+    "insert.timeline.process.title": "插入流程步骤时间线",
+    "insert.timeline.milestones": "里程碑",
+    "insert.timeline.milestones.title": "插入里程碑时间线",
+    "sample.compareBeforeAfterTitle": "优化前后对比",
+    "sample.beforeTitle": "优化前",
+    "sample.beforeText": "流程分散，信息需要人工整理，交付结果不稳定。",
+    "sample.afterTitle": "优化后",
+    "sample.afterText": "结构统一，内容可复用，团队可以更快完成高质量输出。",
+    "sample.compareDecisionTitle": "方案选择",
+    "sample.optionATitle": "方案 A",
+    "sample.optionAText": "上线快、成本低，适合作为第一阶段验证。",
+    "sample.optionBTitle": "方案 B",
+    "sample.optionBText": "能力完整、扩展性更强，适合第二阶段建设。",
+    "sample.chartLineTitle": "增长趋势",
+    "sample.chartDonutTitle": "资源占比",
+    "sample.month1": "1 月",
+    "sample.month2": "2 月",
+    "sample.month3": "3 月",
+    "sample.month4": "4 月",
+    "sample.activeUsers": "活跃用户",
+    "sample.retention": "留存",
+    "sample.channelProduct": "产品",
+    "sample.channelContent": "内容",
+    "sample.channelSales": "销售",
+    "sample.channelOps": "运营",
+    "sample.share": "占比",
+    "sample.tableCompareTitle": "方案对比表",
+    "sample.dimension": "维度",
+    "sample.optionA": "方案 A",
+    "sample.optionB": "方案 B",
+    "sample.recommendation": "建议",
+    "sample.low": "低",
+    "sample.medium": "中",
+    "sample.high": "高",
+    "sample.scale": "扩展性",
+    "sample.tableChecklistTitle": "上线检查清单",
+    "sample.item": "事项",
+    "sample.due": "时间",
+    "sample.contentReview": "内容确认",
+    "sample.product": "产品",
+    "sample.thisWeek": "本周",
+    "sample.assetReady": "素材就绪",
+    "sample.releaseReview": "发布复核",
+    "sample.nextWeek": "下周",
+    "sample.cardsFeaturesTitle": "核心功能",
+    "sample.feature1Title": "自动结构",
+    "sample.feature1Text": "把零散内容整理成适合演示的页面结构。",
+    "sample.feature2Title": "单文件分享",
+    "sample.feature2Text": "图片、视频、音频可以打包进一个 ppt.html 文件。",
+    "sample.feature3Title": "画布编辑",
+    "sample.feature3Text": "用户可以直接双击、拖拽、缩放常见元素。",
+    "sample.cardsProsConsTitle": "优劣与下一步",
+    "sample.proTitle": "优势",
+    "sample.proText": "生成快、结构清楚、便于 AI 和人类继续修改。",
+    "sample.conTitle": "限制",
+    "sample.conText": "复杂自由排版仍需要更多控件和图层管理。",
+    "sample.nextTitle": "下一步",
+    "sample.nextText": "补齐更多组件变体，并持续打磨编辑体验。",
+    "sample.metricsProgressTitle": "项目进度",
+    "sample.completed": "已完成",
+    "sample.completedDetail": "核心能力已进入可用状态。",
+    "sample.openTasks": "待处理",
+    "sample.openTasksDetail": "集中在体验、文档和边界情况。",
+    "sample.risks": "风险",
+    "sample.risksDetail": "需要持续测试真实用户工作流。",
+    "sample.metricsBeforeAfterTitle": "优化效果",
+    "sample.timeCost": "时间成本",
+    "sample.timeCostDetail": "从准备到演示显著缩短。",
+    "sample.quality": "表达质量",
+    "sample.qualityDetail": "模板约束让页面更稳定。",
+    "sample.output": "产出效率",
+    "sample.outputDetail": "同样时间可以完成更多版本。",
+    "sample.timelineProcessTitle": "工作流程",
+    "sample.process1": "收集",
+    "sample.process1Text": "整理目标、受众、素材和关键观点。",
+    "sample.process2": "生成",
+    "sample.process2Text": "让 AI 生成结构化 ppt.html 初稿。",
+    "sample.process3": "编辑",
+    "sample.process3Text": "在画布上直接修改文字、图表和媒体。",
+    "sample.process4": "分享",
+    "sample.process4Text": "保存为单文件并交给其他人继续打开。",
+    "sample.timelineMilestonesTitle": "关键里程碑",
+    "sample.milestone1": "M1",
+    "sample.milestone1Text": "完成核心格式和渲染器。",
+    "sample.milestone2": "M2",
+    "sample.milestone2Text": "补齐可视化编辑和媒体插入。",
+    "sample.milestone3": "M3",
+    "sample.milestone3Text": "发布跨平台桌面端版本。"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "insert.group.basic": "Basic",
+    "insert.group.compare": "Compare",
+    "insert.group.chart": "Charts",
+    "insert.group.table": "Tables",
+    "insert.group.cards": "Cards",
+    "insert.group.metrics": "Data",
+    "insert.group.timeline": "Flow",
+    "insert.group.other": "Other",
+    "insert.compare": "Compare",
+    "insert.compare.beforeAfter": "Before",
+    "insert.compare.beforeAfter.title": "Insert a before/after comparison slide",
+    "insert.compare.decision": "Decision",
+    "insert.compare.decision.title": "Insert a decision comparison slide",
+    "insert.chart.bar": "Bars",
+    "insert.chart.bar.title": "Insert a bar chart for category or quarterly comparison",
+    "insert.chart.line": "Trend",
+    "insert.chart.line.title": "Insert a line chart for growth or trend changes",
+    "insert.chart.donut": "Share",
+    "insert.chart.donut.title": "Insert a donut chart for composition or share",
+    "insert.table.plan": "Plan",
+    "insert.table.plan.title": "Insert a project plan table",
+    "insert.table.compare": "Compare",
+    "insert.table.compare.title": "Insert an option comparison table",
+    "insert.table.checklist": "Checklist",
+    "insert.table.checklist.title": "Insert a launch or delivery checklist",
+    "insert.cards.core": "3 Points",
+    "insert.cards.core.title": "Insert three core idea cards",
+    "insert.cards.features": "Features",
+    "insert.cards.features.title": "Insert three feature cards",
+    "insert.cards.prosCons": "Pros",
+    "insert.cards.prosCons.title": "Insert pros, limits, and next-step cards",
+    "insert.metrics.kpi": "KPI",
+    "insert.metrics.kpi.title": "Insert key metric cards",
+    "insert.metrics.progress": "Progress",
+    "insert.metrics.progress.title": "Insert project progress metrics",
+    "insert.metrics.beforeAfter": "Before",
+    "insert.metrics.beforeAfter.title": "Insert before/after improvement metrics",
+    "insert.timeline.roadmap": "Roadmap",
+    "insert.timeline.roadmap.title": "Insert a roadmap timeline",
+    "insert.timeline.process": "Process",
+    "insert.timeline.process.title": "Insert a process timeline",
+    "insert.timeline.milestones": "Milestones",
+    "insert.timeline.milestones.title": "Insert a milestone timeline",
+    "sample.compareBeforeAfterTitle": "Before and After",
+    "sample.beforeTitle": "Before",
+    "sample.beforeText": "Work was scattered, information was organized by hand, and delivery quality varied.",
+    "sample.afterTitle": "After",
+    "sample.afterText": "The structure is unified, content is reusable, and the team can deliver faster.",
+    "sample.compareDecisionTitle": "Decision Options",
+    "sample.optionATitle": "Option A",
+    "sample.optionAText": "Fast to launch and low cost. Best for first-stage validation.",
+    "sample.optionBTitle": "Option B",
+    "sample.optionBText": "More complete and scalable. Best for the second build stage.",
+    "sample.chartLineTitle": "Growth Trend",
+    "sample.chartDonutTitle": "Resource Share",
+    "sample.month1": "Jan",
+    "sample.month2": "Feb",
+    "sample.month3": "Mar",
+    "sample.month4": "Apr",
+    "sample.activeUsers": "Active users",
+    "sample.retention": "Retention",
+    "sample.channelProduct": "Product",
+    "sample.channelContent": "Content",
+    "sample.channelSales": "Sales",
+    "sample.channelOps": "Ops",
+    "sample.share": "Share",
+    "sample.tableCompareTitle": "Option Comparison",
+    "sample.dimension": "Dimension",
+    "sample.optionA": "Option A",
+    "sample.optionB": "Option B",
+    "sample.recommendation": "Recommendation",
+    "sample.low": "Low",
+    "sample.medium": "Medium",
+    "sample.high": "High",
+    "sample.scale": "Scale",
+    "sample.tableChecklistTitle": "Launch Checklist",
+    "sample.item": "Item",
+    "sample.due": "Due",
+    "sample.contentReview": "Content review",
+    "sample.product": "Product",
+    "sample.thisWeek": "This week",
+    "sample.assetReady": "Assets ready",
+    "sample.releaseReview": "Release review",
+    "sample.nextWeek": "Next week",
+    "sample.cardsFeaturesTitle": "Core Features",
+    "sample.feature1Title": "Auto structure",
+    "sample.feature1Text": "Turn rough material into presentation-ready structure.",
+    "sample.feature2Title": "Single file",
+    "sample.feature2Text": "Package images, video, and audio into one ppt.html file.",
+    "sample.feature3Title": "Canvas editing",
+    "sample.feature3Text": "Double-click, drag, and resize common slide elements.",
+    "sample.cardsProsConsTitle": "Pros and Next Step",
+    "sample.proTitle": "Strength",
+    "sample.proText": "Fast generation, clear structure, and easy follow-up editing.",
+    "sample.conTitle": "Limit",
+    "sample.conText": "Advanced freeform layout still needs more controls and layers.",
+    "sample.nextTitle": "Next",
+    "sample.nextText": "Add more component variants and keep polishing the editor.",
+    "sample.metricsProgressTitle": "Project Progress",
+    "sample.completed": "Complete",
+    "sample.completedDetail": "Core capabilities are usable.",
+    "sample.openTasks": "Open tasks",
+    "sample.openTasksDetail": "Mostly experience, docs, and edge cases.",
+    "sample.risks": "Risks",
+    "sample.risksDetail": "Real user workflows still need testing.",
+    "sample.metricsBeforeAfterTitle": "Improvement Impact",
+    "sample.timeCost": "Time cost",
+    "sample.timeCostDetail": "Preparation to presentation is shorter.",
+    "sample.quality": "Quality",
+    "sample.qualityDetail": "Template constraints make slides stable.",
+    "sample.output": "Output",
+    "sample.outputDetail": "More versions in the same amount of time.",
+    "sample.timelineProcessTitle": "Workflow",
+    "sample.process1": "Collect",
+    "sample.process1Text": "Gather goals, audience, assets, and key ideas.",
+    "sample.process2": "Generate",
+    "sample.process2Text": "Let AI create a structured ppt.html draft.",
+    "sample.process3": "Edit",
+    "sample.process3Text": "Directly edit text, charts, and media on the canvas.",
+    "sample.process4": "Share",
+    "sample.process4Text": "Save one file and let others open it again.",
+    "sample.timelineMilestonesTitle": "Key Milestones",
+    "sample.milestone1": "M1",
+    "sample.milestone1Text": "Complete the core format and renderer.",
+    "sample.milestone2": "M2",
+    "sample.milestone2Text": "Add visual editing and media insertion.",
+    "sample.milestone3": "M3",
+    "sample.milestone3Text": "Release cross-platform desktop builds."
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "insert.group.basic": "基本",
+    "insert.group.compare": "比較",
+    "insert.group.chart": "グラフ",
+    "insert.group.table": "表",
+    "insert.group.cards": "カード",
+    "insert.group.metrics": "データ",
+    "insert.group.timeline": "流れ",
+    "insert.group.other": "その他",
+    "insert.compare": "比較",
+    "insert.compare.beforeAfter": "前後",
+    "insert.compare.beforeAfter.title": "改善前後の比較スライドを挿入",
+    "insert.compare.decision": "判断",
+    "insert.compare.decision.title": "2つの案を比較するスライドを挿入",
+    "insert.chart.bar": "棒",
+    "insert.chart.bar.title": "カテゴリや四半期比較の棒グラフを挿入",
+    "insert.chart.line": "推移",
+    "insert.chart.line.title": "成長や変化を示す折れ線グラフを挿入",
+    "insert.chart.donut": "比率",
+    "insert.chart.donut.title": "構成比を示すドーナツグラフを挿入",
+    "insert.table.plan": "計画表",
+    "insert.table.plan.title": "プロジェクト計画表を挿入",
+    "insert.table.compare": "比較表",
+    "insert.table.compare.title": "案の比較表を挿入",
+    "insert.table.checklist": "チェック",
+    "insert.table.checklist.title": "公開や納品のチェック表を挿入",
+    "insert.cards.core": "3要点",
+    "insert.cards.core.title": "3つの要点カードを挿入",
+    "insert.cards.features": "機能",
+    "insert.cards.features.title": "3つの機能カードを挿入",
+    "insert.cards.prosCons": "利点",
+    "insert.cards.prosCons.title": "利点、制約、次の一手のカードを挿入",
+    "insert.metrics.kpi": "KPI",
+    "insert.metrics.kpi.title": "主要指標カードを挿入",
+    "insert.metrics.progress": "進捗",
+    "insert.metrics.progress.title": "プロジェクト進捗指標を挿入",
+    "insert.metrics.beforeAfter": "前後",
+    "insert.metrics.beforeAfter.title": "改善前後の指標を挿入",
+    "insert.timeline.roadmap": "ロードマップ",
+    "insert.timeline.roadmap.title": "ロードマップのタイムラインを挿入",
+    "insert.timeline.process": "工程",
+    "insert.timeline.process.title": "工程タイムラインを挿入",
+    "insert.timeline.milestones": "節目",
+    "insert.timeline.milestones.title": "マイルストーンのタイムラインを挿入",
+    "sample.compareBeforeAfterTitle": "改善前後の比較",
+    "sample.beforeTitle": "改善前",
+    "sample.beforeText": "作業が分散し、情報整理が手作業で、品質が安定しませんでした。",
+    "sample.afterTitle": "改善後",
+    "sample.afterText": "構造が統一され、内容を再利用でき、より速く届けられます。",
+    "sample.compareDecisionTitle": "案の比較",
+    "sample.optionATitle": "案 A",
+    "sample.optionAText": "公開が速く低コスト。初期検証に向いています。",
+    "sample.optionBTitle": "案 B",
+    "sample.optionBText": "機能が充実し拡張性が高い。次段階の構築に向いています。",
+    "sample.chartLineTitle": "成長推移",
+    "sample.chartDonutTitle": "リソース比率",
+    "sample.month1": "1月",
+    "sample.month2": "2月",
+    "sample.month3": "3月",
+    "sample.month4": "4月",
+    "sample.activeUsers": "アクティブ",
+    "sample.retention": "継続率",
+    "sample.channelProduct": "製品",
+    "sample.channelContent": "コンテンツ",
+    "sample.channelSales": "営業",
+    "sample.channelOps": "運用",
+    "sample.share": "比率",
+    "sample.tableCompareTitle": "案の比較表",
+    "sample.dimension": "観点",
+    "sample.optionA": "案 A",
+    "sample.optionB": "案 B",
+    "sample.recommendation": "推奨",
+    "sample.low": "低",
+    "sample.medium": "中",
+    "sample.high": "高",
+    "sample.scale": "拡張性",
+    "sample.tableChecklistTitle": "公開チェック表",
+    "sample.item": "項目",
+    "sample.due": "期限",
+    "sample.contentReview": "内容確認",
+    "sample.product": "製品",
+    "sample.thisWeek": "今週",
+    "sample.assetReady": "素材準備",
+    "sample.releaseReview": "公開確認",
+    "sample.nextWeek": "来週",
+    "sample.cardsFeaturesTitle": "主要機能",
+    "sample.feature1Title": "自動構造化",
+    "sample.feature1Text": "素材を発表向けの構造に整理します。",
+    "sample.feature2Title": "単一ファイル",
+    "sample.feature2Text": "画像、動画、音声を1つの ppt.html にまとめます。",
+    "sample.feature3Title": "キャンバス編集",
+    "sample.feature3Text": "文字や要素を直接編集、移動、サイズ変更できます。",
+    "sample.cardsProsConsTitle": "利点と次の一手",
+    "sample.proTitle": "強み",
+    "sample.proText": "生成が速く、構造が明確で、続けて編集しやすい。",
+    "sample.conTitle": "制約",
+    "sample.conText": "自由配置にはさらに多くのコントロールとレイヤーが必要です。",
+    "sample.nextTitle": "次",
+    "sample.nextText": "部品バリエーションを増やし、編集体験を磨きます。",
+    "sample.metricsProgressTitle": "プロジェクト進捗",
+    "sample.completed": "完了",
+    "sample.completedDetail": "主要機能は利用可能です。",
+    "sample.openTasks": "未完了",
+    "sample.openTasksDetail": "体験、文書、例外対応が中心です。",
+    "sample.risks": "リスク",
+    "sample.risksDetail": "実ユーザーの流れで継続検証が必要です。",
+    "sample.metricsBeforeAfterTitle": "改善効果",
+    "sample.timeCost": "時間コスト",
+    "sample.timeCostDetail": "準備から発表までが短くなります。",
+    "sample.quality": "品質",
+    "sample.qualityDetail": "テンプレート制約でページが安定します。",
+    "sample.output": "生産性",
+    "sample.outputDetail": "同じ時間でより多くの版を作れます。",
+    "sample.timelineProcessTitle": "作業工程",
+    "sample.process1": "収集",
+    "sample.process1Text": "目的、受け手、素材、要点を集めます。",
+    "sample.process2": "生成",
+    "sample.process2Text": "AI が構造化された ppt.html 初稿を作ります。",
+    "sample.process3": "編集",
+    "sample.process3Text": "キャンバスで文字、グラフ、メディアを編集します。",
+    "sample.process4": "共有",
+    "sample.process4Text": "単一ファイルとして保存し、他の人も開けます。",
+    "sample.timelineMilestonesTitle": "主要マイルストーン",
+    "sample.milestone1": "M1",
+    "sample.milestone1Text": "形式とレンダラーを完成。",
+    "sample.milestone2": "M2",
+    "sample.milestone2Text": "視覚編集とメディア挿入を追加。",
+    "sample.milestone3": "M3",
+    "sample.milestone3Text": "クロスプラットフォーム版を公開。"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "insert.group.basic": "기본",
+    "insert.group.compare": "비교",
+    "insert.group.chart": "차트",
+    "insert.group.table": "표",
+    "insert.group.cards": "카드",
+    "insert.group.metrics": "데이터",
+    "insert.group.timeline": "흐름",
+    "insert.group.other": "기타",
+    "insert.compare": "비교",
+    "insert.compare.beforeAfter": "전후",
+    "insert.compare.beforeAfter.title": "개선 전후 비교 슬라이드 삽입",
+    "insert.compare.decision": "결정",
+    "insert.compare.decision.title": "두 방안을 비교하는 슬라이드 삽입",
+    "insert.chart.bar": "막대",
+    "insert.chart.bar.title": "분기나 카테고리 비교용 막대 차트 삽입",
+    "insert.chart.line": "추세",
+    "insert.chart.line.title": "성장이나 변화 추세용 선 차트 삽입",
+    "insert.chart.donut": "비중",
+    "insert.chart.donut.title": "구성 비율용 도넛 차트 삽입",
+    "insert.table.plan": "계획표",
+    "insert.table.plan.title": "프로젝트 계획표 삽입",
+    "insert.table.compare": "비교표",
+    "insert.table.compare.title": "방안 비교표 삽입",
+    "insert.table.checklist": "체크",
+    "insert.table.checklist.title": "출시 또는 납품 체크리스트 삽입",
+    "insert.cards.core": "3요점",
+    "insert.cards.core.title": "세 가지 핵심 카드 삽입",
+    "insert.cards.features": "기능",
+    "insert.cards.features.title": "세 가지 기능 카드 삽입",
+    "insert.cards.prosCons": "장단",
+    "insert.cards.prosCons.title": "장점, 한계, 다음 단계 카드 삽입",
+    "insert.metrics.kpi": "KPI",
+    "insert.metrics.kpi.title": "핵심 지표 카드 삽입",
+    "insert.metrics.progress": "진행",
+    "insert.metrics.progress.title": "프로젝트 진행 지표 삽입",
+    "insert.metrics.beforeAfter": "전후",
+    "insert.metrics.beforeAfter.title": "개선 전후 지표 삽입",
+    "insert.timeline.roadmap": "로드맵",
+    "insert.timeline.roadmap.title": "로드맵 타임라인 삽입",
+    "insert.timeline.process": "프로세스",
+    "insert.timeline.process.title": "프로세스 타임라인 삽입",
+    "insert.timeline.milestones": "마일스톤",
+    "insert.timeline.milestones.title": "마일스톤 타임라인 삽입",
+    "sample.compareBeforeAfterTitle": "개선 전후 비교",
+    "sample.beforeTitle": "이전",
+    "sample.beforeText": "작업이 흩어지고 정보 정리가 수작업이라 품질이 흔들렸습니다.",
+    "sample.afterTitle": "이후",
+    "sample.afterText": "구조가 통일되고 콘텐츠를 재사용해 더 빠르게 전달합니다.",
+    "sample.compareDecisionTitle": "방안 선택",
+    "sample.optionATitle": "방안 A",
+    "sample.optionAText": "빠르게 출시하고 비용이 낮아 1단계 검증에 적합합니다.",
+    "sample.optionBTitle": "방안 B",
+    "sample.optionBText": "기능이 완성도 높고 확장성이 좋아 2단계 구축에 적합합니다.",
+    "sample.chartLineTitle": "성장 추세",
+    "sample.chartDonutTitle": "리소스 비중",
+    "sample.month1": "1월",
+    "sample.month2": "2월",
+    "sample.month3": "3월",
+    "sample.month4": "4월",
+    "sample.activeUsers": "활성 사용자",
+    "sample.retention": "유지율",
+    "sample.channelProduct": "제품",
+    "sample.channelContent": "콘텐츠",
+    "sample.channelSales": "영업",
+    "sample.channelOps": "운영",
+    "sample.share": "비중",
+    "sample.tableCompareTitle": "방안 비교표",
+    "sample.dimension": "기준",
+    "sample.optionA": "방안 A",
+    "sample.optionB": "방안 B",
+    "sample.recommendation": "추천",
+    "sample.low": "낮음",
+    "sample.medium": "중간",
+    "sample.high": "높음",
+    "sample.scale": "확장성",
+    "sample.tableChecklistTitle": "출시 체크리스트",
+    "sample.item": "항목",
+    "sample.due": "기한",
+    "sample.contentReview": "콘텐츠 확인",
+    "sample.product": "제품",
+    "sample.thisWeek": "이번 주",
+    "sample.assetReady": "소재 준비",
+    "sample.releaseReview": "출시 검토",
+    "sample.nextWeek": "다음 주",
+    "sample.cardsFeaturesTitle": "핵심 기능",
+    "sample.feature1Title": "자동 구조화",
+    "sample.feature1Text": "자료를 발표에 맞는 구조로 정리합니다.",
+    "sample.feature2Title": "단일 파일",
+    "sample.feature2Text": "이미지, 비디오, 오디오를 하나의 ppt.html에 담습니다.",
+    "sample.feature3Title": "캔버스 편집",
+    "sample.feature3Text": "요소를 직접 편집하고 이동하며 크기를 조절합니다.",
+    "sample.cardsProsConsTitle": "장점과 다음 단계",
+    "sample.proTitle": "강점",
+    "sample.proText": "생성이 빠르고 구조가 명확하며 계속 편집하기 쉽습니다.",
+    "sample.conTitle": "한계",
+    "sample.conText": "자유 배치에는 더 많은 컨트롤과 레이어가 필요합니다.",
+    "sample.nextTitle": "다음",
+    "sample.nextText": "컴포넌트 변형을 늘리고 편집 경험을 다듬습니다.",
+    "sample.metricsProgressTitle": "프로젝트 진행",
+    "sample.completed": "완료",
+    "sample.completedDetail": "핵심 기능은 사용할 수 있습니다.",
+    "sample.openTasks": "남은 작업",
+    "sample.openTasksDetail": "경험, 문서, 예외 처리가 중심입니다.",
+    "sample.risks": "위험",
+    "sample.risksDetail": "실제 사용자 흐름에서 계속 검증해야 합니다.",
+    "sample.metricsBeforeAfterTitle": "개선 효과",
+    "sample.timeCost": "시간 비용",
+    "sample.timeCostDetail": "준비부터 발표까지 시간이 줄었습니다.",
+    "sample.quality": "품질",
+    "sample.qualityDetail": "템플릿 제약으로 페이지가 안정됩니다.",
+    "sample.output": "산출",
+    "sample.outputDetail": "같은 시간에 더 많은 버전을 만들 수 있습니다.",
+    "sample.timelineProcessTitle": "작업 프로세스",
+    "sample.process1": "수집",
+    "sample.process1Text": "목표, 청중, 자료, 핵심 메시지를 모읍니다.",
+    "sample.process2": "생성",
+    "sample.process2Text": "AI가 구조화된 ppt.html 초안을 만듭니다.",
+    "sample.process3": "편집",
+    "sample.process3Text": "캔버스에서 텍스트, 차트, 미디어를 편집합니다.",
+    "sample.process4": "공유",
+    "sample.process4Text": "단일 파일로 저장하고 다른 사람도 열 수 있게 합니다.",
+    "sample.timelineMilestonesTitle": "주요 마일스톤",
+    "sample.milestone1": "M1",
+    "sample.milestone1Text": "핵심 형식과 렌더러 완성.",
+    "sample.milestone2": "M2",
+    "sample.milestone2Text": "시각 편집과 미디어 삽입 추가.",
+    "sample.milestone3": "M3",
+    "sample.milestone3Text": "크로스 플랫폼 데스크톱 버전 출시."
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -1268,13 +1792,17 @@
 
     document.querySelectorAll("[data-insert]").forEach(function (button) {
       button.addEventListener("click", function () {
-        insertComponent(button.getAttribute("data-insert"), { source: "click" });
+        insertComponent(button.getAttribute("data-insert"), {
+          source: "click",
+          variant: button.getAttribute("data-variant") || ""
+        });
       });
       button.addEventListener("dragstart", function (event) {
         var type = button.getAttribute("data-insert");
+        var variant = button.getAttribute("data-variant") || "";
         event.dataTransfer.effectAllowed = "copy";
-        event.dataTransfer.setData("application/x-htmlppt-component", type);
-        event.dataTransfer.setData("text/plain", type);
+        event.dataTransfer.setData("application/x-htmlppt-component", encodeComponentPayload(type, variant));
+        event.dataTransfer.setData("text/plain", variant ? type + ":" + variant : type);
       });
     });
 
@@ -1500,13 +2028,14 @@
 
   function insertComponent(type, options) {
     var settings = options || {};
+    var variant = settings.variant || "";
     if (type === "text") {
       var nextPath = "";
       commit(function () {
         nextPath = addTextBoxToSlide(currentSlide(), settings.point);
         selectedCanvasPath = nextPath;
       });
-      toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
+      toast(formatText(t("toast.componentInserted"), { name: insertLabel(type, variant) }));
       window.setTimeout(function () {
         var node = canvasNodeByPath(nextPath);
         if (node) startCanvasEdit(node);
@@ -1534,14 +2063,14 @@
       if (shouldCreateComponentSlide(type)) {
         targetSlide = createComponentSlide();
       }
-      applyComponentToSlide(targetSlide, type);
+      applyComponentToSlide(targetSlide, type, variant);
       selectedCanvasPath = "";
     });
-    toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
+    toast(formatText(t("toast.componentInserted"), { name: insertLabel(type, variant) }));
   }
 
   function shouldCreateComponentSlide(type) {
-    return ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1;
+    return ["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1;
   }
 
   function createComponentSlide() {
@@ -1564,7 +2093,8 @@
     toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
   }
 
-  function applyComponentToSlide(slide, type) {
+  function applyComponentToSlide(slide, type, variant) {
+    var preset = variant || "";
     if (type === "text") {
       slide.layout = "text";
       if (shouldUseSampleTitle(slide)) slide.title = t("sample.textTitle");
@@ -1599,60 +2129,165 @@
       slide.audio.caption = slide.audio.caption || t("sample.audioCaption");
       return;
     }
+    if (type === "compare") {
+      slide.layout = "compare";
+      if (preset === "decision") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.compareDecisionTitle");
+        slide.left = { title: t("sample.optionATitle"), text: t("sample.optionAText") };
+        slide.right = { title: t("sample.optionBTitle"), text: t("sample.optionBText") };
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.compareBeforeAfterTitle");
+        slide.left = { title: t("sample.beforeTitle"), text: t("sample.beforeText") };
+        slide.right = { title: t("sample.afterTitle"), text: t("sample.afterText") };
+      }
+      return;
+    }
     if (type === "chart") {
       slide.layout = "chart";
-      if (shouldUseSampleTitle(slide)) slide.title = t("sample.chartTitle");
-      slide.chart = {
-        kind: "bar",
-        labels: [t("sample.q1"), t("sample.q2"), t("sample.q3"), t("sample.q4")],
-        series: [
-          { name: t("sample.revenue"), values: [12, 20, 31, 42] },
-          { name: t("sample.cost"), values: [8, 11, 18, 24] }
-        ],
-        unit: t("sample.unit")
-      };
+      if (preset === "line") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.chartLineTitle");
+        slide.chart = {
+          kind: "line",
+          labels: [t("sample.month1"), t("sample.month2"), t("sample.month3"), t("sample.month4")],
+          series: [
+            { name: t("sample.activeUsers"), values: [12, 18, 30, 46] },
+            { name: t("sample.retention"), values: [8, 13, 21, 33] }
+          ],
+          unit: t("sample.unit")
+        };
+      } else if (preset === "donut") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.chartDonutTitle");
+        slide.chart = {
+          kind: "donut",
+          labels: [t("sample.channelProduct"), t("sample.channelContent"), t("sample.channelSales"), t("sample.channelOps")],
+          series: [{ name: t("sample.share"), values: [42, 28, 18, 12] }],
+          unit: "%"
+        };
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.chartTitle");
+        slide.chart = {
+          kind: "bar",
+          labels: [t("sample.q1"), t("sample.q2"), t("sample.q3"), t("sample.q4")],
+          series: [
+            { name: t("sample.revenue"), values: [12, 20, 31, 42] },
+            { name: t("sample.cost"), values: [8, 11, 18, 24] }
+          ],
+          unit: t("sample.unit")
+        };
+      }
       return;
     }
     if (type === "table") {
       slide.layout = "table";
-      if (shouldUseSampleTitle(slide)) slide.title = t("sample.tableTitle");
-      slide.table = {
-        columns: [t("sample.phase"), t("sample.owner"), t("sample.status")],
-        rows: [
-          [t("sample.plan"), t("sample.team"), t("sample.done")],
-          [t("sample.prototype"), t("sample.design"), t("sample.progress")]
-        ]
-      };
+      if (preset === "compare") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.tableCompareTitle");
+        slide.table = {
+          columns: [t("sample.dimension"), t("sample.optionA"), t("sample.optionB"), t("sample.recommendation")],
+          rows: [
+            [t("sample.cost"), t("sample.low"), t("sample.medium"), t("sample.optionA")],
+            [t("sample.speed"), t("sample.fast"), t("sample.medium"), t("sample.optionA")],
+            [t("sample.scale"), t("sample.medium"), t("sample.high"), t("sample.optionB")]
+          ]
+        };
+      } else if (preset === "checklist") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.tableChecklistTitle");
+        slide.table = {
+          columns: [t("sample.item"), t("sample.owner"), t("sample.due"), t("sample.status")],
+          rows: [
+            [t("sample.contentReview"), t("sample.product"), t("sample.thisWeek"), t("sample.done")],
+            [t("sample.assetReady"), t("sample.design"), t("sample.thisWeek"), t("sample.progress")],
+            [t("sample.releaseReview"), t("sample.team"), t("sample.nextWeek"), t("sample.plan")]
+          ]
+        };
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.tableTitle");
+        slide.table = {
+          columns: [t("sample.phase"), t("sample.owner"), t("sample.status")],
+          rows: [
+            [t("sample.plan"), t("sample.team"), t("sample.done")],
+            [t("sample.prototype"), t("sample.design"), t("sample.progress")]
+          ]
+        };
+      }
       return;
     }
     if (type === "cards") {
       slide.layout = "threeCards";
-      if (shouldUseSampleTitle(slide)) slide.title = t("sample.cardsTitle");
-      slide.cards = [
-        { title: t("sample.card1Title"), text: t("sample.card1Text") },
-        { title: t("sample.card2Title"), text: t("sample.card2Text") },
-        { title: t("sample.card3Title"), text: t("sample.card3Text") }
-      ];
+      if (preset === "features") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.cardsFeaturesTitle");
+        slide.cards = [
+          { title: t("sample.feature1Title"), text: t("sample.feature1Text") },
+          { title: t("sample.feature2Title"), text: t("sample.feature2Text") },
+          { title: t("sample.feature3Title"), text: t("sample.feature3Text") }
+        ];
+      } else if (preset === "prosCons") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.cardsProsConsTitle");
+        slide.cards = [
+          { title: t("sample.proTitle"), text: t("sample.proText") },
+          { title: t("sample.conTitle"), text: t("sample.conText") },
+          { title: t("sample.nextTitle"), text: t("sample.nextText") }
+        ];
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.cardsTitle");
+        slide.cards = [
+          { title: t("sample.card1Title"), text: t("sample.card1Text") },
+          { title: t("sample.card2Title"), text: t("sample.card2Text") },
+          { title: t("sample.card3Title"), text: t("sample.card3Text") }
+        ];
+      }
       return;
     }
     if (type === "metrics") {
       slide.layout = "data";
-      if (shouldUseSampleTitle(slide)) slide.title = t("sample.metricsTitle");
-      slide.metrics = [
-        { value: "3x", label: t("sample.speed"), detail: t("sample.speedDetail") },
-        { value: "42%", label: t("sample.growth"), detail: t("sample.growthDetail") },
-        { value: "1 file", label: "PPT.html", detail: t("sample.fileDetail") }
-      ];
+      if (preset === "progress") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.metricsProgressTitle");
+        slide.metrics = [
+          { value: "68%", label: t("sample.completed"), detail: t("sample.completedDetail") },
+          { value: "12", label: t("sample.openTasks"), detail: t("sample.openTasksDetail") },
+          { value: "4", label: t("sample.risks"), detail: t("sample.risksDetail") }
+        ];
+      } else if (preset === "beforeAfter") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.metricsBeforeAfterTitle");
+        slide.metrics = [
+          { value: "-42%", label: t("sample.timeCost"), detail: t("sample.timeCostDetail") },
+          { value: "+31%", label: t("sample.quality"), detail: t("sample.qualityDetail") },
+          { value: "2.4x", label: t("sample.output"), detail: t("sample.outputDetail") }
+        ];
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.metricsTitle");
+        slide.metrics = [
+          { value: "3x", label: t("sample.speed"), detail: t("sample.speedDetail") },
+          { value: "42%", label: t("sample.growth"), detail: t("sample.growthDetail") },
+          { value: "1 file", label: "PPT.html", detail: t("sample.fileDetail") }
+        ];
+      }
       return;
     }
     if (type === "timeline") {
       slide.layout = "timeline";
-      if (shouldUseSampleTitle(slide)) slide.title = t("sample.timelineTitle");
-      slide.items = [
-        { title: t("sample.step1"), text: t("sample.step1Text") },
-        { title: t("sample.step2"), text: t("sample.step2Text") },
-        { title: t("sample.step3"), text: t("sample.step3Text") }
-      ];
+      if (preset === "process") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.timelineProcessTitle");
+        slide.items = [
+          { title: t("sample.process1"), text: t("sample.process1Text") },
+          { title: t("sample.process2"), text: t("sample.process2Text") },
+          { title: t("sample.process3"), text: t("sample.process3Text") },
+          { title: t("sample.process4"), text: t("sample.process4Text") }
+        ];
+      } else if (preset === "milestones") {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.timelineMilestonesTitle");
+        slide.items = [
+          { title: t("sample.milestone1"), text: t("sample.milestone1Text") },
+          { title: t("sample.milestone2"), text: t("sample.milestone2Text") },
+          { title: t("sample.milestone3"), text: t("sample.milestone3Text") }
+        ];
+      } else {
+        if (shouldUseSampleTitle(slide)) slide.title = t("sample.timelineTitle");
+        slide.items = [
+          { title: t("sample.step1"), text: t("sample.step1Text") },
+          { title: t("sample.step2"), text: t("sample.step2Text") },
+          { title: t("sample.step3"), text: t("sample.step3Text") }
+        ];
+      }
       return;
     }
     if (type === "quote") {
@@ -1693,8 +2328,31 @@
     return "textBoxes." + index + ".text";
   }
 
-  function insertLabel(type) {
-    return t("insert." + type) || type;
+  function insertLabel(type, variant) {
+    return t(componentLabelKey(type, variant)) || t("insert." + type) || type;
+  }
+
+  function componentLabelKey(type, variant) {
+    return variant ? "insert." + type + "." + variant : "insert." + type;
+  }
+
+  function encodeComponentPayload(type, variant) {
+    return JSON.stringify({ type: type || "", variant: variant || "" });
+  }
+
+  function decodeComponentPayload(raw) {
+    var value = String(raw || "").trim();
+    if (!value) return null;
+    if (value[0] === "{") {
+      try {
+        var parsed = JSON.parse(value);
+        return { type: parsed.type || "", variant: parsed.variant || "" };
+      } catch (error) {
+        return null;
+      }
+    }
+    var parts = value.split(":");
+    return { type: parts[0] || "", variant: parts[1] || "" };
   }
 
   function handleGlobalKeydown(event) {
@@ -2842,9 +3500,13 @@
     if (!hasCanvasDropPayload(event.dataTransfer)) return;
     event.preventDefault();
     els.stageViewport.classList.remove("is-drop-target");
-    var componentType = event.dataTransfer.getData("application/x-htmlppt-component");
-    if (componentType) {
-      insertComponent(componentType, { source: "drop", point: canvasPointFromEvent(event) });
+    var componentPayload = decodeComponentPayload(event.dataTransfer.getData("application/x-htmlppt-component"));
+    if (componentPayload && componentPayload.type) {
+      insertComponent(componentPayload.type, {
+        source: "drop",
+        point: canvasPointFromEvent(event),
+        variant: componentPayload.variant
+      });
       return;
     }
 
