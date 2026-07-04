@@ -119,6 +119,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 | `data` | 핵심 지표 | `metrics` |
 | `chart` | 추세, 그룹 값, 구성비 | `chart.kind`, `chart.labels`, `chart.series` |
 | `video` | 제품 demo, 인터뷰, 화면 녹화 | `video.src`, `video.poster`, `video.caption` |
+| `audio` | 내레이션, 인터뷰 오디오, 팟캐스트 클립 | `audio.src`, `audio.caption` |
 | `table` | 계획표, 비교표 | `table.columns`, `table.rows` |
 | `code` | 코드 표시 | `code` |
 | `ending` | 마무리 | `title`, `subtitle` |
@@ -133,6 +134,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 - 숫자를 강조하려면 `data`.
 - 추세, 그룹 값, 구성비라면 `chart`.
 - demo, 인터뷰, 화면 녹화를 보여주려면 `video`.
+- 내레이션, 인터뷰 오디오, 팟캐스트 클립을 재생하려면 `audio`.
 - 계획이나 상태를 보여주려면 `table`.
 
 ## 5. 자주 쓰는 필드 형식
@@ -163,6 +165,24 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 ```
 
 `src` 는 URL 또는 `data:video/...;base64,...` 값을 사용할 수 있습니다. 비디오 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 비디오를 선택하게 합니다.
+
+오디오:
+
+```json
+"audio": {
+  "src": "https://example.com/narration.mp3",
+  "caption": "오프닝 내레이션",
+  "controls": true
+}
+```
+
+`src` 는 URL 또는 `data:audio/...;base64,...` 값을 사용할 수 있습니다. 오디오 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 오디오를 선택하게 합니다.
+
+자산 패키징 규칙:
+
+- 최종 `.ppt.html` 은 단일 파일이어야 합니다. 저장 또는 다운로드 시 앱은 외부 `image.src`, `video.src`, `video.poster`, `audio.src` 값을 Data URI로 포함합니다.
+- AI는 접근 가능한 URL 또는 직접 Data URI를 쓸 수 있습니다.
+- 자신의 컴퓨터에만 있는 임시 로컬 경로를 쓰지 마세요. 소스가 불확실하면 `src` 를 비워 두고 사용자가 편집기에서 파일을 선택하게 합니다.
 
 목록 또는 타임라인:
 

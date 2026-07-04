@@ -119,6 +119,7 @@ Supported layouts:
 | `data` | Key metrics | `metrics` |
 | `chart` | Trends or proportions | `chart.kind`, `chart.labels`, `chart.series` |
 | `video` | Product demos, interviews, screen recordings | `video.src`, `video.poster`, `video.caption` |
+| `audio` | Narration, interview audio, podcast clips | `audio.src`, `audio.caption` |
 | `table` | Plan or comparison table | `table.columns`, `table.rows` |
 | `code` | Code display | `code` |
 | `ending` | Closing slide | `title`, `subtitle` |
@@ -133,6 +134,7 @@ Selection rules:
 - Need numbers: use `data`.
 - Need trends, grouped values, or proportions: use `chart`.
 - Need a demo clip, interview, or screen recording: use `video`.
+- Need narration, interview audio, or a podcast clip: use `audio`.
 - Need status or plan details: use `table`.
 
 ## 5. Common Field Formats
@@ -163,6 +165,24 @@ Video:
 ```
 
 `src` can be a URL or a `data:video/...;base64,...` value. If the video source is unknown, leave it empty and let the human user choose a local video in the editor.
+
+Audio:
+
+```json
+"audio": {
+  "src": "https://example.com/narration.mp3",
+  "caption": "Opening narration",
+  "controls": true
+}
+```
+
+`src` can be a URL or a `data:audio/...;base64,...` value. If the audio source is unknown, leave it empty and let the human user choose a local audio file in the editor.
+
+Asset packaging rule:
+
+- The final `.ppt.html` should be a single file. On save or download, the app packages external `image.src`, `video.src`, `video.poster`, and `audio.src` values as Data URIs.
+- AI may write reachable URLs or direct Data URIs.
+- Do not write temporary local paths that only exist on your machine. If the source is uncertain, leave `src` empty and let the user choose a file in the editor.
 
 List or timeline:
 

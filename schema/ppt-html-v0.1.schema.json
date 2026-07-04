@@ -89,6 +89,34 @@
         }
       }
     },
+    "audio": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "src": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "controls": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoplay": {
+          "type": "boolean",
+          "default": false
+        },
+        "loop": {
+          "type": "boolean",
+          "default": false
+        },
+        "muted": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
     "textPair": {
       "type": "object",
       "additionalProperties": true,
@@ -227,6 +255,7 @@
             "data",
             "chart",
             "video",
+            "audio",
             "table",
             "code",
             "ending"
@@ -249,6 +278,9 @@
         },
         "video": {
           "$ref": "#/$defs/video"
+        },
+        "audio": {
+          "$ref": "#/$defs/audio"
         },
         "items": {
           "type": "array",

@@ -89,6 +89,13 @@
       <path d="M4 7h11v10H4z"></path>
       <path d="m15 10 5-3v10l-5-3z"></path>
     </symbol>
+    <symbol id="icon-audio" viewBox="0 0 24 24">
+      <path d="M5 14V10"></path>
+      <path d="M9 18V6"></path>
+      <path d="M13 16V8"></path>
+      <path d="M17 20V4"></path>
+      <path d="M21 14V10"></path>
+    </symbol>
     <symbol id="icon-chart" viewBox="0 0 24 24">
       <path d="M5 19V5"></path>
       <path d="M5 19h15"></path>
@@ -170,6 +177,7 @@
       <input id="fileInput" type="file" accept=".html,.json,application/json,text/html" hidden>
       <input id="imageFileInput" type="file" accept="image/*" hidden>
       <input id="videoFileInput" type="file" accept="video/*" hidden>
+      <input id="audioFileInput" type="file" accept="audio/*" hidden>
     </header>
 
     <main class="main-layout">
@@ -195,6 +203,7 @@
           <button type="button" class="insert-tool" draggable="true" data-insert="text" data-i18n-title="insert.text.title"><svg><use href="#icon-text"></use></svg><span data-i18n="insert.text">文本</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="image" data-i18n-title="insert.image.title"><svg><use href="#icon-image"></use></svg><span data-i18n="insert.image">图片</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="video" data-i18n-title="insert.video.title"><svg><use href="#icon-video"></use></svg><span data-i18n="insert.video">视频</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="audio" data-i18n-title="insert.audio.title"><svg><use href="#icon-audio"></use></svg><span data-i18n="insert.audio">音频</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="chart" data-i18n-title="insert.chart.title"><svg><use href="#icon-chart"></use></svg><span data-i18n="insert.chart">图表</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="table" data-i18n-title="insert.table.title"><svg><use href="#icon-table"></use></svg><span data-i18n="insert.table">表格</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="cards" data-i18n-title="insert.cards.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.cards">卡片</span></button>
@@ -257,7 +266,7 @@
             <span data-i18n="field.subtitle">副标题</span>
             <textarea id="subtitleInput" rows="2"></textarea>
           </label>
-          <label class="field-group" data-layouts="text,imageRight,imageLeft,imageBackground,section,chart,video">
+          <label class="field-group" data-layouts="text,imageRight,imageLeft,imageBackground,section,chart,video,audio">
             <span data-i18n="field.body">正文</span>
             <textarea id="bodyInput" rows="5"></textarea>
           </label>
@@ -312,6 +321,21 @@
           <label>
             <span data-i18n="field.caption">说明</span>
             <input id="videoCaptionInput" type="text">
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="audio">
+          <h2 data-i18n="panel.audio">音频</h2>
+          <div class="inline-tools">
+            <button type="button" id="audioFileBtn" data-i18n="action.pickAudio">选择本地音频</button>
+          </div>
+          <label>
+            <span data-i18n="field.audioSrc">音频 URL 或 Data URI</span>
+            <input id="audioSrcInput" type="text">
+          </label>
+          <label>
+            <span data-i18n="field.caption">说明</span>
+            <input id="audioCaptionInput" type="text">
           </label>
         </section>
 

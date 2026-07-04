@@ -3,13 +3,14 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.6";
+  var APP_VERSION_LABEL = "v0.2.7";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
   var currentIndex = 0;
   var currentFilePath = "";
   var dirty = false;
+  var saving = false;
   var history = [];
   var future = [];
   var syncing = false;
@@ -837,6 +838,70 @@
     "canvas.timeline": "타임라인"
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "action.pickAudio": "选择本地音频",
+    "insert.audio": "音频",
+    "insert.audio.title": "插入音频，或拖到画布创建音频页",
+    "panel.audio": "音频",
+    "field.audioSrc": "音频 URL 或 Data URI",
+    "layout.audio": "音频",
+    "canvas.audio": "音频",
+    "toast.audioAdded": "音频已加入当前页面",
+    "toast.assetsEmbedded": "已将 {count} 个外部资源打包进单文件",
+    "alert.assetPackageFailed": "保存前需要把所有资源打包进单文件，但以下资源读取失败：\n{details}\n请选择本地文件，或换成可访问的 URL。",
+    "asset.failureLine": "第 {slide} 页 {path}: {src} ({message})",
+    "sample.audioTitle": "音频播放",
+    "sample.audioCaption": "双击音频可替换本地文件"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "action.pickAudio": "Choose Audio",
+    "insert.audio": "Audio",
+    "insert.audio.title": "Insert audio, or drag to the canvas",
+    "panel.audio": "Audio",
+    "field.audioSrc": "Audio URL or Data URI",
+    "layout.audio": "Audio",
+    "canvas.audio": "Audio",
+    "toast.audioAdded": "Audio added to this slide",
+    "toast.assetsEmbedded": "{count} external assets embedded into the single file",
+    "alert.assetPackageFailed": "Saving requires every asset to be embedded in the single file, but these assets could not be read:\n{details}\nChoose local files or use reachable URLs.",
+    "asset.failureLine": "Slide {slide} {path}: {src} ({message})",
+    "sample.audioTitle": "Audio Playback",
+    "sample.audioCaption": "Double-click the audio block to replace it"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "action.pickAudio": "音声を選択",
+    "insert.audio": "音声",
+    "insert.audio.title": "音声を挿入、またはキャンバスへドラッグ",
+    "panel.audio": "音声",
+    "field.audioSrc": "音声 URL または Data URI",
+    "layout.audio": "音声",
+    "canvas.audio": "音声",
+    "toast.audioAdded": "音声を追加しました",
+    "toast.assetsEmbedded": "{count} 個の外部アセットを単一ファイルに埋め込みました",
+    "alert.assetPackageFailed": "保存前にすべてのアセットを単一ファイルへ埋め込む必要がありますが、次のアセットを読み込めませんでした:\n{details}\nローカルファイルを選ぶか、アクセス可能な URL に変更してください。",
+    "asset.failureLine": "{slide} 枚目 {path}: {src} ({message})",
+    "sample.audioTitle": "音声再生",
+    "sample.audioCaption": "音声をダブルクリックして差し替え"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "action.pickAudio": "오디오 선택",
+    "insert.audio": "오디오",
+    "insert.audio.title": "오디오를 삽입하거나 캔버스로 드래그",
+    "panel.audio": "오디오",
+    "field.audioSrc": "오디오 URL 또는 Data URI",
+    "layout.audio": "오디오",
+    "canvas.audio": "오디오",
+    "toast.audioAdded": "오디오가 추가되었습니다",
+    "toast.assetsEmbedded": "외부 자산 {count}개를 단일 파일에 포함했습니다",
+    "alert.assetPackageFailed": "저장하려면 모든 자산을 단일 파일에 포함해야 하지만 다음 자산을 읽을 수 없습니다:\n{details}\n로컬 파일을 선택하거나 접근 가능한 URL로 바꾸세요.",
+    "asset.failureLine": "{slide}번 슬라이드 {path}: {src} ({message})",
+    "sample.audioTitle": "오디오 재생",
+    "sample.audioCaption": "오디오 블록을 더블 클릭해 교체"
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -855,12 +920,13 @@
   function cacheElements() {
     [
       "newDeckBtn", "templatesBtn", "openDeckBtn", "downloadDeckBtn", "saveAsDeckBtn", "jsonBtn", "validateBtn", "presentBtn",
-      "languageInput", "fileInput", "imageFileInput", "videoFileInput", "fileStatus",
+      "languageInput", "fileInput", "imageFileInput", "videoFileInput", "audioFileInput", "fileStatus",
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
+      "audioFileBtn", "audioSrcInput", "audioCaptionInput",
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
@@ -1177,6 +1243,20 @@
     bindSlideInput(els.videoPosterInput, function (slide, value) { slide.video.poster = value; });
     bindSlideInput(els.videoCaptionInput, function (slide, value) { slide.video.caption = value; });
 
+    els.audioFileBtn.addEventListener("click", function () {
+      openAudioPicker();
+    });
+
+    els.audioFileInput.addEventListener("change", function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      readAudioFile(file);
+      event.target.value = "";
+    });
+
+    bindSlideInput(els.audioSrcInput, function (slide, value) { slide.audio.src = value; });
+    bindSlideInput(els.audioCaptionInput, function (slide, value) { slide.audio.caption = value; });
+
     els.presentBtn.addEventListener("click", function () { openPresenter(currentIndex); });
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
@@ -1220,12 +1300,30 @@
     reader.readAsDataURL(file);
   }
 
+  function readAudioFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      commit(function () {
+        var slide = currentSlide();
+        slide.layout = "audio";
+        slide.audio.src = reader.result;
+        if (!slide.audio.caption) slide.audio.caption = file.name.replace(/\.[^.]+$/, "");
+      });
+      toast(t("toast.audioAdded"));
+    };
+    reader.readAsDataURL(file);
+  }
+
   function openImagePicker() {
     els.imageFileInput.click();
   }
 
   function openVideoPicker() {
     els.videoFileInput.click();
+  }
+
+  function openAudioPicker() {
+    els.audioFileInput.click();
   }
 
   function insertComponent(type, options) {
@@ -1236,6 +1334,10 @@
     }
     if (type === "video" && settings.source === "click") {
       openVideoPicker();
+      return;
+    }
+    if (type === "audio" && settings.source === "click") {
+      openAudioPicker();
       return;
     }
 
@@ -1272,6 +1374,13 @@
       slide.video = slide.video || {};
       slide.video.caption = slide.video.caption || t("sample.videoCaption");
       slide.video.fit = slide.video.fit || "cover";
+      return;
+    }
+    if (type === "audio") {
+      slide.layout = "audio";
+      if (!slide.title) slide.title = t("sample.audioTitle");
+      slide.audio = slide.audio || {};
+      slide.audio.caption = slide.audio.caption || t("sample.audioCaption");
       return;
     }
     if (type === "chart") {
@@ -1604,8 +1713,10 @@
     bindCanvasText(".ppt-body", "body");
     bindCanvasText(".ppt-media .ppt-caption", "image.caption", { singleLine: true });
     bindCanvasText(".ppt-video .ppt-caption", "video.caption", { singleLine: true });
+    bindCanvasText(".ppt-audio .ppt-caption", "audio.caption", { singleLine: true });
     bindCanvasComponent(".ppt-media", "image", { labelKey: "canvas.image", fileAction: "image" });
     bindCanvasComponent(".ppt-video", "video", { labelKey: "canvas.video", fileAction: "video" });
+    bindCanvasComponent(".ppt-audio", "audio", { labelKey: "canvas.audio", fileAction: "audio" });
     bindCanvasComponent(".ppt-chart-wrap", "chart", { labelKey: "canvas.chart" });
     bindCanvasComponent(".ppt-table", "table", { labelKey: "canvas.table" });
     bindCanvasComponent(".ppt-card-grid", "cards", { labelKey: "canvas.cards" });
@@ -2139,6 +2250,7 @@
       selectCanvasTarget(node);
       if (options.fileAction === "image") openImagePicker();
       else if (options.fileAction === "video") openVideoPicker();
+      else if (options.fileAction === "audio") openAudioPicker();
       else toast(formatText(t("toast.componentSelected"), { name: canvasLabel(options, node.getAttribute("data-canvas-edit")) }));
       return;
     }
@@ -2304,6 +2416,12 @@
     var videoFile = droppedFile(event.dataTransfer, "video/");
     if (videoFile) {
       readVideoFile(videoFile);
+      return;
+    }
+
+    var audioFile = droppedFile(event.dataTransfer, "audio/");
+    if (audioFile) {
+      readAudioFile(audioFile);
     }
   }
 
@@ -2315,13 +2433,17 @@
     return hasFileType(dataTransfer, "video/");
   }
 
+  function hasAudioFile(dataTransfer) {
+    return hasFileType(dataTransfer, "audio/");
+  }
+
   function hasComponentPayload(dataTransfer) {
     if (!dataTransfer || !dataTransfer.types) return false;
     return Array.prototype.indexOf.call(dataTransfer.types, "application/x-htmlppt-component") !== -1;
   }
 
   function hasCanvasDropPayload(dataTransfer) {
-    return hasComponentPayload(dataTransfer) || hasImageFile(dataTransfer) || hasVideoFile(dataTransfer);
+    return hasComponentPayload(dataTransfer) || hasImageFile(dataTransfer) || hasVideoFile(dataTransfer) || hasAudioFile(dataTransfer);
   }
 
   function hasFileType(dataTransfer, prefix) {
@@ -2374,6 +2496,8 @@
     els.videoSrcInput.value = slide.video.src || "";
     els.videoPosterInput.value = slide.video.poster || "";
     els.videoCaptionInput.value = slide.video.caption || "";
+    els.audioSrcInput.value = slide.audio.src || "";
+    els.audioCaptionInput.value = slide.audio.caption || "";
     els.itemsInput.value = stringifyRows(slide.items);
     els.leftTitleInput.value = slide.left.title || "";
     els.leftTextInput.value = slide.left.text || "";
@@ -2398,6 +2522,8 @@
   function updateButtons() {
     els.undoBtn.disabled = !history.length;
     els.redoBtn.disabled = !future.length;
+    els.downloadDeckBtn.disabled = saving;
+    els.saveAsDeckBtn.disabled = saving;
     els.moveSlideUpBtn.disabled = currentIndex <= 0;
     els.moveSlideDownBtn.disabled = currentIndex >= deck.slides.length - 1;
     els.deleteSlideBtn.disabled = deck.slides.length <= 1;
@@ -2451,25 +2577,141 @@
   }
 
   function saveDeck(forceDialog) {
-    var html = PPTHtml.exportStandalone(deck);
-    var name = filenameFromTitle(deck.title);
-    if (desktop && desktop.isDesktop) {
-      var action = forceDialog ? desktop.saveDeckAs : desktop.saveDeck;
-      action({ filePath: currentFilePath, defaultName: name, content: html }).then(function (result) {
-        if (!result || result.canceled) return;
-        currentFilePath = result.filePath || currentFilePath;
-        dirty = false;
-        updateFileStatus();
-        toast(formatText(t("toast.saved"), { name: basename(currentFilePath) }));
-      }).catch(function (error) {
+    if (saving) return;
+    saving = true;
+    setSaveButtonsDisabled(true);
+
+    packageDeckAssets(deck).then(function (result) {
+      deck = result.deck;
+      if (result.count) {
+        renderAll();
+        persist();
+        toast(formatText(t("toast.assetsEmbedded"), { count: result.count }));
+      }
+
+      var html = PPTHtml.exportStandalone(deck);
+      var name = filenameFromTitle(deck.title);
+      if (desktop && desktop.isDesktop) {
+        var action = forceDialog ? desktop.saveDeckAs : desktop.saveDeck;
+        return action({ filePath: currentFilePath, defaultName: name, content: html }).then(function (saveResult) {
+          if (!saveResult || saveResult.canceled) {
+            if (result.count) {
+              dirty = true;
+              updateFileStatus();
+            }
+            return;
+          }
+          currentFilePath = saveResult.filePath || currentFilePath;
+          dirty = false;
+          updateFileStatus();
+          toast(formatText(t("toast.saved"), { name: basename(currentFilePath) }));
+        });
+      }
+
+      PPTHtml.download(name, html);
+      dirty = false;
+      updateFileStatus();
+      toast(t("toast.downloaded"));
+    }).catch(function (error) {
+      if (error && error.assetFailures) {
+        alert(formatText(t("alert.assetPackageFailed"), { details: formatAssetFailureDetails(error.assetFailures) }));
+      } else {
         alert(formatText(t("alert.saveFailed"), { message: error.message }));
+      }
+    }).finally(function () {
+      saving = false;
+      setSaveButtonsDisabled(false);
+    });
+  }
+
+  function setSaveButtonsDisabled(disabled) {
+    els.downloadDeckBtn.disabled = disabled;
+    els.saveAsDeckBtn.disabled = disabled;
+  }
+
+  function packageDeckAssets(sourceDeck) {
+    var nextDeck = PPTHtml.normalizeDeck(sourceDeck);
+    var refs = PPTHtml.collectExternalAssetReferences(nextDeck);
+    if (!refs.length) return Promise.resolve({ deck: nextDeck, count: 0 });
+
+    var failures = [];
+    var completed = 0;
+    var chain = Promise.resolve();
+    refs.forEach(function (ref) {
+      chain = chain.then(function () {
+        return embedAssetReference(ref).then(function (dataUrl) {
+          setAssetReference(nextDeck, ref, dataUrl);
+          completed += 1;
+        }).catch(function (error) {
+          failures.push({ ref: ref, error: error });
+        });
       });
-      return;
+    });
+
+    return chain.then(function () {
+      if (failures.length) {
+        var error = new Error("Asset packaging failed");
+        error.assetFailures = failures;
+        throw error;
+      }
+      return { deck: PPTHtml.normalizeDeck(nextDeck), count: completed };
+    });
+  }
+
+  function embedAssetReference(ref) {
+    if (desktop && desktop.isDesktop && typeof desktop.embedAsset === "function") {
+      return desktop.embedAsset({
+        src: ref.src,
+        kind: ref.kind,
+        path: ref.path,
+        basePath: currentFilePath
+      }).then(function (result) {
+        if (!result || !result.src) throw new Error("Empty embedded asset");
+        return result.src;
+      });
     }
-    PPTHtml.download(name, html);
-    dirty = false;
-    updateFileStatus();
-    toast(t("toast.downloaded"));
+
+    return fetch(ref.src).then(function (response) {
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      return response.blob();
+    }).then(blobToDataUrl);
+  }
+
+  function blobToDataUrl(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result); };
+      reader.onerror = function () { reject(reader.error || new Error("Unable to read asset")); };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function setAssetReference(targetDeck, ref, dataUrl) {
+    var slide = targetDeck.slides[ref.slideIndex];
+    if (!slide) return;
+    if (ref.path.indexOf(".image.src") !== -1) slide.image.src = dataUrl;
+    if (ref.path.indexOf(".video.src") !== -1) slide.video.src = dataUrl;
+    if (ref.path.indexOf(".video.poster") !== -1) slide.video.poster = dataUrl;
+    if (ref.path.indexOf(".audio.src") !== -1) slide.audio.src = dataUrl;
+  }
+
+  function formatAssetFailureDetails(failures) {
+    return failures.map(function (failure) {
+      var ref = failure.ref;
+      var message = failure.error && failure.error.message ? failure.error.message : String(failure.error || "");
+      return formatText(t("asset.failureLine"), {
+        slide: ref.slideNumber,
+        path: ref.path,
+        src: compactSource(ref.src),
+        message: message
+      });
+    }).join("\n");
+  }
+
+  function compactSource(src) {
+    var value = String(src || "");
+    if (value.length <= 96) return value;
+    return value.slice(0, 48) + "..." + value.slice(-24);
   }
 
   function confirmDiscard() {

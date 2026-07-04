@@ -119,6 +119,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 | `data` | 主要指標 | `metrics` |
 | `chart` | 推移、グループ値、構成比 | `chart.kind`、`chart.labels`、`chart.series` |
 | `video` | 製品 demo、インタビュー、画面録画 | `video.src`、`video.poster`、`video.caption` |
+| `audio` | ナレーション、インタビュー音声、ポッドキャスト | `audio.src`、`audio.caption` |
 | `table` | 計画表、比較表 | `table.columns`、`table.rows` |
 | `code` | コード表示 | `code` |
 | `ending` | 終了スライド | `title`、`subtitle` |
@@ -133,6 +134,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 - 数字を強調：`data`。
 - 推移、グループ値、構成比：`chart`。
 - demo、インタビュー、画面録画を見せる：`video`。
+- ナレーション、インタビュー音声、ポッドキャストを再生する：`audio`。
 - 計画や状態を示す：`table`。
 
 ## 5. よく使うフィールド形式
@@ -163,6 +165,24 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 ```
 
 `src` は URL または `data:video/...;base64,...` を使えます。動画ソースが未確定の場合は空にして、人間がエディタでローカル動画を選べるようにします。
+
+音声：
+
+```json
+"audio": {
+  "src": "https://example.com/narration.mp3",
+  "caption": "冒頭ナレーション",
+  "controls": true
+}
+```
+
+`src` は URL または `data:audio/...;base64,...` を使えます。音声ソースが未確定の場合は空にして、人間がエディタでローカル音声を選べるようにします。
+
+アセットのパッケージ規則：
+
+- 最終的な `.ppt.html` は単一ファイルであるべきです。保存またはダウンロード時、アプリは外部 `image.src`、`video.src`、`video.poster`、`audio.src` を Data URI として同梱します。
+- AI はアクセス可能な URL、または直接 Data URI を書けます。
+- 自分の環境にしか存在しない一時ローカルパスを書かないでください。ソースが不明な場合は `src` を空にして、ユーザーがエディタでファイルを選べるようにします。
 
 リストまたはタイムライン：
 

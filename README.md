@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.7
+
+PPT.html Studio now treats `.ppt.html` as a true single-file container. Before saving or downloading, external image, video, video poster, and audio sources are embedded as Data URI assets inside the same HTML file. Audio is also available as a first-class insertable slide component.
+
 ## New in v0.2.6
 
 PPT.html Studio now exposes a real component palette in the main editor. Users can click or drag text, image, video, chart, table, card, metric, timeline, quote, and code components into the current slide. Common toolbar commands are icon-first with hover tooltips, videos are supported as first-class slide content, and the app UI can switch between Chinese, English, Japanese, and Korean.
@@ -96,7 +100,7 @@ npm start
 4. Click `AI JSON` to paste a deck from an AI model. Fenced `json` code blocks are accepted.
 5. Click `Check` and copy the validation report back to AI if anything needs repair.
 6. Click `Present` to preview the deck.
-7. Use `Save / Download`, or desktop `Save As`, to create one shareable `.ppt.html` file.
+7. Use `Save / Download`, or desktop `Save As`, to create one shareable `.ppt.html` file. Images, video, audio, posters, CSS, and player JavaScript are packaged into that one file.
 
 Build the desktop app locally:
 

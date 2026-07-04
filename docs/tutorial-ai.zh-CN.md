@@ -119,6 +119,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 | `data` | 关键指标 | `metrics` |
 | `chart` | 趋势、分组数值、占比 | `chart.kind`、`chart.labels`、`chart.series` |
 | `video` | 产品 demo、访谈、录屏 | `video.src`、`video.poster`、`video.caption` |
+| `audio` | 旁白、采访音频、播客片段 | `audio.src`、`audio.caption` |
 | `table` | 对照表、计划表 | `table.columns`、`table.rows` |
 | `code` | 代码展示 | `code` |
 | `ending` | 结束页 | `title`、`subtitle` |
@@ -133,6 +134,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 需要突出数字：用 `data`。
 - 需要展示趋势、分组数值或占比：用 `chart`。
 - 需要展示 demo、访谈或录屏：用 `video`。
+- 需要播放旁白、采访音频或播客片段：用 `audio`。
 - 需要列明计划和状态：用 `table`。
 
 ## 5. 常用字段格式
@@ -163,6 +165,24 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 ```
 
 `src` 可以是 URL，也可以是 `data:video/...;base64,...`。如果不确定视频来源，可以先留空，让人类在编辑器中选择本地视频。
+
+音频：
+
+```json
+"audio": {
+  "src": "https://example.com/narration.mp3",
+  "caption": "开场旁白",
+  "controls": true
+}
+```
+
+`src` 可以是 URL，也可以是 `data:audio/...;base64,...`。如果不确定音频来源，可以先留空，让人类在编辑器中选择本地音频。
+
+资源打包规则：
+
+- 最终 `.ppt.html` 应该是单文件。保存或下载时，软件会把外部 `image.src`、`video.src`、`video.poster`、`audio.src` 打包为 Data URI。
+- AI 可以先写可访问的 URL，或者直接写 Data URI。
+- 不要写只在你本机存在的临时路径。无法确认资源时，把 `src` 留空，让用户在编辑器中选择文件。
 
 列表或时间线：
 

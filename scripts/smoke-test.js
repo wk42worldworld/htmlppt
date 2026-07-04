@@ -106,6 +106,52 @@ assert.match(videoHtml, /ppt-layout-video/);
 assert.match(videoHtml, /ppt-video/);
 assert.match(videoHtml, /Product demo/);
 
+const audioDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Audio deck",
+  slides: [
+    {
+      layout: "audio",
+      title: "Narration",
+      audio: {
+        src: "data:audio/mpeg;base64,AAAA",
+        caption: "Voiceover"
+      }
+    }
+  ]
+});
+assert.equal(audioDeck.slides[0].layout, "audio");
+assert.equal(ppt.validateDeck(audioDeck).ok, true);
+const audioHtml = ppt.exportStandalone(audioDeck);
+assert.match(audioHtml, /ppt-layout-audio/);
+assert.match(audioHtml, /ppt-audio/);
+assert.match(audioHtml, /Narration/);
+
+const externalAssetDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "External assets",
+  slides: [
+    {
+      layout: "video",
+      title: "Remote media",
+      image: { src: "data:image/png;base64,AAAA" },
+      video: {
+        src: "media/demo.mp4",
+        poster: "https://example.com/poster.png"
+      },
+      audio: { src: "file:///tmp/narration.mp3" }
+    }
+  ]
+});
+const externalRefs = ppt.collectExternalAssetReferences(externalAssetDeck);
+assert.equal(externalRefs.length, 3);
+assert.equal(JSON.stringify(externalRefs.map((item) => item.path)), JSON.stringify([
+  "slides[0].video.src",
+  "slides[0].video.poster",
+  "slides[0].audio.src"
+]));
+assert.equal(ppt.collectExternalAssetReferences(audioDeck).length, 0);
+
 const canvasDeck = ppt.normalizeDeck({
   version: "0.1",
   title: "Canvas deck",
@@ -130,6 +176,7 @@ assert.match(canvasHtml, /420/);
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);
+assert.match(html, /single-file-data-uri-assets/);
 assert.match(html, /F5/);
 assert.match(html, /ArrowDown/);
 assert.match(html, /is-ui-hidden/);

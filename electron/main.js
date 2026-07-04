@@ -2,6 +2,7 @@
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
+const { fileURLToPath } = require("node:url");
 const { app, BrowserWindow, Menu, dialog, ipcMain, nativeImage, shell } = require("electron");
 
 const isMac = process.platform === "darwin";
@@ -90,6 +91,10 @@ function registerIpcHandlers() {
     return saveDeckFromRenderer(event, payload, true);
   });
 
+  ipcMain.handle("asset:embed", async (_event, payload) => {
+    return embedAssetFromRenderer(payload || {});
+  });
+
   ipcMain.handle("window:setFullScreen", async (event, enabled) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) return false;
@@ -116,6 +121,86 @@ async function saveDeckFromRenderer(event, payload, forceDialog) {
 
   await fs.writeFile(filePath, data.content || "", "utf8");
   return { canceled: false, filePath };
+}
+
+async function embedAssetFromRenderer(payload) {
+  const src = String(payload.src || "").trim();
+  if (!src) return { src: "" };
+  if (/^data:/i.test(src)) return { src };
+
+  if (/^https?:\/\//i.test(src)) {
+    const response = await fetch(src);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText || ""}`.trim());
+    }
+    const buffer = Buffer.from(await response.arrayBuffer());
+    const contentType = response.headers.get("content-type") || "";
+    return {
+      src: bufferToDataUrl(buffer, mimeFromSource(src, payload.kind, contentType)),
+      size: buffer.length
+    };
+  }
+
+  const filePath = resolveAssetPath(src, payload.basePath);
+  const buffer = await fs.readFile(filePath);
+  return {
+    src: bufferToDataUrl(buffer, mimeFromSource(filePath, payload.kind, "")),
+    size: buffer.length
+  };
+}
+
+function resolveAssetPath(src, basePath) {
+  if (/^blob:/i.test(src)) {
+    throw new Error("Blob URL cannot be embedded after the app session ends");
+  }
+
+  if (/^file:/i.test(src)) return fileURLToPath(src);
+  if (path.isAbsolute(src)) return src;
+
+  if (!basePath) {
+    throw new Error(`Relative asset has no deck file base path: ${src}`);
+  }
+
+  return path.resolve(path.dirname(basePath), src);
+}
+
+function bufferToDataUrl(buffer, mime) {
+  return `data:${mime || "application/octet-stream"};base64,${buffer.toString("base64")}`;
+}
+
+function mimeFromSource(src, kind, contentType) {
+  const cleanType = String(contentType || "").split(";")[0].trim().toLowerCase();
+  if (cleanType) return cleanType;
+
+  const ext = path.extname(src.split("?")[0].split("#")[0]).toLowerCase();
+  const table = {
+    ".avif": "image/avif",
+    ".bmp": "image/bmp",
+    ".gif": "image/gif",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+    ".webp": "image/webp",
+    ".m4v": "video/mp4",
+    ".mov": "video/quicktime",
+    ".mp4": "video/mp4",
+    ".ogv": "video/ogg",
+    ".webm": "video/webm",
+    ".aac": "audio/aac",
+    ".flac": "audio/flac",
+    ".m4a": "audio/mp4",
+    ".mp3": "audio/mpeg",
+    ".oga": "audio/ogg",
+    ".ogg": "audio/ogg",
+    ".wav": "audio/wav",
+    ".weba": "audio/webm"
+  };
+  if (table[ext]) return table[ext];
+  if (kind === "image") return "image/png";
+  if (kind === "video") return "video/mp4";
+  if (kind === "audio") return "audio/mpeg";
+  return "application/octet-stream";
 }
 
 function buildMenu() {

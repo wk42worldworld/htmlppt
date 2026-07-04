@@ -58,6 +58,18 @@ project-name.ppt.html
     "caption": "",
     "fit": "cover"
   },
+  "video": {
+    "src": "",
+    "poster": "",
+    "caption": "",
+    "fit": "cover",
+    "controls": true
+  },
+  "audio": {
+    "src": "",
+    "caption": "",
+    "controls": true
+  },
   "items": [],
   "cards": [],
   "metrics": [],
@@ -96,9 +108,22 @@ v0.1 支持这些版式：
 - `timeline`：时间线页
 - `data`：数据页
 - `chart`：图表页
+- `video`：视频页
+- `audio`：音频页
 - `table`：表格页
 - `code`：代码页
 - `ending`：结束页
+
+## 单文件资源约定
+
+`.ppt.html` 的分享形态是一个完整 HTML 文件。导出时，渲染器 CSS、播放器 JavaScript 和 deck JSON 都会写入同一个文件；编辑器保存前会尝试把外部媒体资源打包为 Data URI：
+
+- `image.src`
+- `video.src`
+- `video.poster`
+- `audio.src`
+
+AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，让人类在编辑器里选择本地文件。不要输出只在某台机器上有效的临时路径。
 
 ## Image Fields
 
@@ -108,6 +133,26 @@ v0.1 支持这些版式：
 - `alt`：替代文字，便于无障碍和 AI 理解图片内容。
 - `caption`：图片说明，会显示在图片上。
 - `fit`：图片适配方式，`cover` 表示填充裁切，`contain` 表示完整显示。
+
+## Video Fields
+
+`video` 支持：
+
+- `src`：视频 URL 或 `data:video/...` Data URI。
+- `poster`：封面图 URL 或 `data:image/...` Data URI。
+- `caption`：视频说明。
+- `fit`：视频适配方式，`cover` 或 `contain`。
+- `controls`：是否显示浏览器原生播放控件。
+- `autoplay`、`loop`、`muted`：可选播放行为。
+
+## Audio Fields
+
+`audio` 支持：
+
+- `src`：音频 URL 或 `data:audio/...` Data URI。
+- `caption`：音频说明。
+- `controls`：是否显示浏览器原生播放控件。
+- `autoplay`、`loop`、`muted`：可选播放行为。
 
 ## Chart Fields
 

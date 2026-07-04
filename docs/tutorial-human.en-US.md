@@ -136,13 +136,14 @@ The left slide rail supports:
 
 Delete is disabled when only one slide remains, so the deck cannot become empty.
 
-## 7. Add Images, Data, Charts, Tables, and Code
+## 7. Add Images, Video, Audio, Data, Charts, Tables, and Code
 
 The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas:
 
 - `Text`: creates a normal text slide.
 - `Image`: click to choose a local image; drag to create an image slide placeholder.
 - `Video`: click to choose a local video; drag to create a video slide placeholder.
+- `Audio`: click to choose a local audio file; drag to create an audio slide placeholder.
 - `Chart`, `Table`, `Cards`, `Data`, `Timeline`, `Quote`, and `Code`: switch the current slide to the matching layout and add editable starter content.
 
 After inserting a component, continue editing it in the right panel, or double-click text, drag components, and resize them directly on the canvas.
@@ -156,6 +157,12 @@ Images:
 5. Add alt text and an optional caption.
 
 You can also drag an image file onto the center canvas. If the current slide is not an image layout, the app switches it to `imageRight` and embeds the image into the current `.ppt.html` file.
+
+Video and audio:
+
+1. Click `Video` or `Audio` in the insert palette and choose a local file.
+2. The app converts the media to a Data URI and stores it inside the same `.ppt.html`.
+3. You can also paste a URL in the right panel. Before saving or downloading, the app tries to package reachable URLs into the single file. If a resource cannot be read, saving stops and the missing resource is listed.
 
 Data slides:
 
@@ -297,12 +304,14 @@ Browser version:
 
 - Click `Save / Download`.
 - The browser downloads a `.ppt.html` file.
+- Before saving, external images, videos, audio, video posters, and player dependencies are packaged into the HTML. If saving succeeds, sharing that one file is enough.
 
 Desktop app:
 
 - `Save`: save to the current file.
 - `Save As`: choose a new location.
 - Shortcut: `Ctrl/Cmd+S`.
+- The desktop app uses the same packaging step. If a URL or local path cannot be read, fix that asset and save again.
 
 Sharing:
 
