@@ -230,10 +230,14 @@ Click `Present` in the top bar.
 
 During presentation:
 
+- Press `F5` to start from the first slide.
+- Press `Shift+F5` to start from the current slide.
 - Click `Previous` / `Next`.
-- Use the left and right arrow keys.
-- Press Space to advance.
-- Click `Exit` to return to the editor.
+- Use arrow keys, `PageUp`, and `PageDown` to move.
+- Press Space, `Enter`, or `N` to advance.
+- Press `P` or `Backspace` to go back.
+- Press `Home` / `End` to jump to the first or last slide.
+- Click `Exit` or press `Esc` to return to the editor.
 
 Before sharing a deck, play through it once from beginning to end.
 

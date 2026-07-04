@@ -61,6 +61,7 @@
         if (command === "save") saveDeck(false);
         if (command === "saveAs") saveDeck(true);
         if (command === "validate") showValidationDialog();
+        if (command === "presentFromStart") openPresenter(0);
         if (command === "present") openPresenter(currentIndex);
       });
     }
@@ -268,38 +269,92 @@
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
     els.presentExitBtn.addEventListener("click", closePresenter);
 
-    document.addEventListener("keydown", function (event) {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
-        event.preventDefault();
-        saveDeck(event.shiftKey);
-        return;
-      }
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "o") {
-        event.preventDefault();
-        openDeck();
-        return;
-      }
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "n") {
-        event.preventDefault();
-        createNewDeck();
-        return;
-      }
-      if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
-        event.preventDefault();
-        if (event.shiftKey) redo();
-        else undo();
-      }
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "y") {
-        event.preventDefault();
-        redo();
-      }
-      if (presenting) {
-        if (event.key === "Escape") closePresenter();
-        if (event.key === "ArrowRight" || event.key === " " || event.key === "PageDown") showPresentationSlide(presentIndex + 1);
-        if (event.key === "ArrowLeft" || event.key === "PageUp") showPresentationSlide(presentIndex - 1);
-      }
-    });
+    document.addEventListener("keydown", handleGlobalKeydown);
+  }
+
+  function handleGlobalKeydown(event) {
+    var key = event.key;
+    var lowerKey = key.toLowerCase();
+    var commandKey = event.metaKey || event.ctrlKey;
+
+    if (key === "F5") {
+      event.preventDefault();
+      openPresenter(event.shiftKey ? currentIndex : 0);
+      return;
+    }
+
+    if (commandKey && key === "Enter") {
+      event.preventDefault();
+      openPresenter(currentIndex);
+      return;
+    }
+
+    if (commandKey && lowerKey === "s") {
+      event.preventDefault();
+      saveDeck(event.shiftKey);
+      return;
+    }
+    if (commandKey && lowerKey === "o") {
+      event.preventDefault();
+      openDeck();
+      return;
+    }
+    if (commandKey && lowerKey === "n") {
+      event.preventDefault();
+      createNewDeck();
+      return;
+    }
+
+    if (presenting && handlePresenterShortcut(event)) return;
+    if (isTextEditingTarget(event.target)) return;
+
+    if (commandKey && lowerKey === "z") {
+      event.preventDefault();
+      if (event.shiftKey) redo();
+      else undo();
+    }
+    if (commandKey && lowerKey === "y") {
+      event.preventDefault();
+      redo();
+    }
+  }
+
+  function handlePresenterShortcut(event) {
+    var key = event.key;
+    var nextKeys = ["ArrowRight", "ArrowDown", " ", "Enter", "PageDown", "n", "N"];
+    var previousKeys = ["ArrowLeft", "ArrowUp", "PageUp", "Backspace", "p", "P"];
+
+    if (key === "Escape") {
+      event.preventDefault();
+      closePresenter();
+      return true;
+    }
+    if (nextKeys.indexOf(key) !== -1) {
+      event.preventDefault();
+      showPresentationSlide(presentIndex + 1);
+      return true;
+    }
+    if (previousKeys.indexOf(key) !== -1) {
+      event.preventDefault();
+      showPresentationSlide(presentIndex - 1);
+      return true;
+    }
+    if (key === "Home") {
+      event.preventDefault();
+      showPresentationSlide(0);
+      return true;
+    }
+    if (key === "End") {
+      event.preventDefault();
+      showPresentationSlide(deck.slides.length - 1);
+      return true;
+    }
+
+    return false;
+  }
+
+  function isTextEditingTarget(target) {
+    return target && /INPUT|TEXTAREA|SELECT/.test(target.tagName);
   }
 
   function bindDeckInput(input, setter) {
@@ -625,6 +680,8 @@
     presenting = false;
     els.presenter.hidden = true;
     document.body.classList.remove("is-presenting");
+    currentIndex = clamp(presentIndex, 0, deck.slides.length - 1);
+    renderAll();
   }
 
   function loadInitialDeck() {

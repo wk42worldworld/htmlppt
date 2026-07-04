@@ -160,8 +160,13 @@ function buildMenu() {
           click: () => sendCommand("validate")
         },
         {
-          label: "Present",
-          accelerator: "CmdOrCtrl+Enter",
+          label: "Start Presentation",
+          accelerator: "F5",
+          click: () => sendCommand("presentFromStart")
+        },
+        {
+          label: "Present From Current Slide",
+          accelerator: "Shift+F5",
           click: () => sendCommand("present")
         },
         { type: "separator" },

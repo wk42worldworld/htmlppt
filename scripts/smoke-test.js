@@ -40,6 +40,8 @@ assert.match(ppt.formatValidationReport(badDeck, badResult), /AI repair instruct
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);
+assert.match(html, /F5/);
+assert.match(html, /ArrowDown/);
 
 const fencedDeck = ppt.parseFileText("```json\n" + JSON.stringify(ppt.createTemplateDeck("lesson")) + "\n```");
 assert.equal(fencedDeck.title, "课程课件");

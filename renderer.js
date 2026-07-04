@@ -765,8 +765,9 @@
       "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
       "function fit(){var sc=Math.min(window.innerWidth/w,(window.innerHeight-72)/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
       "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';stage.appendChild(slide(arr(d.slides)[i]||{}));count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit()}" +
-      "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=function(){document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()};" +
-      "document.addEventListener('keydown',function(ev){if(ev.key==='ArrowRight'||ev.key===' '||ev.key==='PageDown')show(i+1);if(ev.key==='ArrowLeft'||ev.key==='PageUp')show(i-1);if(ev.key==='Home')show(0);if(ev.key==='End')show(arr(d.slides).length-1)});" +
+      "function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}" +
+      "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;" +
+      "document.addEventListener('keydown',function(ev){var k=ev.key;if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();show(i-1);return}if(k==='Home'){ev.preventDefault();show(0);return}if(k==='End'){ev.preventDefault();show(arr(d.slides).length-1)}});" +
       "window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\\D/g,''),10)-1||0);" +
       "})();";
   }
