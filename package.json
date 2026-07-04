@@ -1,6 +1,6 @@
 {
   "name": "htmlppt",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PPT.html Studio: an AI-friendly, human-editable presentation format and editor.",
   "main": "electron/main.js",
   "homepage": "https://github.com/wk42worldworld/htmlppt#readme",
@@ -12,7 +12,7 @@
     "url": "https://github.com/wk42worldworld/htmlppt/issues"
   },
   "license": "MIT",
-  "author": "PPT.html contributors",
+  "author": "PPT.html contributors <wk42worldworld@users.noreply.github.com>",
   "private": false,
   "scripts": {
     "start": "electron .",
@@ -65,6 +65,9 @@
     "linux": {
       "icon": "build/icon.png",
       "category": "Office",
+      "desktopName": "htmlppt",
+      "syncDesktopName": true,
+      "maintainer": "PPT.html contributors <wk42worldworld@users.noreply.github.com>",
       "target": [
         "AppImage",
         "deb"
