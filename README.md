@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.10
+
+PPT.html Studio now has a clearer first-run experience: a new recognizable HTML slide icon, real favicons in the editor and exported standalone `.ppt.html` files, a wider default desktop window, less cramped 1280px layout columns, a cleaner current-slide action bar, and earlier Electron app identity setup to reduce default Electron branding during launch.
+
 ## New in v0.2.9
 
 PPT.html Studio now has a first object style inspector. Click text, text boxes, cards, table cells, metrics, chart legends, or media blocks on the canvas, then adjust font size, text color, alignment, bold, italic, background, border, radius, and opacity in the right panel. These edits are saved as structured `styles[path]` data, preserved in exported `.ppt.html` files, and remain readable for AI agents.

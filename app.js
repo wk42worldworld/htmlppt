@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.9";
+  var APP_VERSION_LABEL = "v0.2.10";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
@@ -4177,7 +4177,7 @@
 
   function setButtonUnavailable(button, unavailable) {
     if (!button) return;
-    button.disabled = false;
+    button.disabled = Boolean(unavailable);
     button.classList.toggle("is-disabled", Boolean(unavailable));
     button.setAttribute("aria-disabled", unavailable ? "true" : "false");
   }
@@ -4317,8 +4317,8 @@
 
   function fitFrame(frame, viewport) {
     if (!frame || !viewport) return;
-    var availableWidth = viewport.clientWidth - 24;
-    var availableHeight = viewport.clientHeight - 24;
+    var availableWidth = viewport.clientWidth - 16;
+    var availableHeight = viewport.clientHeight - 16;
     var scale = Math.min(availableWidth / PPTHtml.baseWidth, availableHeight / PPTHtml.baseHeight);
     scale = Math.max(0.1, Math.min(scale, 1.3));
     frame.style.width = PPTHtml.baseWidth + "px";

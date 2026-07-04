@@ -104,10 +104,41 @@ button.danger {
   place-items: center;
   width: 34px;
   height: 34px;
-  border-radius: 7px;
-  color: #fff;
-  background: #1f2725;
-  font-weight: 880;
+  overflow: hidden;
+  border-radius: 9px;
+  color: #14212a;
+  background: linear-gradient(135deg, #121a23, #0f8b8d);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .2);
+}
+
+.brand-mark svg {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.brand-mark .logo-bg {
+  fill: url("#brandLogoGradient");
+}
+
+.brand-mark .logo-card {
+  fill: #f8fbff;
+}
+
+.brand-mark .logo-bar {
+  fill: #0f8b8d;
+}
+
+.brand-mark .logo-code {
+  fill: none;
+  stroke: #17202a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.brand-mark .logo-play {
+  fill: #ffb000;
 }
 
 .brand strong,
@@ -232,11 +263,17 @@ button.danger {
 }
 
 .rail-tools {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   padding: 12px;
   border-top: 1px solid var(--ui-line);
+}
+
+.rail-tools button.icon-button {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
 }
 
 .workspace {
@@ -1040,12 +1077,40 @@ button.primary {
 .brand-mark {
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(255, 255, 255, .13);
-  border-radius: 10px;
-  color: #0d1117;
-  background: #f7fbff;
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 11px;
+  color: #17202a;
+  background: linear-gradient(135deg, #121a23, #0f8b8d 62%, #356dff);
   box-shadow: 0 12px 24px rgba(0, 0, 0, .22);
-  font-weight: 900;
+}
+
+.brand-mark svg {
+  width: 34px;
+  height: 34px;
+}
+
+.brand-mark .logo-bg {
+  fill: url("#brandLogoGradient");
+}
+
+.brand-mark .logo-card {
+  fill: #f8fbff;
+}
+
+.brand-mark .logo-bar {
+  fill: #0f8b8d;
+}
+
+.brand-mark .logo-code {
+  fill: none;
+  stroke: #17202a;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.brand-mark .logo-play {
+  fill: #ffb000;
 }
 
 .brand small {
@@ -1077,7 +1142,7 @@ button.primary {
 }
 
 .main-layout {
-  grid-template-columns: 236px minmax(540px, 1fr) 360px;
+  grid-template-columns: 216px minmax(560px, 1fr) 320px;
   background: var(--ui-bg);
 }
 
@@ -1161,8 +1226,25 @@ button.primary {
 }
 
 .rail-tools {
-  padding: 12px 11px 14px;
-  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--ui-line);
+  background: linear-gradient(#fff, #f8fafc);
+}
+
+.rail-tools button.icon-button {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+  height: 36px;
+  border-radius: 9px;
+}
+
+.rail-tools button.danger {
+  color: #b42318;
+  background: linear-gradient(#fff, #fff7f6);
 }
 
 .workspace {
@@ -1175,7 +1257,7 @@ button.primary {
 }
 
 .stage-viewport {
-  padding: 28px;
+  padding: 20px;
   background:
     linear-gradient(rgba(15, 23, 42, .04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(15, 23, 42, .04) 1px, transparent 1px),
@@ -1463,7 +1545,7 @@ button[hidden] {
 }
 
 .main-layout {
-  grid-template-columns: 236px 86px minmax(540px, 1fr) 360px;
+  grid-template-columns: 216px 86px minmax(560px, 1fr) 320px;
 }
 
 .insert-dock {
@@ -1545,9 +1627,9 @@ button[hidden] {
   cursor: grabbing;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1280px) {
   .main-layout {
-    grid-template-columns: 206px 76px minmax(430px, 1fr) 326px;
+    grid-template-columns: 192px 76px minmax(0, 1fr) 292px;
   }
 
   .insert-tool {

@@ -20,19 +20,32 @@ function configureAppIdentity() {
     app.setAppUserModelId("world.wk42.htmlppt");
   }
 
+  if (isMac && typeof app.setAboutPanelOptions === "function") {
+    app.setAboutPanelOptions({
+      applicationName: appName,
+      applicationVersion: app.getVersion(),
+      iconPath: appIconPath()
+    });
+  }
+
   if (isMac && app.dock) {
-    const dockIcon = nativeImage.createFromPath(appIconPath());
-    if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
+    try {
+      const dockIcon = nativeImage.createFromPath(appIconPath());
+      if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
+    } catch (error) {
+      console.warn("Unable to set PPT.html dock icon:", error.message);
+    }
   }
 }
 
 function createWindow() {
   const window = new BrowserWindow({
-    width: 1280,
-    height: 820,
+    width: 1440,
+    height: 900,
     minWidth: 960,
     minHeight: 680,
-    backgroundColor: "#e9ecef",
+    show: false,
+    backgroundColor: "#f4f7fb",
     title: appName,
     icon: appIconPath(),
     webPreferences: {
@@ -43,7 +56,14 @@ function createWindow() {
     }
   });
 
-  window.loadFile(path.join(__dirname, "..", "index.html"));
+  window.once("ready-to-show", () => {
+    if (!window.isDestroyed()) window.show();
+  });
+
+  window.loadFile(path.join(__dirname, "..", "index.html")).catch((error) => {
+    console.error("Unable to load PPT.html Studio:", error);
+    if (!window.isDestroyed()) window.show();
+  });
 
   window.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
@@ -317,6 +337,8 @@ function buildMenu() {
 
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
+
+configureAppIdentity();
 
 app.whenReady().then(() => {
   configureAppIdentity();

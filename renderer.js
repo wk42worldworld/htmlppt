@@ -7,6 +7,8 @@
   var THEMES = ["paper", "launch", "studio", "boardroom"];
   var CHART_KINDS = ["bar", "line", "donut"];
   var TRANSITIONS = ["none", "fade", "slide", "push", "zoom"];
+  var STANDALONE_FAVICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><defs><linearGradient id=\"g\" x1=\"8\" y1=\"6\" x2=\"56\" y2=\"58\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#121a23\"/><stop offset=\".62\" stop-color=\"#0f8b8d\"/><stop offset=\"1\" stop-color=\"#356dff\"/></linearGradient></defs><rect width=\"64\" height=\"64\" rx=\"14\" fill=\"url(#g)\"/><rect x=\"12\" y=\"12\" width=\"40\" height=\"38\" rx=\"7\" fill=\"#f8fbff\"/><rect x=\"16\" y=\"16\" width=\"32\" height=\"7\" rx=\"3\" fill=\"#0f8b8d\"/><path d=\"m27 29-6 6 6 6m10-12 6 6-6 6\" fill=\"none\" stroke=\"#17202a\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M42 29 51 35 42 41z\" fill=\"#ffb000\"/></svg>";
+  var STANDALONE_FAVICON = "data:image/svg+xml," + encodeURIComponent(STANDALONE_FAVICON_SVG);
 
   var LAYOUTS = [
     ["hero", "封面"],
@@ -1555,7 +1557,7 @@
       "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
       "  <meta name=\"ppt-html-packaging\" content=\"single-file-data-uri-assets\">\n" +
       "  <title>" + title + "</title>\n" +
-      "  <link rel=\"icon\" href=\"data:,\">\n" +
+      "  <link rel=\"icon\" type=\"image/svg+xml\" href=\"" + STANDALONE_FAVICON + "\">\n" +
       "  <style>\n" + SLIDE_CSS + "\n" +
       "    html,body{margin:0;min-height:100%;background:#101214;color:#f4f4f4;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:0}\n" +
       "    #ppt-player-root{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden;background:#101214}\n" +
