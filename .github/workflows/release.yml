@@ -54,9 +54,58 @@ jobs:
       - name: Verify source
         run: npm test
 
-      - name: Build desktop app
+      - name: Configure unsigned signing fallback
+        if: runner.os != 'macOS'
+        run: echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+
+      - name: Configure macOS signing and notarization
+        if: runner.os == 'macOS'
         env:
-          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          MAC_CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          signing_enabled=false
+          notarization_enabled=false
+
+          if [ -n "$MAC_CERTIFICATE_BASE64" ] && [ -n "$MAC_CERTIFICATE_PASSWORD" ]; then
+            cert_path="$RUNNER_TEMP/mac-signing-cert.p12"
+            node -e "require('fs').writeFileSync(process.argv[1], Buffer.from(process.env.MAC_CERTIFICATE_BASE64, 'base64'))" "$cert_path"
+            echo "CSC_LINK=$cert_path" >> "$GITHUB_ENV"
+            echo "CSC_KEY_PASSWORD=$MAC_CERTIFICATE_PASSWORD" >> "$GITHUB_ENV"
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=true" >> "$GITHUB_ENV"
+            signing_enabled=true
+          else
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            echo "macOS signing certificate secrets are missing; building unsigned macOS artifacts."
+          fi
+
+          if [ "$signing_enabled" = "true" ] && [ -n "$APPLE_API_KEY_BASE64" ] && [ -n "$APPLE_API_KEY_ID" ] && [ -n "$APPLE_API_ISSUER" ]; then
+            api_key_path="$RUNNER_TEMP/AuthKey_${APPLE_API_KEY_ID}.p8"
+            node -e "require('fs').writeFileSync(process.argv[1], Buffer.from(process.env.APPLE_API_KEY_BASE64, 'base64'))" "$api_key_path"
+            chmod 600 "$api_key_path"
+            echo "APPLE_API_KEY=$api_key_path" >> "$GITHUB_ENV"
+            echo "APPLE_API_KEY_ID=$APPLE_API_KEY_ID" >> "$GITHUB_ENV"
+            echo "APPLE_API_ISSUER=$APPLE_API_ISSUER" >> "$GITHUB_ENV"
+            notarization_enabled=true
+          elif [ "$signing_enabled" = "true" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "APPLE_ID=$APPLE_ID" >> "$GITHUB_ENV"
+            echo "APPLE_APP_SPECIFIC_PASSWORD=$APPLE_APP_SPECIFIC_PASSWORD" >> "$GITHUB_ENV"
+            echo "APPLE_TEAM_ID=$APPLE_TEAM_ID" >> "$GITHUB_ENV"
+            notarization_enabled=true
+          else
+            echo "macOS notarization secrets are missing or signing is disabled; notarization will be skipped."
+          fi
+
+          echo "MAC_SIGNING_ENABLED=$signing_enabled" >> "$GITHUB_ENV"
+          echo "MAC_NOTARIZATION_ENABLED=$notarization_enabled" >> "$GITHUB_ENV"
+
+      - name: Build desktop app
         run: npm run dist -- ${{ matrix.target }} ${{ matrix.arch }} --publish never
 
       - name: Upload build artifact

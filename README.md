@@ -37,6 +37,10 @@ Product roadmap:
 
 - [中文路线图](docs/roadmap.zh-CN.md)
 
+Release operations:
+
+- [macOS 签名与公证指南](docs/macos-notarization.zh-CN.md)
+
 ## Quick Start
 
 Run the browser editor:
