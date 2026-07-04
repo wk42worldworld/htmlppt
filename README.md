@@ -15,16 +15,18 @@ The key idea stays the same: AI writes clean structure, humans make judgment cal
 - [日本語ホーム](docs/home.ja-JP.md)
 - [한국어 홈](docs/home.ko-KR.md)
 
-## Tutorials
+## Detailed Tutorials
 
-Human-friendly tutorials:
+The tutorial pages are written as clear, chaptered guides in four languages.
+
+Human-friendly manuals cover installation, templates, visual editing, AI JSON import, validation, presentation, saving, sharing, and troubleshooting:
 
 - [中文教程](docs/tutorial-human.zh-CN.md)
 - [English Tutorial](docs/tutorial-human.en-US.md)
 - [日本語チュートリアル](docs/tutorial-human.ja-JP.md)
 - [한국어 튜토리얼](docs/tutorial-human.ko-KR.md)
 
-AI-friendly authoring guides:
+AI and agent authoring guides cover the JSON contract, deck structure, layout selection, field formats, validation-report repair flow, complete examples, reusable prompts, and common mistakes:
 
 - [中文 AI 指南](docs/tutorial-ai.zh-CN.md)
 - [English AI Guide](docs/tutorial-ai.en-US.md)

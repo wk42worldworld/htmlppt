@@ -1,10 +1,43 @@
 # Human Tutorial
 
-This guide is for users who do not want to write code. The goal is to create a `.ppt.html` deck that can be played, shared, and edited again.
+This tutorial is for people who do not want to write code. The goal is to create a `.ppt.html` deck that can be presented, shared, and edited again.
 
-## 1. Open the Editor
+## Table of Contents
 
-Run locally:
+1. Understand the PPT.html workflow
+2. Open the editor
+3. Start from a template
+4. Edit deck information and theme
+5. Edit slide content
+6. Manage slide order
+7. Add images, data, tables, and code
+8. Draft with AI JSON
+9. Repair issues with validation reports
+10. Present the deck
+11. Save, share, and edit again
+12. Troubleshooting
+
+## 1. Understand the PPT.html Workflow
+
+PPT.html Studio separates a deck into three layers:
+
+- Content: titles, subtitles, body text, lists, images, metrics, tables, and code.
+- Layout: stable slide templates such as cover, comparison, cards, data, and tables.
+- Playback: the app renders structured content into browser-ready HTML slides.
+
+You do not need to write HTML. You also do not need to manually drag dozens of text boxes like in a traditional slide editor. Edit content, choose layouts, validate the deck, and save one `.ppt.html` file.
+
+## 2. Open the Editor
+
+There are two ways to use PPT.html Studio.
+
+Desktop app:
+
+1. Download the package for your system from GitHub Releases.
+2. Launch PPT.html Studio.
+3. Use the desktop app for serious editing because it supports open, save, and save as.
+
+Browser development version:
 
 ```bash
 npm install
@@ -17,41 +50,119 @@ Open:
 http://localhost:5173
 ```
 
-You can also download the desktop app from GitHub Releases and launch PPT.html Studio directly.
+The browser version is useful for previewing and development. Saving from the browser downloads a new file.
 
-## 2. Start From a Template
+## 3. Start From a Template
 
-Click `Templates` and choose a product pitch, lesson, project update, or demo deck. The template creates a complete draft that you can replace with your own content.
+Click `Templates` in the top bar and choose one starter:
 
-## 3. Edit the First Slide
+- AI Director Camera: a product demo example.
+- Product Pitch: for product introductions, launches, and pitches.
+- Lesson: for classes and training materials.
+- Project Update: for status reports, milestones, risks, and decisions.
 
-Select slide 1 on the left, then edit these fields on the right:
+After you choose a template, slides appear on the left, the current slide appears in the center, and editable fields appear on the right.
 
-- Deck title
-- Theme
-- Kicker
-- Title
-- Subtitle
+For a first test, choose `Project Update`. It includes a cover, data slide, table, comparison, and closing slide.
 
-The slide canvas updates immediately.
+## 4. Edit Deck Information and Theme
 
-## 4. Add and Arrange Slides
+Use the `Deck` section in the right panel:
 
-In the left slide rail you can:
+- Title: used as the default file name when saving.
+- Theme: controls the visual style of the whole deck.
 
-- Click `+` to add a slide
-- Click a thumbnail to switch slides
-- Use duplicate, move up, move down, and delete
+Available themes:
 
-Each slide can use a layout such as hero, comparison, three cards, data, table, or code.
+- `Paper`: light and clean, good for lessons and document-like reports.
+- `Launch`: dark and high-contrast, good for demos and presentations.
+- `Studio`: modern tool-like style, good for product and design work.
+- `Boardroom`: formal and restrained, good for business updates.
 
-For image slides, click `Choose local image` to embed an image into the `.ppt.html` file.
+The canvas updates immediately when you change the theme.
 
-## 5. Import AI JSON
+## 5. Edit Slide Content
+
+Click any slide in the left rail. The `Slide` section shows fields for the current slide:
+
+- Layout: decides how the slide is arranged.
+- Kicker: a small label such as `Problem`, `Plan`, or `Demo`.
+- Title: the most important sentence on the slide.
+- Subtitle: supporting copy.
+- Body: longer explanation.
+- Notes: private speaker notes.
+
+Different layouts reveal different fields:
+
+- `compare` shows left and right titles and text.
+- `threeCards` shows card content.
+- `data` shows metrics.
+- `table` shows columns and rows.
+- `code` shows a code field.
+
+Editing tips:
+
+- Keep one main point per slide.
+- Keep titles short.
+- Use 3 to 6 list items.
+- Use 1 to 3 metrics on data slides.
+- Split overloaded slides into multiple slides.
+
+## 6. Manage Slide Order
+
+The left slide rail supports:
+
+- `+`: add a new slide after the current one.
+- `Duplicate`: copy the current slide.
+- `Move Up` / `Move Down`: reorder slides.
+- `Delete`: remove the current slide.
+- Click a thumbnail: switch slides.
+
+Delete is disabled when only one slide remains, so the deck cannot become empty.
+
+## 7. Add Images, Data, Tables, and Code
+
+Images:
+
+1. Change the layout to `hero`, `imageRight`, or `imageLeft`.
+2. Click `Choose local image`.
+3. The image is embedded into the `.ppt.html` file as a Data URI.
+
+Data slides:
+
+In the `data` layout, write one metric per line:
+
+```text
+72% | Progress | Core workflow is complete
+2 | Key risks | Resources and release window
+1 | Decision | Whether to expand the pilot
+```
+
+Tables:
+
+Columns use `|` separators:
+
+```text
+Stage | Time | Status
+```
+
+Rows use the same format:
+
+```text
+Requirements | Week 1 | Done
+Prototype | Week 2 | In progress
+Pilot | Week 4 | Not started
+```
+
+Code:
+
+Switch the layout to `code` and paste code into the code field.
+
+## 8. Draft With AI JSON
 
 Click `AI JSON`, paste deck JSON generated by an AI model, then click `Load from text`.
 
-Minimal example:
+PPT.html Studio accepts raw JSON:
 
 ```json
 {
@@ -70,22 +181,115 @@ Minimal example:
 }
 ```
 
-After import, click `Check`. If the report shows errors or warnings, copy it back to the AI model and ask it to repair the JSON.
+It also accepts fenced `json` code blocks:
 
-## 6. Present
+````markdown
+```json
+{
+  "version": "0.1",
+  "title": "My Deck",
+  "theme": "launch",
+  "slides": []
+}
+```
+````
+
+Useful prompt for AI:
+
+```text
+Generate deck JSON for PPT.html Studio.
+Topic: my project update
+Length: 5 slides
+Tone: formal and concise
+Use version 0.1. Do not output free-form HTML.
+```
+
+## 9. Repair Issues With Validation Reports
+
+After importing AI JSON, click `Check`.
+
+The validation report tells you:
+
+- Whether the deck can be shared.
+- How many errors, warnings, and tips were found.
+- Which field needs attention.
+- How an AI model should repair it.
+
+If the report contains `ERROR`:
+
+1. Click `Copy Report`.
+2. Paste the report back to the AI model.
+3. Ask it to repair the deck and return full deck JSON.
+4. Load the fixed JSON in the `AI JSON` panel.
+
+If the report only contains `WARNING` or `TIP`, the deck usually still plays, but it is worth improving.
+
+## 10. Present the Deck
 
 Click `Present` in the top bar.
 
-During presentation you can:
+During presentation:
 
-- Click previous and next
-- Use the left and right arrow keys
-- Exit back to the editor
+- Click `Previous` / `Next`.
+- Use the left and right arrow keys.
+- Press Space to advance.
+- Click `Exit` to return to the editor.
 
-## 7. Save and Share
+Before sharing a deck, play through it once from beginning to end.
 
-In the browser version, click `Save / Download`. In the desktop app, use `Save`, `Save As`, or `Ctrl/Cmd+S`. The file is normal HTML. You can:
+## 11. Save, Share, and Edit Again
 
-- Open it in a browser
-- Send it to other people
-- Open it again in PPT.html Studio for editing
+Browser version:
+
+- Click `Save / Download`.
+- The browser downloads a `.ppt.html` file.
+
+Desktop app:
+
+- `Save`: save to the current file.
+- `Save As`: choose a new location.
+- Shortcut: `Ctrl/Cmd+S`.
+
+Sharing:
+
+- Send the `.ppt.html` file to another person.
+- They can open it directly in a browser.
+- They can also open it again in PPT.html Studio for editing.
+
+## 12. Troubleshooting
+
+### Can the file be opened by double-clicking?
+
+Yes. A `.ppt.html` file is an HTML file and can be opened by a browser.
+
+### Why not generate PPTX directly?
+
+PPTX is complex internally. AI output is often fragile and hard to edit again. PPT.html uses structured JSON, which is easier for AI and humans to maintain together.
+
+### What if AI-generated content fails to import?
+
+Check that:
+
+- The JSON is complete.
+- `version` is `"0.1"`.
+- `slides` is an array.
+- Every slide has `layout` and `title`.
+
+Then use `Check` or paste the error message back to AI.
+
+### Will images be lost?
+
+Images selected with `Choose local image` are embedded into the `.ppt.html` file. If you manually enter an image URL, the receiver must be able to access that URL.
+
+### When should I split a slide?
+
+Split a slide when it has a long title, more than 6 list items, more than 3 core metrics, or a table that feels too wide.
+
+## Final Checklist
+
+- Every slide has a clear title.
+- The slide order supports the story.
+- Metrics and tables are not placeholders.
+- `Check` has been run.
+- The deck has been presented once.
+- The final deck has been saved as `.ppt.html`.
