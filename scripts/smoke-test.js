@@ -91,16 +91,18 @@ const canvasDeck = ppt.normalizeDeck({
       layout: "hero",
       title: "Moved title",
       canvas: {
-        title: { x: 24, y: 36 }
+        title: { x: 24, y: 36, w: 420, h: 90 }
       }
     }
   ]
 });
 assert.equal(canvasDeck.slides[0].canvas.title.x, 24);
+assert.equal(canvasDeck.slides[0].canvas.title.w, 420);
 const canvasHtml = ppt.exportStandalone(canvasDeck);
 assert.match(canvasHtml, /"canvas"/);
 assert.match(canvasHtml, /data-ppt-path/);
 assert.match(canvasHtml, /24/);
+assert.match(canvasHtml, /420/);
 
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);

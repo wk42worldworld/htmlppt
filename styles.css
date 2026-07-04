@@ -291,7 +291,7 @@ button.danger {
 }
 
 .stage-frame [data-canvas-edit] {
-  cursor: text;
+  cursor: grab;
   border-radius: 4px;
   outline: 0 solid transparent;
   outline-offset: 5px;
@@ -318,6 +318,121 @@ button.danger {
   background: rgba(223, 79, 63, .08);
   cursor: grabbing;
   user-select: none;
+}
+
+.stage-frame .canvas-selection-box {
+  position: absolute;
+  z-index: 20;
+  border: 2px solid var(--ui-accent);
+  border-radius: 5px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .7);
+  pointer-events: none;
+}
+
+.stage-frame .canvas-selection-label {
+  position: absolute;
+  left: 0;
+  top: -30px;
+  max-width: 260px;
+  overflow: hidden;
+  padding: 4px 8px;
+  border-radius: 5px;
+  color: #fff;
+  background: var(--ui-accent);
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.stage-frame .canvas-reset-button {
+  position: absolute;
+  right: -2px;
+  top: -36px;
+  height: 26px;
+  padding: 0 9px;
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
+  background: #fff;
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+.stage-frame .canvas-resize-handle {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border: 2px solid var(--ui-accent);
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(16, 18, 20, .22);
+  pointer-events: auto;
+}
+
+.stage-frame .canvas-resize-nw,
+.stage-frame .canvas-resize-se {
+  cursor: nwse-resize;
+}
+
+.stage-frame .canvas-resize-ne,
+.stage-frame .canvas-resize-sw {
+  cursor: nesw-resize;
+}
+
+.stage-frame .canvas-resize-n,
+.stage-frame .canvas-resize-s {
+  cursor: ns-resize;
+}
+
+.stage-frame .canvas-resize-e,
+.stage-frame .canvas-resize-w {
+  cursor: ew-resize;
+}
+
+.stage-frame .canvas-resize-nw {
+  left: -7px;
+  top: -7px;
+}
+
+.stage-frame .canvas-resize-n {
+  left: 50%;
+  top: -7px;
+  transform: translateX(-50%);
+}
+
+.stage-frame .canvas-resize-ne {
+  right: -7px;
+  top: -7px;
+}
+
+.stage-frame .canvas-resize-e {
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.stage-frame .canvas-resize-se {
+  right: -7px;
+  bottom: -7px;
+}
+
+.stage-frame .canvas-resize-s {
+  left: 50%;
+  bottom: -7px;
+  transform: translateX(-50%);
+}
+
+.stage-frame .canvas-resize-sw {
+  left: -7px;
+  bottom: -7px;
+}
+
+.stage-frame .canvas-resize-w {
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .stage-frame .ppt-code.is-canvas-editing {

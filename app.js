@@ -2,7 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
-  var APP_VERSION_LABEL = "v0.2.3";
+  var APP_VERSION_LABEL = "v0.2.4";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var currentIndex = 0;
@@ -18,6 +18,8 @@
   var activeEditPushed = false;
   var activeCanvasEdit = null;
   var activeCanvasDrag = null;
+  var activeCanvasResize = null;
+  var selectedCanvasPath = "";
   var presenterUiTimer = 0;
   var presenterFullscreenActive = false;
 
@@ -33,6 +35,7 @@
     renderAll();
     window.addEventListener("resize", function () {
       fitFrame(els.stageFrame, els.stageViewport);
+      renderCanvasControls();
       if (presenting) fitPresentationFrame(els.presenterStage, els.presenter);
     });
   }
@@ -164,6 +167,7 @@
 
     els.stageFrame.addEventListener("pointerdown", handleCanvasPointerDown);
     els.stageFrame.addEventListener("dblclick", handleCanvasDblClick);
+    els.stageViewport.addEventListener("pointerdown", handleCanvasViewportPointerDown);
     els.stageViewport.addEventListener("dragover", handleCanvasDragOver);
     els.stageViewport.addEventListener("dragenter", handleCanvasDragEnter);
     els.stageViewport.addEventListener("dragleave", handleCanvasDragLeave);
@@ -329,6 +333,7 @@
 
     if (presenting && handlePresenterShortcut(event)) return;
     if (isTextEditingTarget(event.target)) return;
+    if (handleCanvasShortcut(event)) return;
 
     if (commandKey && lowerKey === "z") {
       event.preventDefault();
@@ -527,6 +532,7 @@
 
   function selectSlide(index) {
     if (index === currentIndex) return;
+    selectedCanvasPath = "";
     currentIndex = index;
     renderAll();
   }
@@ -538,6 +544,7 @@
     els.currentSlideLabel.textContent = "第 " + (currentIndex + 1) + " 页";
     els.currentSlideTitle.textContent = currentSlide().title || "未命名页面";
     fitFrame(els.stageFrame, els.stageViewport);
+    renderCanvasControls();
   }
 
   function enhanceCanvasEditing() {
@@ -645,8 +652,10 @@
 
   function handleCanvasPointerDown(event) {
     if (presenting || activeCanvasEdit || event.button !== 0) return;
+    if (event.target.closest(".canvas-selection-box")) return;
     var target = event.target.closest("[data-canvas-edit]");
     if (!target || !els.stageFrame.contains(target)) return;
+    selectCanvasTarget(target);
     activeCanvasDrag = {
       node: target,
       path: target.getAttribute("data-canvas-edit"),
@@ -675,8 +684,11 @@
     event.preventDefault();
     setCanvasOffsetStyle(drag.node, {
       x: clamp(drag.origin.x + dx, -420, 420),
-      y: clamp(drag.origin.y + dy, -240, 240)
+      y: clamp(drag.origin.y + dy, -240, 240),
+      w: drag.origin.w,
+      h: drag.origin.h
     });
+    positionCanvasSelectionBox(drag.node);
   }
 
   function handleCanvasPointerEnd(event) {
@@ -702,6 +714,249 @@
     persist();
   }
 
+  function handleCanvasViewportPointerDown(event) {
+    if (event.target.closest("[data-canvas-edit]") || event.target.closest(".canvas-selection-box")) return;
+    if (!selectedCanvasPath) return;
+    selectedCanvasPath = "";
+    renderCanvasControls();
+  }
+
+  function selectCanvasTarget(node) {
+    var path = node.getAttribute("data-canvas-edit");
+    if (!path) return;
+    selectedCanvasPath = path;
+    renderCanvasControls();
+  }
+
+  function canvasNodeByPath(path) {
+    if (!path) return null;
+    var nodes = els.stageFrame.querySelectorAll("[data-canvas-edit]");
+    for (var index = 0; index < nodes.length; index += 1) {
+      if (nodes[index].getAttribute("data-canvas-edit") === path) return nodes[index];
+    }
+    return null;
+  }
+
+  function renderCanvasControls() {
+    els.stageFrame.querySelectorAll(".canvas-selection-box").forEach(function (box) {
+      box.remove();
+    });
+
+    var node = canvasNodeByPath(selectedCanvasPath);
+    if (!node || activeCanvasEdit) {
+      if (!node) selectedCanvasPath = "";
+      return;
+    }
+
+    var box = document.createElement("div");
+    box.className = "canvas-selection-box";
+    box.setAttribute("data-canvas-selection", selectedCanvasPath);
+
+    var label = document.createElement("span");
+    label.className = "canvas-selection-label";
+    label.textContent = selectedCanvasPath;
+    box.appendChild(label);
+
+    var reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "canvas-reset-button";
+    reset.title = "重置这个元素的位置和尺寸";
+    reset.textContent = "重置";
+    reset.addEventListener("pointerdown", function (event) {
+      event.stopPropagation();
+    });
+    reset.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      resetSelectedCanvasOffset();
+    });
+    box.appendChild(reset);
+
+    ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach(function (handle) {
+      var control = document.createElement("span");
+      control.className = "canvas-resize-handle canvas-resize-" + handle;
+      control.setAttribute("data-canvas-handle", handle);
+      control.setAttribute("title", "拖拽调整尺寸");
+      control.addEventListener("pointerdown", handleCanvasResizePointerDown);
+      box.appendChild(control);
+    });
+
+    els.stageFrame.appendChild(box);
+    positionCanvasSelectionBox(node, box);
+  }
+
+  function getNodeFrameBounds(node) {
+    var scale = currentFrameScale();
+    var nodeRect = node.getBoundingClientRect();
+    var frameRect = els.stageFrame.getBoundingClientRect();
+    return {
+      x: (nodeRect.left - frameRect.left) / scale,
+      y: (nodeRect.top - frameRect.top) / scale,
+      w: nodeRect.width / scale,
+      h: nodeRect.height / scale
+    };
+  }
+
+  function positionCanvasSelectionBox(node, existingBox) {
+    var box = existingBox || els.stageFrame.querySelector(".canvas-selection-box");
+    if (!box || !node) return;
+    var bounds = getNodeFrameBounds(node);
+    box.style.left = bounds.x + "px";
+    box.style.top = bounds.y + "px";
+    box.style.width = Math.max(8, bounds.w) + "px";
+    box.style.height = Math.max(8, bounds.h) + "px";
+  }
+
+  function handleCanvasResizePointerDown(event) {
+    if (presenting || activeCanvasEdit || event.button !== 0) return;
+    var handle = event.currentTarget.getAttribute("data-canvas-handle");
+    var path = selectedCanvasPath;
+    var node = canvasNodeByPath(path);
+    if (!handle || !node) return;
+    event.preventDefault();
+    event.stopPropagation();
+    activeCanvasResize = {
+      node: node,
+      path: path,
+      handle: handle,
+      before: JSON.stringify(deck),
+      startX: event.clientX,
+      startY: event.clientY,
+      scale: currentFrameScale(),
+      origin: getCanvasOffset(path),
+      startBox: getNodeFrameBounds(node),
+      moved: false
+    };
+    node.classList.add("is-canvas-dragging");
+    window.addEventListener("pointermove", handleCanvasResizePointerMove);
+    window.addEventListener("pointerup", handleCanvasResizePointerEnd);
+    window.addEventListener("pointercancel", handleCanvasResizePointerEnd);
+  }
+
+  function handleCanvasResizePointerMove(event) {
+    if (!activeCanvasResize) return;
+    var resize = activeCanvasResize;
+    var dx = (event.clientX - resize.startX) / resize.scale;
+    var dy = (event.clientY - resize.startY) / resize.scale;
+    if (!resize.moved && Math.hypot(dx, dy) < 3) return;
+    resize.moved = true;
+    event.preventDefault();
+
+    var next = {
+      x: resize.origin.x,
+      y: resize.origin.y,
+      w: resize.origin.w || resize.startBox.w,
+      h: resize.origin.h || resize.startBox.h
+    };
+    var handle = resize.handle;
+    var minW = 44;
+    var minH = 24;
+
+    if (handle.indexOf("e") !== -1) next.w = Math.max(minW, resize.startBox.w + dx);
+    if (handle.indexOf("s") !== -1) next.h = Math.max(minH, resize.startBox.h + dy);
+    if (handle.indexOf("w") !== -1) {
+      next.w = Math.max(minW, resize.startBox.w - dx);
+      next.x = resize.origin.x + resize.startBox.w - next.w;
+    }
+    if (handle.indexOf("n") !== -1) {
+      next.h = Math.max(minH, resize.startBox.h - dy);
+      next.y = resize.origin.y + resize.startBox.h - next.h;
+    }
+
+    next.x = clamp(next.x, -420, 420);
+    next.y = clamp(next.y, -240, 240);
+    setCanvasOffsetStyle(resize.node, next);
+    positionCanvasSelectionBox(resize.node);
+  }
+
+  function handleCanvasResizePointerEnd(event) {
+    if (!activeCanvasResize) return;
+    var resize = activeCanvasResize;
+    activeCanvasResize = null;
+    window.removeEventListener("pointermove", handleCanvasResizePointerMove);
+    window.removeEventListener("pointerup", handleCanvasResizePointerEnd);
+    window.removeEventListener("pointercancel", handleCanvasResizePointerEnd);
+    resize.node.classList.remove("is-canvas-dragging");
+    if (!resize.moved) return;
+    event.preventDefault();
+
+    var offset = parseCanvasOffsetStyle(resize.node);
+    if (sameOffset(resize.origin, offset)) return;
+    history.push(resize.before);
+    if (history.length > 80) history.shift();
+    future = [];
+    setCanvasOffset(resize.path, offset);
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+  }
+
+  function handleCanvasShortcut(event) {
+    if (!selectedCanvasPath || presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    var node = canvasNodeByPath(selectedCanvasPath);
+    if (!node) {
+      selectedCanvasPath = "";
+      return false;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      selectedCanvasPath = "";
+      renderCanvasControls();
+      return true;
+    }
+
+    if (event.key === "Delete" || event.key === "Backspace") {
+      event.preventDefault();
+      resetSelectedCanvasOffset();
+      return true;
+    }
+
+    var arrowDelta = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1]
+    }[event.key];
+    if (!arrowDelta) return false;
+
+    event.preventDefault();
+    var step = event.shiftKey ? 10 : 1;
+    var origin = getCanvasOffset(selectedCanvasPath);
+    var next = {
+      x: clamp(origin.x + arrowDelta[0] * step, -420, 420),
+      y: clamp(origin.y + arrowDelta[1] * step, -240, 240),
+      w: origin.w,
+      h: origin.h
+    };
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+    setCanvasOffset(selectedCanvasPath, next);
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+    return true;
+  }
+
+  function resetSelectedCanvasOffset() {
+    if (!selectedCanvasPath) return;
+    var slide = currentSlide();
+    var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
+    if (!canvas[selectedCanvasPath]) return;
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+    delete canvas[selectedCanvasPath];
+    if (!Object.keys(canvas).length) delete slide.canvas;
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+  }
+
   function currentFrameScale() {
     var transform = window.getComputedStyle(els.stageFrame).transform;
     if (!transform || transform === "none") return 1;
@@ -719,20 +974,29 @@
     var offset = canvas[path] || {};
     return {
       x: Number(offset.x) || 0,
-      y: Number(offset.y) || 0
+      y: Number(offset.y) || 0,
+      w: Number(offset.w) || 0,
+      h: Number(offset.h) || 0
     };
   }
 
   function setCanvasOffset(path, offset) {
     var slide = currentSlide();
     slide.canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
-    if (Math.abs(offset.x) < 0.5 && Math.abs(offset.y) < 0.5) {
+    var next = {
+      x: Math.round(Number(offset.x) || 0),
+      y: Math.round(Number(offset.y) || 0),
+      w: Math.max(0, Math.round(Number(offset.w) || 0)),
+      h: Math.max(0, Math.round(Number(offset.h) || 0))
+    };
+    if (Math.abs(next.x) < 1 && Math.abs(next.y) < 1 && next.w < 1 && next.h < 1) {
       delete slide.canvas[path];
     } else {
-      slide.canvas[path] = {
-        x: Math.round(offset.x),
-        y: Math.round(offset.y)
-      };
+      slide.canvas[path] = {};
+      if (next.x) slide.canvas[path].x = next.x;
+      if (next.y) slide.canvas[path].y = next.y;
+      if (next.w) slide.canvas[path].w = next.w;
+      if (next.h) slide.canvas[path].h = next.h;
     }
     if (!Object.keys(slide.canvas).length) delete slide.canvas;
   }
@@ -740,12 +1004,33 @@
   function setCanvasOffsetStyle(node, offset) {
     var x = Number(offset && offset.x) || 0;
     var y = Number(offset && offset.y) || 0;
+    var w = Math.max(0, Number(offset && offset.w) || 0);
+    var h = Math.max(0, Number(offset && offset.h) || 0);
     node.dataset.canvasX = String(x);
     node.dataset.canvasY = String(y);
+    node.dataset.canvasW = String(w);
+    node.dataset.canvasH = String(h);
+    if (w) {
+      node.style.width = w + "px";
+      node.style.maxWidth = w + "px";
+    } else {
+      node.style.width = "";
+      node.style.maxWidth = "";
+    }
+    if (h) {
+      node.style.minHeight = h + "px";
+    } else {
+      node.style.minHeight = "";
+    }
     if (!x && !y) {
       node.style.transform = "";
-      node.style.position = "";
-      node.style.zIndex = "";
+      if (!w && !h) {
+        node.style.position = "";
+        node.style.zIndex = "";
+      } else {
+        node.style.position = "relative";
+        node.style.zIndex = "5";
+      }
       return;
     }
     node.style.position = "relative";
@@ -756,12 +1041,17 @@
   function parseCanvasOffsetStyle(node) {
     return {
       x: Number(node.dataset.canvasX) || 0,
-      y: Number(node.dataset.canvasY) || 0
+      y: Number(node.dataset.canvasY) || 0,
+      w: Number(node.dataset.canvasW) || 0,
+      h: Number(node.dataset.canvasH) || 0
     };
   }
 
   function sameOffset(left, right) {
-    return Math.round(left.x) === Math.round(right.x) && Math.round(left.y) === Math.round(right.y);
+    return Math.round(left.x) === Math.round(right.x)
+      && Math.round(left.y) === Math.round(right.y)
+      && Math.round(left.w) === Math.round(right.w)
+      && Math.round(left.h) === Math.round(right.h);
   }
 
   function handleCanvasDblClick(event) {
@@ -783,6 +1073,7 @@
       before: JSON.stringify(deck),
       originalText: node.innerText
     };
+    renderCanvasControls();
     node.classList.add("is-canvas-editing");
     node.contentEditable = "true";
     node.spellcheck = false;

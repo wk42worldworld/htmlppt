@@ -151,6 +151,12 @@
         },
         "y": {
           "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
         }
       }
     },

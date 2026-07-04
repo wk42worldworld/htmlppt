@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.4
+
+PPT.html Studio now borrows the best direct-manipulation ideas from open-source visual editors while keeping the file AI-friendly. Click any editable slide element to show a canvas selection frame, drag it for precise placement, resize it with eight handles, nudge it with arrow keys, use `Shift` for faster nudges, and reset element geometry without touching the slide content. These edits are saved as structured `canvas` `x/y/w/h` data and survive standalone `.ppt.html` export.
+
 ## New in v0.2.3
 
 PPT.html Studio now has a first canvas-style editing layer. Double-click rendered text, cards, metrics, table cells, chart legends, and code blocks to edit them in place; drag editable slide elements for light visual adjustments that are saved as structured `canvas` offsets; drag images onto the stage; and drag slide thumbnails to reorder pages.
@@ -46,6 +50,7 @@ AI and agent authoring guides cover the JSON contract, deck structure, layout se
 Product roadmap:
 
 - [中文路线图](docs/roadmap.zh-CN.md)
+- [HTML 画布编辑项目调研与实施计划](docs/canvas-editor-research.zh-CN.md)
 
 Release operations:
 
@@ -79,7 +84,7 @@ npm start
 
 1. Open PPT.html Studio.
 2. Click `Templates` and choose Product Pitch, Lesson, Project Update, or the demo deck.
-3. Edit the title, subtitle, metrics, charts, table rows, or slide order in the visual editor. You can also double-click text directly on the canvas and drag editable elements for light positioning tweaks.
+3. Edit the title, subtitle, metrics, charts, table rows, or slide order in the visual editor. You can also double-click text directly on the canvas, drag editable elements, resize them with handles, and nudge the selected element with arrow keys.
 4. Click `AI JSON` to paste a deck from an AI model. Fenced `json` code blocks are accepted.
 5. Click `Check` and copy the validation report back to AI if anything needs repair.
 6. Click `Present` to preview the deck.
@@ -113,7 +118,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Start from built-in templates for product pitches, lessons, project updates, or the demo deck.
 - Open, save, and save as `.ppt.html` files in the desktop app.
 - Import local images into image slides as embedded data URIs.
-- Double-click canvas text to edit in place, drag editable slide elements for structured position offsets, and drag thumbnails to reorder pages.
+- Double-click canvas text to edit in place, drag or resize editable slide elements for structured `canvas` geometry, nudge selection with arrow keys, reset a selected element, and drag thumbnails to reorder pages.
 - Create bar, line, and donut charts from structured labels and series.
 - Run `Check` to get a human-readable and AI-readable validation report.
 

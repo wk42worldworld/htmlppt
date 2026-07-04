@@ -115,7 +115,11 @@ Direct canvas editing:
 - Double-click titles, subtitles, body text, list items, cards, metrics, table cells, chart legends, or code blocks on the canvas to edit text in place.
 - Press `Enter` to save single-line edits. For multi-line content, use line breaks and press `Ctrl+Enter` or `Cmd+Enter` to save.
 - Press `Esc` to cancel the current canvas edit.
-- Drag editable text or content blocks on the canvas for light position tweaks. The position is saved in the current slide's `canvas` data, so exported `.ppt.html` files keep the adjustment.
+- Click editable text or content blocks on the canvas to show a selection frame.
+- Drag the selected element for light position tweaks. Drag the frame's corner or side handles to change width and height.
+- With an element selected, press arrow keys to nudge by 1 pixel. Hold `Shift` while pressing an arrow key to move by 10 pixels.
+- Click `Reset` on the selection frame, or press `Delete` / `Backspace`, to clear the selected element's saved position and size.
+- Position and size are saved in the current slide's `canvas` data, so exported `.ppt.html` files keep the adjustment.
 - Use `Undo` if a drag lands in the wrong place.
 - Use dragging for small refinements. For major layout changes, switch layouts or split content into more slides so the deck stays friendly to both AI and human editing.
 
