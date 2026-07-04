@@ -363,6 +363,10 @@ textarea:focus {
   transform-origin: center center;
 }
 
+.presenter .ppt-slide {
+  box-shadow: none;
+}
+
 .presenter-controls {
   position: fixed;
   left: 50%;

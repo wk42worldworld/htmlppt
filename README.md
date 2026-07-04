@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.2
+
+PPT.html Studio now uses true full-window presentation scaling. The editor and exported `.ppt.html` player no longer reserve hidden margins for controls or cap presentation zoom, so 16:9 displays fill cleanly without the old black border.
+
 ## New in v0.2.1
 
 PPT.html Studio now includes structured chart slides. Create bar, line, and donut charts from labels and series in the editor, or let AI generate the same `chart` JSON for a shareable `.ppt.html` file.

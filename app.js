@@ -2,7 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
-  var APP_VERSION_LABEL = "v0.2.1";
+  var APP_VERSION_LABEL = "v0.2.2";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var currentIndex = 0;
@@ -31,7 +31,7 @@
     renderAll();
     window.addEventListener("resize", function () {
       fitFrame(els.stageFrame, els.stageViewport);
-      if (presenting) fitFrame(els.presenterStage, els.presenter);
+      if (presenting) fitPresentationFrame(els.presenterStage, els.presenter);
     });
   }
 
@@ -679,6 +679,22 @@
     frame.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
   }
 
+  function fitPresentationFrame(frame, viewport) {
+    if (!frame || !viewport) return;
+    var scale = Math.min(viewport.clientWidth / PPTHtml.baseWidth, viewport.clientHeight / PPTHtml.baseHeight);
+    scale = Math.max(0.1, scale);
+    frame.style.width = PPTHtml.baseWidth + "px";
+    frame.style.height = PPTHtml.baseHeight + "px";
+    frame.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
+  }
+
+  function syncPresenterBackdrop() {
+    var slideNode = els.presenterStage && els.presenterStage.querySelector(".ppt-slide");
+    if (!slideNode) return;
+    var background = window.getComputedStyle(slideNode).backgroundColor;
+    if (background) els.presenter.style.background = background;
+  }
+
   function requestPresenterFullscreen() {
     presenterFullscreenActive = false;
 
@@ -768,7 +784,8 @@
     els.presenterStage.innerHTML = "";
     els.presenterStage.appendChild(PPTHtml.renderSlide(deck.slides[presentIndex], deck, { index: presentIndex }));
     els.presentCounter.textContent = (presentIndex + 1) + " / " + deck.slides.length;
-    fitFrame(els.presenterStage, els.presenter);
+    fitPresentationFrame(els.presenterStage, els.presenter);
+    syncPresenterBackdrop();
   }
 
   function closePresenter(options) {
@@ -777,6 +794,7 @@
     window.clearTimeout(presenterUiTimer);
     els.presenter.hidden = true;
     els.presenter.classList.remove("is-ui-hidden");
+    els.presenter.style.background = "";
     document.body.classList.remove("is-presenting");
     if (!settings.skipFullscreenExit) exitPresenterFullscreen();
     currentIndex = clamp(presentIndex, 0, deck.slides.length - 1);
