@@ -23,7 +23,7 @@ v0.2.0 开始，PPT.html Studio 不只是一个格式原型，而是一条完整
 - AI JSON 导入
 - 质量检查报告，可直接复制给 AI 修复
 - 12 种基础版式和 4 套主题
-- GitHub Actions 自动构建 Linux、macOS arm64、macOS x64、Windows 程序
+- GitHub Actions 自动构建 Linux、macOS arm64、macOS x64、Windows 程序，并支持 macOS 签名与公证配置
 
 ## 快速开始
 
@@ -49,3 +49,4 @@ npm run serve
 - [普通用户教程](tutorial-human.zh-CN.md)
 - [AI 生成指南](tutorial-ai.zh-CN.md)
 - [产品路线图](roadmap.zh-CN.md)
+- [macOS 签名与公证指南](macos-notarization.zh-CN.md)

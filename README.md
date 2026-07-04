@@ -40,6 +40,9 @@ Product roadmap:
 Release operations:
 
 - [macOS 签名与公证指南](docs/macos-notarization.zh-CN.md)
+- [macOS Signing and Notarization Guide](docs/macos-notarization.en-US.md)
+- [macOS 署名と公証ガイド](docs/macos-notarization.ja-JP.md)
+- [macOS 서명 및 공증 가이드](docs/macos-notarization.ko-KR.md)
 
 ## Quick Start
 
@@ -117,3 +120,5 @@ Release builds are triggered by tags such as:
 git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
+
+The release workflow validates that the tag matches `package.json` exactly. For notarized macOS assets, set the repository variable `ENABLE_APPLE_NOTARIZATION=true` and configure the Apple secrets documented in the macOS signing guide; otherwise macOS packages are still built as unsigned fallback artifacts.

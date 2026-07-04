@@ -5,7 +5,8 @@ PPT.html Studio 的 macOS Release 已经支持云端签名和 Apple notarization
 ## 当前状态
 
 - 没有配置 secrets 时：GitHub Actions 仍会构建 macOS `.dmg` 和 `.zip`，但它们是未签名、未公证版本。
-- 配置完整 secrets 后：GitHub Actions 会自动使用 Developer ID 证书签名，并通过 Apple notarytool 公证。
+- 配置完整 secrets，并且设置仓库变量 `ENABLE_APPLE_NOTARIZATION=true` 后：GitHub Actions 会使用 Developer ID 证书签名，并通过 Apple notarytool 公证。
+- `ENABLE_APPLE_NOTARIZATION` 没有设置为 `true` 时：即使仓库里暂时有旧 Apple secrets，Release 也会走未签名 fallback，避免 stale 凭据把四平台发布卡住。
 
 ## 为什么需要公证
 
@@ -40,12 +41,42 @@ PPT.html Studio 的 macOS Release 已经支持云端签名和 Apple notarization
 Settings -> Secrets and variables -> Actions -> New repository secret
 ```
 
+### 打开公证开关
+
+先进入：
+
+```text
+Settings -> Secrets and variables -> Actions -> Variables -> New repository variable
+```
+
+添加：
+
+| Variable | 值 | 说明 |
+| --- | --- | --- |
+| `ENABLE_APPLE_NOTARIZATION` | `true` | 只有设置为 `true` 时，macOS Release 才会执行 Developer ID 签名和 Apple 公证 |
+
+如果这个变量没有设置，或者值不是 `true`，workflow 会继续构建四个平台，但 macOS 包不会签名/公证。
+
+### 签名证书
+
 配置签名证书：
 
 | Secret | 说明 |
 | --- | --- |
 | `MAC_CERTIFICATE_BASE64` | Developer ID Application `.p12` 文件的 base64 内容 |
 | `MAC_CERTIFICATE_PASSWORD` | 导出 `.p12` 时设置的密码 |
+
+如果你已经有另一个项目使用了 Tauri/CyberCode 风格的 secrets，也可以复用这些别名：
+
+| Secret | 等价于 |
+| --- | --- |
+| `APPLE_CERTIFICATE` | `MAC_CERTIFICATE_BASE64` |
+| `APPLE_CERTIFICATE_PASSWORD` | `MAC_CERTIFICATE_PASSWORD` |
+| `APPLE_SIGNING_IDENTITY` | 可选；workflow 会转换给 Electron Builder 使用 |
+
+通常只要 `.p12` 中只有一个 Developer ID Application 证书，就不需要配置 signing identity。
+
+### 公证凭据
 
 推荐配置 notarization API key：
 
@@ -63,7 +94,19 @@ Settings -> Secrets and variables -> Actions -> New repository secret
 | `APPLE_APP_SPECIFIC_PASSWORD` | Apple ID app-specific password |
 | `APPLE_TEAM_ID` | Apple Developer Team ID |
 
+如果从 CyberCode 项目迁移，`APPLE_PASSWORD` 也可以作为 `APPLE_APP_SPECIFIC_PASSWORD` 的别名。
+
 如果两种 notarization 方式都配置，workflow 优先使用 App Store Connect API key。
+
+## Workflow 行为
+
+Release workflow 借鉴了 CyberCode 的发布策略：
+
+1. 先读取 `package.json` 里的版本号。
+2. 如果是 tag 触发，要求 tag 必须等于 `v版本号`，例如 `package.json` 是 `0.2.1` 时，tag 必须是 `v0.2.1`。
+3. macOS job 只有在 `ENABLE_APPLE_NOTARIZATION=true` 时才检查 Apple secrets。
+4. secrets 不完整时，macOS job 会在真正构建前失败，并输出缺少哪个 secret。
+5. 没有打开公证开关时，Linux、Windows、macOS 仍会正常出包；macOS 包是未签名/未公证 fallback。
 
 ## 生成 base64 内容
 
@@ -85,7 +128,7 @@ base64 -i AuthKey_XXXXXXXXXX.p8 | pbcopy
 
 ## 触发发布
 
-配置好 secrets 后，推送新 tag：
+配置好变量和 secrets 后，先更新 `package.json` 版本，再推送匹配的新 tag：
 
 ```bash
 git tag vX.Y.Z

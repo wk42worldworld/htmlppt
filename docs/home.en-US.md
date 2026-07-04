@@ -23,7 +23,7 @@ The product principle is simple: AI writes structure, humans make decisions, and
 - AI JSON import
 - Validation reports that humans can read and AI can repair from
 - 12 starter layouts and 4 themes
-- GitHub Actions builds for Linux, macOS arm64, macOS x64, and Windows
+- GitHub Actions builds for Linux, macOS arm64, macOS x64, and Windows, with optional macOS signing and notarization
 
 ## Quick Start
 
@@ -48,3 +48,4 @@ More guides:
 
 - [Human Tutorial](tutorial-human.en-US.md)
 - [AI Authoring Guide](tutorial-ai.en-US.md)
+- [macOS Signing and Notarization Guide](macos-notarization.en-US.md)

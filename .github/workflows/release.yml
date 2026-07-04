@@ -9,6 +9,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build ${{ matrix.name }}
@@ -51,38 +55,140 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Read package version
+        id: package_version
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate tag matches package version
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          EXPECTED_TAG="v${{ steps.package_version.outputs.value }}"
+          if [ "$GITHUB_REF_NAME" != "$EXPECTED_TAG" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package version $EXPECTED_TAG"
+            exit 1
+          fi
+
       - name: Verify source
         run: npm test
 
-      - name: Configure unsigned signing fallback
-        if: runner.os != 'macOS'
-        run: echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
-
-      - name: Configure macOS signing and notarization
-        if: runner.os == 'macOS'
+      - name: Validate macOS notarization config
+        if: runner.os == 'macOS' && vars.ENABLE_APPLE_NOTARIZATION == 'true'
+        shell: bash
         env:
           MAC_CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
           MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
           APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          set -euo pipefail
+
+          certificate="${MAC_CERTIFICATE_BASE64:-${APPLE_CERTIFICATE:-}}"
+          certificate_password="${MAC_CERTIFICATE_PASSWORD:-${APPLE_CERTIFICATE_PASSWORD:-}}"
+          apple_password="${APPLE_APP_SPECIFIC_PASSWORD:-${APPLE_PASSWORD:-}}"
+          missing=0
+
+          require_value() {
+            local value="$1"
+            local label="$2"
+            if [ -z "$value" ]; then
+              echo "::error::$label is required when ENABLE_APPLE_NOTARIZATION=true."
+              missing=1
+            fi
+          }
+
+          require_value "$certificate" "MAC_CERTIFICATE_BASE64 or APPLE_CERTIFICATE"
+          require_value "$certificate_password" "MAC_CERTIFICATE_PASSWORD or APPLE_CERTIFICATE_PASSWORD"
+
+          api_key_touched=false
+          api_key_ready=false
+          if [ -n "${APPLE_API_KEY_BASE64:-}" ] || [ -n "${APPLE_API_KEY_ID:-}" ] || [ -n "${APPLE_API_ISSUER:-}" ]; then
+            api_key_touched=true
+            require_value "${APPLE_API_KEY_BASE64:-}" "APPLE_API_KEY_BASE64"
+            require_value "${APPLE_API_KEY_ID:-}" "APPLE_API_KEY_ID"
+            require_value "${APPLE_API_ISSUER:-}" "APPLE_API_ISSUER"
+            if [ -n "${APPLE_API_KEY_BASE64:-}" ] && [ -n "${APPLE_API_KEY_ID:-}" ] && [ -n "${APPLE_API_ISSUER:-}" ]; then
+              api_key_ready=true
+            fi
+          fi
+
+          apple_id_touched=false
+          apple_id_ready=false
+          if [ -n "${APPLE_ID:-}" ] || [ -n "$apple_password" ] || [ -n "${APPLE_TEAM_ID:-}" ]; then
+            apple_id_touched=true
+            require_value "${APPLE_ID:-}" "APPLE_ID"
+            require_value "$apple_password" "APPLE_APP_SPECIFIC_PASSWORD or APPLE_PASSWORD"
+            require_value "${APPLE_TEAM_ID:-}" "APPLE_TEAM_ID"
+            if [ -n "${APPLE_ID:-}" ] && [ -n "$apple_password" ] && [ -n "${APPLE_TEAM_ID:-}" ]; then
+              apple_id_ready=true
+            fi
+          fi
+
+          if [ "$api_key_ready" != "true" ] && [ "$apple_id_ready" != "true" ]; then
+            if [ "$api_key_touched" != "true" ] && [ "$apple_id_touched" != "true" ]; then
+              echo "::error::Provide either APPLE_API_KEY_BASE64 + APPLE_API_KEY_ID + APPLE_API_ISSUER, or APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD/APPLE_PASSWORD + APPLE_TEAM_ID."
+            fi
+            missing=1
+          fi
+
+          exit "$missing"
+
+      - name: Configure unsigned signing fallback
+        if: runner.os != 'macOS' || vars.ENABLE_APPLE_NOTARIZATION != 'true'
+        shell: bash
+        run: echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+
+      - name: Configure macOS signing and notarization
+        if: runner.os == 'macOS' && vars.ENABLE_APPLE_NOTARIZATION == 'true'
+        shell: bash
+        env:
+          MAC_CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE_BASE64 }}
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          MAC_SIGNING_IDENTITY: ${{ secrets.MAC_SIGNING_IDENTITY }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+
           signing_enabled=false
           notarization_enabled=false
+          certificate="${MAC_CERTIFICATE_BASE64:-${APPLE_CERTIFICATE:-}}"
+          certificate_password="${MAC_CERTIFICATE_PASSWORD:-${APPLE_CERTIFICATE_PASSWORD:-}}"
+          signing_identity="${MAC_SIGNING_IDENTITY:-${APPLE_SIGNING_IDENTITY:-}}"
+          apple_password="${APPLE_APP_SPECIFIC_PASSWORD:-${APPLE_PASSWORD:-}}"
 
-          if [ -n "$MAC_CERTIFICATE_BASE64" ] && [ -n "$MAC_CERTIFICATE_PASSWORD" ]; then
+          if [ -n "$certificate" ] && [ -n "$certificate_password" ]; then
             cert_path="$RUNNER_TEMP/mac-signing-cert.p12"
-            node -e "require('fs').writeFileSync(process.argv[1], Buffer.from(process.env.MAC_CERTIFICATE_BASE64, 'base64'))" "$cert_path"
+            CERTIFICATE_BASE64="$certificate" node -e "require('fs').writeFileSync(process.argv[1], Buffer.from(process.env.CERTIFICATE_BASE64, 'base64'))" "$cert_path"
             echo "CSC_LINK=$cert_path" >> "$GITHUB_ENV"
-            echo "CSC_KEY_PASSWORD=$MAC_CERTIFICATE_PASSWORD" >> "$GITHUB_ENV"
+            echo "CSC_KEY_PASSWORD=$certificate_password" >> "$GITHUB_ENV"
             echo "CSC_IDENTITY_AUTO_DISCOVERY=true" >> "$GITHUB_ENV"
+            if [ -n "$signing_identity" ] && [ "$signing_identity" != "-" ]; then
+              signing_identity="${signing_identity#Developer ID Application: }"
+              echo "CSC_NAME=$signing_identity" >> "$GITHUB_ENV"
+            fi
             signing_enabled=true
           else
-            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
-            echo "macOS signing certificate secrets are missing; building unsigned macOS artifacts."
+            echo "::error::macOS signing certificate secrets are missing while ENABLE_APPLE_NOTARIZATION=true."
+            exit 1
           fi
 
           if [ "$signing_enabled" = "true" ] && [ -n "$APPLE_API_KEY_BASE64" ] && [ -n "$APPLE_API_KEY_ID" ] && [ -n "$APPLE_API_ISSUER" ]; then
@@ -93,13 +199,14 @@ jobs:
             echo "APPLE_API_KEY_ID=$APPLE_API_KEY_ID" >> "$GITHUB_ENV"
             echo "APPLE_API_ISSUER=$APPLE_API_ISSUER" >> "$GITHUB_ENV"
             notarization_enabled=true
-          elif [ "$signing_enabled" = "true" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+          elif [ "$signing_enabled" = "true" ] && [ -n "$APPLE_ID" ] && [ -n "$apple_password" ] && [ -n "$APPLE_TEAM_ID" ]; then
             echo "APPLE_ID=$APPLE_ID" >> "$GITHUB_ENV"
-            echo "APPLE_APP_SPECIFIC_PASSWORD=$APPLE_APP_SPECIFIC_PASSWORD" >> "$GITHUB_ENV"
+            echo "APPLE_APP_SPECIFIC_PASSWORD=$apple_password" >> "$GITHUB_ENV"
             echo "APPLE_TEAM_ID=$APPLE_TEAM_ID" >> "$GITHUB_ENV"
             notarization_enabled=true
           else
-            echo "macOS notarization secrets are missing or signing is disabled; notarization will be skipped."
+            echo "::error::macOS notarization credentials are missing while ENABLE_APPLE_NOTARIZATION=true."
+            exit 1
           fi
 
           echo "MAC_SIGNING_ENABLED=$signing_enabled" >> "$GITHUB_ENV"

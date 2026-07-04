@@ -23,7 +23,7 @@ v0.2.0 から、PPT.html Studio は単なる形式プロトタイプではなく
 - AI JSON インポート
 - 人間にも AI にも読める検証レポート
 - 12 種類の基本レイアウトと 4 種類のテーマ
-- GitHub Actions による Linux、macOS arm64、macOS x64、Windows ビルド
+- GitHub Actions による Linux、macOS arm64、macOS x64、Windows ビルド。macOS 署名と公証も設定可能
 
 ## クイックスタート
 
@@ -48,3 +48,4 @@ npm run serve
 
 - [人間向けチュートリアル](tutorial-human.ja-JP.md)
 - [AI 向け生成ガイド](tutorial-ai.ja-JP.md)
+- [macOS 署名と公証ガイド](macos-notarization.ja-JP.md)
