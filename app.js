@@ -2,7 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
-  var APP_VERSION_LABEL = "v0.2.4";
+  var APP_VERSION_LABEL = "v0.2.5";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var currentIndex = 0;

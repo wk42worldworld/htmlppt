@@ -4,6 +4,8 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 
 ## What Is New
 
+v0.2.5 refreshes the whole editor UI with a cleaner local-first desktop app feel inspired by OpenHuman-style surfaces: a compact dark top bar, lighter panels, refined thumbnails, polished controls and dialogs, a calmer canvas grid, softer shadows, and better behavior on narrow screens.
+
 v0.2.4 extends the first canvas layer with proper selection and transform controls. Click an editable slide element to show a selection frame, drag it, resize it with eight handles, nudge it with arrow keys, use `Shift` for faster nudges, and reset the selected element's position and size. The result is saved as structured `canvas` `x/y/w/h` data and preserved in exported `.ppt.html` files.
 
 v0.2.3 added the first canvas-style editing layer. Double-click titles, body text, cards, metrics, table cells, chart legends, and code blocks directly on the canvas; drag editable slide elements for light position tweaks saved as structured `canvas` offsets; drag images onto the stage; and drag thumbnails to reorder slides.
