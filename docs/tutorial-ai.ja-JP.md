@@ -45,6 +45,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
   "version": "0.1",
   "title": "製品紹介",
   "theme": "launch",
+  "transition": "fade",
   "aspectRatio": "16:9",
   "slides": []
 }
@@ -55,6 +56,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 - `version`：現在は `"0.1"` 固定。
 - `title`：デッキタイトル。既定ファイル名にも使われる。
 - `theme`：`paper`、`launch`、`studio`、`boardroom` のいずれか。
+- `transition`：既定の切替効果。`none`、`fade`、`slide`、`push`、`zoom` のいずれか。
 - `aspectRatio`：現在は `"16:9"`。
 - `slides`：スライド配列。
 
@@ -75,6 +77,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 {
   "id": "slide-1",
   "layout": "hero",
+  "transition": "inherit",
   "kicker": "Product",
   "title": "PPT.html",
   "subtitle": "AI が構造を書き、人間が編集し、ブラウザで再生する",
@@ -87,6 +90,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 
 - `id`：`slide-1`、`slide-2` のような安定 ID。
 - `layout`：スライドのレイアウト名。
+- `transition`：このスライドが入るときの切替効果。`inherit` はデッキ既定値に従う。個別指定は `none`、`fade`、`slide`、`push`、`zoom`。
 - `kicker`：短いラベル。空でもよい。
 - `title`：スライドの主タイトル。
 - `subtitle`：補足コピー。

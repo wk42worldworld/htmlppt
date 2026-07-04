@@ -38,6 +38,7 @@ The product principle is simple: AI writes structure, humans make decisions, and
 - Video supports local embedding, URL / Data URI sources, posters, captions, and cover/contain fit
 - Audio supports local embedding, URL / Data URI sources, captions, and native browser controls
 - Charts support bar, line, and donut rendering from structured labels and series
+- Presentation mode and exported single-file players support none, fade, slide, push, and zoom transitions
 - App UI language switching for Chinese, English, Japanese, and Korean
 - AI JSON import
 - Validation reports that humans can read and AI can repair from

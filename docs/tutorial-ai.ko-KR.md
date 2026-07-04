@@ -45,6 +45,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
   "version": "0.1",
   "title": "제품 소개",
   "theme": "launch",
+  "transition": "fade",
   "aspectRatio": "16:9",
   "slides": []
 }
@@ -55,6 +56,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 - `version`: 현재 `"0.1"` 고정.
 - `title`: 문서 제목이며 기본 파일명에도 사용됩니다.
 - `theme`: `paper`, `launch`, `studio`, `boardroom` 중 하나.
+- `transition`: 기본 전환 효과. `none`, `fade`, `slide`, `push`, `zoom` 중 하나.
 - `aspectRatio`: 현재 `"16:9"`.
 - `slides`: 슬라이드 배열.
 
@@ -75,6 +77,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 {
   "id": "slide-1",
   "layout": "hero",
+  "transition": "inherit",
   "kicker": "Product",
   "title": "PPT.html",
   "subtitle": "AI는 구조를 쓰고, 사람은 편집하고, 브라우저가 발표합니다",
@@ -87,6 +90,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 
 - `id`: `slide-1`, `slide-2` 같은 안정적인 ID.
 - `layout`: 슬라이드 레이아웃 이름.
+- `transition`: 이 슬라이드가 들어올 때의 전환 효과. `inherit` 은 문서 기본값을 따릅니다. 개별 지정은 `none`, `fade`, `slide`, `push`, `zoom`.
 - `kicker`: 짧은 라벨. 비워도 됩니다.
 - `title`: 슬라이드 주 제목.
 - `subtitle`: 보조 문구.

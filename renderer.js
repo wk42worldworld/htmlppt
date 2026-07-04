@@ -6,6 +6,7 @@
   var BASE_HEIGHT = 720;
   var THEMES = ["paper", "launch", "studio", "boardroom"];
   var CHART_KINDS = ["bar", "line", "donut"];
+  var TRANSITIONS = ["none", "fade", "slide", "push", "zoom"];
 
   var LAYOUTS = [
     ["hero", "封面"],
@@ -242,6 +243,17 @@
     });
 
     return chart;
+  }
+
+  function normalizeTransition(value, fallback) {
+    var transition = safeText(value || fallback || "fade");
+    return TRANSITIONS.indexOf(transition) !== -1 ? transition : "fade";
+  }
+
+  function normalizeSlideTransition(value) {
+    if (safeText(value) === "inherit") return "inherit";
+    if (!safeText(value)) return "inherit";
+    return normalizeTransition(value, "fade");
   }
 
   function uid(prefix) {
@@ -909,6 +921,7 @@
     var slide = raw && typeof raw === "object" ? clone(raw) : {};
     slide.id = slide.id || "slide-" + (index + 1);
     slide.layout = slide.layout || "text";
+    slide.transition = normalizeSlideTransition(slide.transition);
     slide.title = safeText(slide.title || "未命名页面");
     slide.subtitle = safeText(slide.subtitle);
     slide.kicker = safeText(slide.kicker);
@@ -939,6 +952,7 @@
     deck.version = deck.version || FORMAT_VERSION;
     deck.title = safeText(deck.title || "未命名演示");
     deck.theme = safeText(deck.theme || "paper");
+    deck.transition = normalizeTransition(deck.transition, "fade");
     deck.aspectRatio = deck.aspectRatio || "16:9";
     deck.slides = asArray(deck.slides).map(normalizeSlide);
     if (!deck.slides.length) deck.slides.push(normalizeSlide({ layout: "hero", title: deck.title }, 0));
@@ -1399,7 +1413,7 @@
 
   function standaloneSource() {
     return "(function(){'use strict';" +
-      "var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0;" +
+      "var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0,anim=0;" +
       "function e(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x)n.textContent=x;return n}" +
       "function a(p,t,c,x){if(x==null||x==='')return;var n=e(t,c,x);p.appendChild(n);return n}" +
       "function arr(v){return Array.isArray(v)?v:[]}" +
@@ -1427,14 +1441,16 @@
       "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='video'){n.appendChild(stack(s,false));n.appendChild(vid(s.video));return n}if(s.layout==='audio'){n.appendChild(stack(s,false));n.appendChild(aud(s.audio));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
       "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
       "function fit(){var sc=Math.min(window.innerWidth/w,window.innerHeight/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
-      "function bg(){var sl=stage.querySelector('.ppt-slide');if(sl)root.style.background=getComputedStyle(sl).backgroundColor||''}" +
+      "function bg(){var sl=stage.querySelector('.ppt-slide.is-entering')||stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide');if(sl)root.style.background=getComputedStyle(sl).backgroundColor||''}" +
       "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}" +
-      "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';var sd=arr(d.slides)[i]||{},sn=slide(sd);tbs(sn,sd);off(sn,sd);stage.appendChild(sn);count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
+      "function tr(s){var v=s&&s.transition&&s.transition!=='inherit'?s.transition:d.transition;return /^(none|fade|slide|push|zoom)$/.test(v)?v:'fade'}" +
+      "function reduce(){return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}" +
+      "function show(n,instant){var ni=Math.max(0,Math.min(arr(d.slides).length-1,n)),old=stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide'),dir=ni>=i?'forward':'backward',sd=arr(d.slides)[ni]||{},sn=slide(sd),kind=tr(sd),go=!instant&&old&&ni!==i&&kind!=='none'&&!reduce();clearTimeout(anim);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction');tbs(sn,sd);off(sn,sd);sn.classList.add('is-current');i=ni;if(!go){stage.innerHTML='';stage.appendChild(sn)}else{old.classList.remove('is-current','is-entering');old.classList.add('is-exiting');sn.classList.add('is-entering');stage.dataset.transition=kind;stage.dataset.direction=dir;stage.classList.add('is-transitioning');stage.appendChild(sn);requestAnimationFrame(function(){stage.classList.add('is-animating')});anim=setTimeout(function(){stage.innerHTML='';sn.classList.remove('is-entering','is-exiting');sn.classList.add('is-current');stage.appendChild(sn);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction')},420)}count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
       "function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}" +
       "function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}" +
       "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;" +
       "document.addEventListener('keydown',function(ev){var k=ev.key;if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();show(i-1);return}if(k==='Home'){ev.preventDefault();show(0);return}if(k==='End'){ev.preventDefault();show(arr(d.slides).length-1)}});" +
-      "window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\\D/g,''),10)-1||0);" +
+      "window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\\D/g,''),10)-1||0,true);" +
       "})();";
   }
 
@@ -1454,8 +1470,15 @@
       "    html,body{margin:0;min-height:100%;background:#101214;color:#f4f4f4;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:0}\n" +
       "    #ppt-player-root{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden;background:#101214}\n" +
       "    #ppt-player-root.is-ui-hidden{cursor:none}\n" +
-      "    .ppt-player-stage{position:absolute;top:50%;left:50%;transform-origin:center center}\n" +
-      "    #ppt-player-root .ppt-slide{box-shadow:none}\n" +
+      "    .ppt-player-stage{position:absolute;top:50%;left:50%;overflow:hidden;transform-origin:center center}\n" +
+      "    #ppt-player-root .ppt-slide{position:absolute;inset:0;box-shadow:none;will-change:opacity,transform}\n" +
+      "    .ppt-player-stage .ppt-slide.is-current{opacity:1;transform:translate3d(0,0,0) scale(1)}\n" +
+      "    .ppt-player-stage.is-transitioning .ppt-slide{pointer-events:none}.ppt-player-stage.is-transitioning .ppt-slide.is-entering{z-index:2}.ppt-player-stage.is-transitioning .ppt-slide.is-exiting{z-index:1}\n" +
+      "    .ppt-player-stage[data-transition=fade] .ppt-slide.is-entering{opacity:0}.ppt-player-stage[data-transition=fade].is-animating .ppt-slide.is-entering{opacity:1;transition:opacity .34s ease}.ppt-player-stage[data-transition=fade].is-animating .ppt-slide.is-exiting{opacity:0;transition:opacity .34s ease}\n" +
+      "    .ppt-player-stage[data-transition=slide][data-direction=forward] .ppt-slide.is-entering{opacity:0;transform:translate3d(72px,0,0)}.ppt-player-stage[data-transition=slide][data-direction=backward] .ppt-slide.is-entering{opacity:0;transform:translate3d(-72px,0,0)}.ppt-player-stage[data-transition=slide].is-animating .ppt-slide.is-entering{opacity:1;transform:translate3d(0,0,0);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=slide][data-direction=forward].is-animating .ppt-slide.is-exiting{opacity:0;transform:translate3d(-44px,0,0);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=slide][data-direction=backward].is-animating .ppt-slide.is-exiting{opacity:0;transform:translate3d(44px,0,0);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}\n" +
+      "    .ppt-player-stage[data-transition=push][data-direction=forward] .ppt-slide.is-entering{transform:translate3d(100%,0,0)}.ppt-player-stage[data-transition=push][data-direction=backward] .ppt-slide.is-entering{transform:translate3d(-100%,0,0)}.ppt-player-stage[data-transition=push].is-animating .ppt-slide.is-entering{transform:translate3d(0,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=push][data-direction=forward].is-animating .ppt-slide.is-exiting{transform:translate3d(-100%,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=push][data-direction=backward].is-animating .ppt-slide.is-exiting{transform:translate3d(100%,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}\n" +
+      "    .ppt-player-stage[data-transition=zoom] .ppt-slide.is-entering{opacity:0;transform:scale(.94)}.ppt-player-stage[data-transition=zoom].is-animating .ppt-slide.is-entering{opacity:1;transform:scale(1);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=zoom].is-animating .ppt-slide.is-exiting{opacity:0;transform:scale(1.04);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}\n" +
+      "    @media (prefers-reduced-motion:reduce){.ppt-player-stage .ppt-slide{transition:none!important}}\n" +
       "    .ppt-player-bar{position:fixed;left:50%;bottom:18px;display:flex;align-items:center;gap:10px;transform:translateX(-50%);padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(16,18,20,.82);backdrop-filter:blur(10px);opacity:1;transition:opacity .18s ease,transform .18s ease}\n" +
       "    #ppt-player-root.is-ui-hidden .ppt-player-bar{pointer-events:none;opacity:0;transform:translate(-50%,12px)}\n" +
       "    #ppt-player-root.is-ui-hidden .ppt-player-bar:focus-within{pointer-events:auto;opacity:1;transform:translateX(-50%)}\n" +
@@ -1489,6 +1512,7 @@
     baseHeight: BASE_HEIGHT,
     themes: THEMES,
     layouts: LAYOUTS,
+    transitions: TRANSITIONS,
     slideCss: SLIDE_CSS,
     deckTemplates: [
       { id: "ai-camera", name: "AI 导演相机", description: "产品发布 demo，适合展示一个新想法。" },

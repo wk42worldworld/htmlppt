@@ -29,6 +29,7 @@ project-name.ppt.html
   "version": "0.1",
   "title": "AI 导演相机",
   "theme": "launch",
+  "transition": "fade",
   "aspectRatio": "16:9",
   "slides": []
 }
@@ -39,6 +40,7 @@ project-name.ppt.html
 - `version`：格式版本，当前为 `0.1`。
 - `title`：演示文稿标题。
 - `theme`：主题名称。
+- `transition`：默认切换动效，可选 `none`、`fade`、`slide`、`push`、`zoom`。
 - `aspectRatio`：当前固定支持 `16:9`。
 - `slides`：幻灯片数组。
 
@@ -48,6 +50,7 @@ project-name.ppt.html
 {
   "id": "slide-1",
   "layout": "hero",
+  "transition": "inherit",
   "kicker": "PRODUCT LAUNCH",
   "title": "AI 导演相机",
   "subtitle": "让普通人像导演一样设计镜头",
@@ -114,6 +117,16 @@ v0.1 支持这些版式：
 - `table`：表格页
 - `code`：代码页
 - `ending`：结束页
+
+## Transitions
+
+切换动效用于演示模式和导出的单文件播放器。
+
+- Deck 级 `transition` 是全局默认值，默认 `fade`。
+- Slide 级 `transition` 可以覆盖当前页进入时的动效，默认 `inherit`。
+- 支持值：`none`、`fade`、`slide`、`push`、`zoom`。
+- Slide 级额外支持 `inherit`，表示跟随 deck 默认值。
+- 播放器会尊重系统的 `prefers-reduced-motion: reduce`，此时自动禁用切换动画。
 
 ## 单文件资源约定
 

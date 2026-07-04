@@ -71,10 +71,12 @@ assert.equal(ppt.validateDeck(imageDeck).ok, true);
 const chartDeck = ppt.normalizeDeck({
   version: "0.1",
   title: "Chart deck",
+  transition: "push",
   slides: [
     {
       layout: "chart",
       title: "Quarterly growth",
+      transition: "zoom",
       chart: {
         kind: "line",
         labels: ["Q1", "Q2", "Q3", "Q4"],
@@ -87,12 +89,16 @@ const chartDeck = ppt.normalizeDeck({
     }
   ]
 });
+assert.equal(chartDeck.transition, "push");
 assert.equal(chartDeck.slides[0].chart.kind, "line");
+assert.equal(chartDeck.slides[0].transition, "zoom");
 assert.equal(chartDeck.slides[0].chart.series.length, 2);
 assert.equal(ppt.validateDeck(chartDeck).ok, true);
 const chartHtml = ppt.exportStandalone(chartDeck);
 assert.match(chartHtml, /ppt-layout-chart/);
 assert.match(chartHtml, /ppt-chart/);
+assert.match(chartHtml, /data-transition=push/);
+assert.match(chartHtml, /prefers-reduced-motion/);
 assert.match(chartHtml, /Quarterly growth/);
 
 const videoDeck = ppt.normalizeDeck({
@@ -217,6 +223,8 @@ assert.match(html, /F5/);
 assert.match(html, /ArrowDown/);
 assert.match(html, /is-ui-hidden/);
 assert.match(html, /requestFullscreen/);
+assert.match(html, /is-transitioning/);
+assert.match(html, /data-transition/);
 
 const fencedDeck = ppt.parseFileText("```json\n" + JSON.stringify(ppt.createTemplateDeck("lesson")) + "\n```");
 assert.equal(fencedDeck.title, "课程课件");

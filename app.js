@@ -24,6 +24,7 @@
   var activeCanvasResize = null;
   var selectedCanvasPath = "";
   var presenterUiTimer = 0;
+  var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
   var pendingMediaInsertType = "";
   var liveRenderFrame = 0;
@@ -1446,6 +1447,50 @@
     "sample.milestone3Text": "크로스 플랫폼 데스크톱 버전 출시."
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "field.deckTransition": "默认切换",
+    "field.slideTransition": "本页切换",
+    "transition.inherit": "跟随全局",
+    "transition.none": "无",
+    "transition.fade": "淡入",
+    "transition.slide": "滑入",
+    "transition.push": "推入",
+    "transition.zoom": "缩放"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "field.deckTransition": "Default transition",
+    "field.slideTransition": "Slide transition",
+    "transition.inherit": "Use deck default",
+    "transition.none": "None",
+    "transition.fade": "Fade",
+    "transition.slide": "Slide",
+    "transition.push": "Push",
+    "transition.zoom": "Zoom"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "field.deckTransition": "既定の切替",
+    "field.slideTransition": "このスライドの切替",
+    "transition.inherit": "全体設定に従う",
+    "transition.none": "なし",
+    "transition.fade": "フェード",
+    "transition.slide": "スライド",
+    "transition.push": "プッシュ",
+    "transition.zoom": "ズーム"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "field.deckTransition": "기본 전환",
+    "field.slideTransition": "슬라이드 전환",
+    "transition.inherit": "전체 설정 사용",
+    "transition.none": "없음",
+    "transition.fade": "페이드",
+    "transition.slide": "슬라이드",
+    "transition.push": "밀기",
+    "transition.zoom": "줌"
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -1468,7 +1513,7 @@
       "languageInput", "fileInput", "imageFileInput", "videoFileInput", "audioFileInput", "fileStatus",
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
-      "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
+      "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
@@ -1870,8 +1915,10 @@
 
     bindDeckInput(els.deckTitleInput, function (value) { deck.title = value; });
     bindDeckInput(els.deckThemeInput, function (value) { deck.theme = value; });
+    bindDeckInput(els.deckTransitionInput, function (value) { deck.transition = value; });
 
     bindSlideInput(els.slideLayoutInput, function (slide, value) { slide.layout = value; updateFieldVisibility(); });
+    bindSlideInput(els.slideTransitionInput, function (slide, value) { slide.transition = value; });
     bindSlideInput(els.kickerInput, function (slide, value) { slide.kicker = value; });
     bindSlideInput(els.titleInput, function (slide, value) { slide.title = value; });
     bindSlideInput(els.subtitleInput, function (slide, value) { slide.subtitle = value; });
@@ -3595,7 +3642,9 @@
     var slide = currentSlide();
     els.deckTitleInput.value = deck.title;
     els.deckThemeInput.value = deck.theme;
+    els.deckTransitionInput.value = deck.transition || "fade";
     els.slideLayoutInput.value = slide.layout;
+    els.slideTransitionInput.value = slide.transition || "inherit";
     els.kickerInput.value = slide.kicker;
     els.titleInput.value = slide.title;
     els.subtitleInput.value = slide.subtitle;
@@ -3906,7 +3955,11 @@
   }
 
   function syncPresenterBackdrop() {
-    var slideNode = els.presenterStage && els.presenterStage.querySelector(".ppt-slide");
+    var slideNode = els.presenterStage && (
+      els.presenterStage.querySelector(".ppt-slide.is-entering")
+      || els.presenterStage.querySelector(".ppt-slide.is-current")
+      || els.presenterStage.querySelector(".ppt-slide")
+    );
     if (!slideNode) return;
     var background = window.getComputedStyle(slideNode).backgroundColor;
     if (background) els.presenter.style.background = background;
@@ -3991,27 +4044,78 @@
     presenting = true;
     presentIndex = index || 0;
     els.presenter.hidden = false;
-    showPresentationSlide(presentIndex);
+    showPresentationSlide(presentIndex, { instant: true });
     document.body.classList.add("is-presenting");
     showPresenterChrome();
     requestPresenterFullscreen();
   }
 
-  function showPresentationSlide(index) {
-    presentIndex = clamp(index, 0, deck.slides.length - 1);
-    els.presenterStage.innerHTML = "";
-    els.presenterStage.appendChild(PPTHtml.renderSlide(deck.slides[presentIndex], deck, { index: presentIndex }));
+  function showPresentationSlide(index, options) {
+    var settings = options || {};
+    var previousIndex = presentIndex;
+    var nextIndex = clamp(index, 0, deck.slides.length - 1);
+    var oldSlide = els.presenterStage.querySelector(".ppt-slide.is-current") || els.presenterStage.querySelector(".ppt-slide");
+    var direction = nextIndex >= previousIndex ? "forward" : "backward";
+    var transition = effectiveSlideTransition(deck.slides[nextIndex]);
+    var shouldAnimate = !settings.instant && oldSlide && nextIndex !== previousIndex && transition !== "none" && !prefersReducedMotion();
+
+    window.clearTimeout(presenterTransitionTimer);
+    presentIndex = nextIndex;
+    els.presenterStage.classList.remove("is-transitioning", "is-animating");
+    els.presenterStage.removeAttribute("data-transition");
+    els.presenterStage.removeAttribute("data-direction");
+
+    var newSlide = PPTHtml.renderSlide(deck.slides[presentIndex], deck, { index: presentIndex });
+    newSlide.classList.add("is-current");
+
+    if (!shouldAnimate) {
+      els.presenterStage.innerHTML = "";
+      els.presenterStage.appendChild(newSlide);
+    } else {
+      oldSlide.classList.remove("is-current", "is-entering");
+      oldSlide.classList.add("is-exiting");
+      newSlide.classList.add("is-entering");
+      els.presenterStage.dataset.transition = transition;
+      els.presenterStage.dataset.direction = direction;
+      els.presenterStage.classList.add("is-transitioning");
+      els.presenterStage.appendChild(newSlide);
+      window.requestAnimationFrame(function () {
+        els.presenterStage.classList.add("is-animating");
+      });
+      presenterTransitionTimer = window.setTimeout(function () {
+        els.presenterStage.innerHTML = "";
+        newSlide.classList.remove("is-entering", "is-exiting");
+        newSlide.classList.add("is-current");
+        els.presenterStage.appendChild(newSlide);
+        els.presenterStage.classList.remove("is-transitioning", "is-animating");
+        els.presenterStage.removeAttribute("data-transition");
+        els.presenterStage.removeAttribute("data-direction");
+      }, 420);
+    }
+
     els.presentCounter.textContent = (presentIndex + 1) + " / " + deck.slides.length;
     fitPresentationFrame(els.presenterStage, els.presenter);
     syncPresenterBackdrop();
+  }
+
+  function effectiveSlideTransition(slide) {
+    var transition = slide && slide.transition && slide.transition !== "inherit" ? slide.transition : deck.transition;
+    return PPTHtml.transitions.indexOf(transition) !== -1 ? transition : "fade";
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
   function closePresenter(options) {
     var settings = options || {};
     presenting = false;
     window.clearTimeout(presenterUiTimer);
+    window.clearTimeout(presenterTransitionTimer);
     els.presenter.hidden = true;
     els.presenter.classList.remove("is-ui-hidden");
+    els.presenterStage.classList.remove("is-transitioning", "is-animating");
+    els.presenterStage.innerHTML = "";
     els.presenter.style.background = "";
     document.body.classList.remove("is-presenting");
     if (!settings.skipFullscreenExit) exitPresenterFullscreen();

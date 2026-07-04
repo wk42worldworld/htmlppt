@@ -528,11 +528,120 @@ textarea:focus {
   position: absolute;
   top: 50%;
   left: 50%;
+  overflow: hidden;
   transform-origin: center center;
 }
 
 .presenter .ppt-slide {
+  position: absolute;
+  inset: 0;
   box-shadow: none;
+  will-change: opacity, transform;
+}
+
+.presenter-stage .ppt-slide.is-current {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.presenter-stage.is-transitioning .ppt-slide {
+  pointer-events: none;
+}
+
+.presenter-stage.is-transitioning .ppt-slide.is-entering {
+  z-index: 2;
+}
+
+.presenter-stage.is-transitioning .ppt-slide.is-exiting {
+  z-index: 1;
+}
+
+.presenter-stage[data-transition="fade"] .ppt-slide.is-entering {
+  opacity: 0;
+}
+
+.presenter-stage[data-transition="fade"].is-animating .ppt-slide.is-entering {
+  opacity: 1;
+  transition: opacity .34s ease;
+}
+
+.presenter-stage[data-transition="fade"].is-animating .ppt-slide.is-exiting {
+  opacity: 0;
+  transition: opacity .34s ease;
+}
+
+.presenter-stage[data-transition="slide"][data-direction="forward"] .ppt-slide.is-entering {
+  opacity: 0;
+  transform: translate3d(72px, 0, 0);
+}
+
+.presenter-stage[data-transition="slide"][data-direction="backward"] .ppt-slide.is-entering {
+  opacity: 0;
+  transform: translate3d(-72px, 0, 0);
+}
+
+.presenter-stage[data-transition="slide"].is-animating .ppt-slide.is-entering {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity .34s ease, transform .34s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="slide"][data-direction="forward"].is-animating .ppt-slide.is-exiting {
+  opacity: 0;
+  transform: translate3d(-44px, 0, 0);
+  transition: opacity .34s ease, transform .34s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="slide"][data-direction="backward"].is-animating .ppt-slide.is-exiting {
+  opacity: 0;
+  transform: translate3d(44px, 0, 0);
+  transition: opacity .34s ease, transform .34s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="push"][data-direction="forward"] .ppt-slide.is-entering {
+  transform: translate3d(100%, 0, 0);
+}
+
+.presenter-stage[data-transition="push"][data-direction="backward"] .ppt-slide.is-entering {
+  transform: translate3d(-100%, 0, 0);
+}
+
+.presenter-stage[data-transition="push"].is-animating .ppt-slide.is-entering {
+  transform: translate3d(0, 0, 0);
+  transition: transform .36s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="push"][data-direction="forward"].is-animating .ppt-slide.is-exiting {
+  transform: translate3d(-100%, 0, 0);
+  transition: transform .36s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="push"][data-direction="backward"].is-animating .ppt-slide.is-exiting {
+  transform: translate3d(100%, 0, 0);
+  transition: transform .36s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="zoom"] .ppt-slide.is-entering {
+  opacity: 0;
+  transform: scale(.94);
+}
+
+.presenter-stage[data-transition="zoom"].is-animating .ppt-slide.is-entering {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity .34s ease, transform .34s cubic-bezier(.2, .8, .2, 1);
+}
+
+.presenter-stage[data-transition="zoom"].is-animating .ppt-slide.is-exiting {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity .34s ease, transform .34s cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .presenter-stage .ppt-slide {
+    transition: none !important;
+  }
 }
 
 .presenter-controls {

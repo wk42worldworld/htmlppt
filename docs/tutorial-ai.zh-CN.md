@@ -45,6 +45,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
   "version": "0.1",
   "title": "产品介绍",
   "theme": "launch",
+  "transition": "fade",
   "aspectRatio": "16:9",
   "slides": []
 }
@@ -55,6 +56,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - `version`：当前固定为 `"0.1"`。
 - `title`：文稿标题，也会影响默认文件名。
 - `theme`：可选 `paper`、`launch`、`studio`、`boardroom`。
+- `transition`：默认切换动效，可选 `none`、`fade`、`slide`、`push`、`zoom`。
 - `aspectRatio`：当前固定使用 `"16:9"`。
 - `slides`：幻灯片数组。
 
@@ -75,6 +77,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 {
   "id": "slide-1",
   "layout": "hero",
+  "transition": "inherit",
   "kicker": "Product",
   "title": "PPT.html",
   "subtitle": "AI 写结构，人类做编辑，浏览器负责播放",
@@ -87,6 +90,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 
 - `id`：稳定 ID，建议使用 `slide-1`、`slide-2`。
 - `layout`：版式名称。
+- `transition`：本页进入时的切换动效。用 `inherit` 跟随文稿默认值，也可以写 `none`、`fade`、`slide`、`push`、`zoom`。
 - `kicker`：短标签，可为空。
 - `title`：页面标题。
 - `subtitle`：页面副标题。

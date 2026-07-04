@@ -45,6 +45,7 @@ Minimal deck:
   "version": "0.1",
   "title": "Product Story",
   "theme": "launch",
+  "transition": "fade",
   "aspectRatio": "16:9",
   "slides": []
 }
@@ -55,6 +56,7 @@ Fields:
 - `version`: currently fixed to `"0.1"`.
 - `title`: deck title and default file-name source.
 - `theme`: one of `paper`, `launch`, `studio`, `boardroom`.
+- `transition`: default slide transition, one of `none`, `fade`, `slide`, `push`, or `zoom`.
 - `aspectRatio`: currently `"16:9"`.
 - `slides`: slide array.
 
@@ -75,6 +77,7 @@ Generic slide:
 {
   "id": "slide-1",
   "layout": "hero",
+  "transition": "inherit",
   "kicker": "Product",
   "title": "PPT.html",
   "subtitle": "AI writes structure, humans edit, browsers present",
@@ -87,6 +90,7 @@ Fields:
 
 - `id`: stable slide ID such as `slide-1`, `slide-2`.
 - `layout`: slide layout name.
+- `transition`: transition used when this slide enters. Use `inherit` for the deck default, or `none`, `fade`, `slide`, `push`, or `zoom`.
 - `kicker`: short label; may be empty.
 - `title`: main slide title.
 - `subtitle`: supporting copy.

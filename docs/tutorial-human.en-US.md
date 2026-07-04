@@ -286,6 +286,8 @@ If the report only contains `WARNING` or `TIP`, the deck usually still plays, bu
 
 Click `Present` in the top bar. The desktop app enters full-screen presentation; in the browser, the app requests full screen when the browser allows it. If the browser blocks the request, click `Full Screen` inside the player.
 
+In the right `Deck` panel, choose the default transition: `None`, `Fade`, `Slide`, `Push`, or `Zoom`. In the `Slide` panel, each slide can follow the deck default or override it. Exported single-file players keep these transition settings.
+
 During presentation:
 
 - Press `F5` to start from the first slide.

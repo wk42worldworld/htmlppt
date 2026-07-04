@@ -19,6 +19,9 @@
       "enum": ["paper", "launch", "studio", "boardroom"],
       "default": "paper"
     },
+    "transition": {
+      "$ref": "#/$defs/transition"
+    },
     "aspectRatio": {
       "type": "string",
       "enum": ["16:9"],
@@ -230,6 +233,16 @@
         }
       }
     },
+    "transition": {
+      "type": "string",
+      "enum": ["none", "fade", "slide", "push", "zoom"],
+      "default": "fade"
+    },
+    "slideTransition": {
+      "type": "string",
+      "enum": ["inherit", "none", "fade", "slide", "push", "zoom"],
+      "default": "inherit"
+    },
     "canvasOffset": {
       "type": "object",
       "additionalProperties": false,
@@ -284,6 +297,9 @@
             "code",
             "ending"
           ]
+        },
+        "transition": {
+          "$ref": "#/$defs/slideTransition"
         },
         "kicker": {
           "type": "string"
