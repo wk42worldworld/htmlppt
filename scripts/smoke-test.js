@@ -42,6 +42,8 @@ assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);
 assert.match(html, /F5/);
 assert.match(html, /ArrowDown/);
+assert.match(html, /is-ui-hidden/);
+assert.match(html, /requestFullscreen/);
 
 const fencedDeck = ppt.parseFileText("```json\n" + JSON.stringify(ppt.createTemplateDeck("lesson")) + "\n```");
 assert.equal(fencedDeck.title, "课程课件");

@@ -7,6 +7,7 @@ contextBridge.exposeInMainWorld("htmlpptDesktop", {
   openDeck: () => ipcRenderer.invoke("deck:open"),
   saveDeck: (payload) => ipcRenderer.invoke("deck:save", payload),
   saveDeckAs: (payload) => ipcRenderer.invoke("deck:saveAs", payload),
+  setFullScreen: (enabled) => ipcRenderer.invoke("window:setFullScreen", Boolean(enabled)),
   onMenuCommand: (callback) => {
     const listener = (_event, command) => callback(command);
     ipcRenderer.on("menu-command", listener);

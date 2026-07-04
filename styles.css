@@ -348,6 +348,10 @@ textarea:focus {
   background: #101214;
 }
 
+.presenter.is-ui-hidden {
+  cursor: none;
+}
+
 .presenter[hidden] {
   display: none;
 }
@@ -372,6 +376,20 @@ textarea:focus {
   border-radius: 8px;
   background: rgba(16, 18, 20, .82);
   backdrop-filter: blur(10px);
+  opacity: 1;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.presenter.is-ui-hidden .presenter-controls {
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+}
+
+.presenter.is-ui-hidden .presenter-controls:focus-within {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateX(-50%);
 }
 
 .presenter-controls span {

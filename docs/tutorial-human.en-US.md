@@ -226,7 +226,7 @@ If the report only contains `WARNING` or `TIP`, the deck usually still plays, bu
 
 ## 10. Present the Deck
 
-Click `Present` in the top bar.
+Click `Present` in the top bar. The desktop app enters full-screen presentation; in the browser, the app requests full screen when the browser allows it. If the browser blocks the request, click `Full Screen` inside the player.
 
 During presentation:
 
@@ -238,6 +238,8 @@ During presentation:
 - Press `P` or `Backspace` to go back.
 - Press `Home` / `End` to jump to the first or last slide.
 - Click `Exit` or press `Esc` to return to the editor.
+
+The presentation controls hide automatically when the mouse is idle. Move the mouse to show them again.
 
 Before sharing a deck, play through it once from beginning to end.
 

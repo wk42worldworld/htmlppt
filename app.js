@@ -16,6 +16,8 @@
   var toastTimer = 0;
   var activeEditSnapshot = "";
   var activeEditPushed = false;
+  var presenterUiTimer = 0;
+  var presenterFullscreenActive = false;
 
   var els = {};
 
@@ -268,6 +270,11 @@
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
     els.presentExitBtn.addEventListener("click", closePresenter);
+    els.presenter.addEventListener("pointermove", showPresenterChrome);
+    els.presenter.addEventListener("pointerdown", showPresenterChrome);
+    els.presenter.addEventListener("focusin", showPresenterChrome);
+    els.presenter.addEventListener("dblclick", togglePresenterFullscreen);
+    document.addEventListener("fullscreenchange", handleDocumentFullscreenChange);
 
     document.addEventListener("keydown", handleGlobalKeydown);
   }
@@ -660,12 +667,88 @@
     frame.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
   }
 
+  function requestPresenterFullscreen() {
+    presenterFullscreenActive = false;
+
+    if (desktop && desktop.isDesktop && typeof desktop.setFullScreen === "function") {
+      desktop.setFullScreen(true).then(function () {
+        presenterFullscreenActive = true;
+      }).catch(function () {
+        requestBrowserFullscreen();
+      });
+      return;
+    }
+
+    requestBrowserFullscreen();
+  }
+
+  function requestBrowserFullscreen() {
+    if (!els.presenter.requestFullscreen) return;
+    var result = els.presenter.requestFullscreen();
+    if (result && result.then) {
+      result.then(function () {
+        presenterFullscreenActive = true;
+      }).catch(function () {
+        presenterFullscreenActive = false;
+      });
+    }
+  }
+
+  function exitPresenterFullscreen() {
+    presenterFullscreenActive = false;
+
+    if (desktop && desktop.isDesktop && typeof desktop.setFullScreen === "function") {
+      desktop.setFullScreen(false).catch(function () {});
+    }
+
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(function () {});
+    }
+  }
+
+  function togglePresenterFullscreen(event) {
+    if (!presenting) return;
+    if (event && event.target && event.target.closest(".presenter-controls")) return;
+    showPresenterChrome();
+
+    if (desktop && desktop.isDesktop) {
+      if (presenterFullscreenActive) exitPresenterFullscreen();
+      else requestPresenterFullscreen();
+      return;
+    }
+
+    if (!document.fullscreenElement) {
+      requestPresenterFullscreen();
+      return;
+    }
+
+    exitPresenterFullscreen();
+  }
+
+  function showPresenterChrome() {
+    if (!presenting) return;
+    window.clearTimeout(presenterUiTimer);
+    els.presenter.classList.remove("is-ui-hidden");
+    presenterUiTimer = window.setTimeout(function () {
+      if (presenting) els.presenter.classList.add("is-ui-hidden");
+    }, 1800);
+  }
+
+  function handleDocumentFullscreenChange() {
+    if (!presenting) return;
+    if (!document.fullscreenElement && presenterFullscreenActive) {
+      closePresenter({ skipFullscreenExit: true });
+    }
+  }
+
   function openPresenter(index) {
     presenting = true;
     presentIndex = index || 0;
     els.presenter.hidden = false;
     showPresentationSlide(presentIndex);
     document.body.classList.add("is-presenting");
+    showPresenterChrome();
+    requestPresenterFullscreen();
   }
 
   function showPresentationSlide(index) {
@@ -676,10 +759,14 @@
     fitFrame(els.presenterStage, els.presenter);
   }
 
-  function closePresenter() {
+  function closePresenter(options) {
+    var settings = options || {};
     presenting = false;
+    window.clearTimeout(presenterUiTimer);
     els.presenter.hidden = true;
+    els.presenter.classList.remove("is-ui-hidden");
     document.body.classList.remove("is-presenting");
+    if (!settings.skipFullscreenExit) exitPresenterFullscreen();
     currentIndex = clamp(presentIndex, 0, deck.slides.length - 1);
     renderAll();
   }

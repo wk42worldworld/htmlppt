@@ -89,6 +89,13 @@ function registerIpcHandlers() {
   ipcMain.handle("deck:saveAs", async (event, payload) => {
     return saveDeckFromRenderer(event, payload, true);
   });
+
+  ipcMain.handle("window:setFullScreen", async (event, enabled) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    if (!window) return false;
+    window.setFullScreen(Boolean(enabled));
+    return window.isFullScreen();
+  });
 }
 
 async function saveDeckFromRenderer(event, payload, forceDialog) {
