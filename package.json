@@ -1,0 +1,75 @@
+{
+  "name": "htmlppt",
+  "version": "0.1.0",
+  "description": "PPT.html Studio: an AI-friendly, human-editable presentation format and editor.",
+  "main": "electron/main.js",
+  "homepage": "https://github.com/wk42worldworld/htmlppt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wk42worldworld/htmlppt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wk42worldworld/htmlppt/issues"
+  },
+  "license": "MIT",
+  "author": "PPT.html contributors",
+  "private": false,
+  "scripts": {
+    "start": "electron .",
+    "serve": "python3 -m http.server 5173",
+    "check": "node --check app.js && node --check renderer.js && node --check electron/main.js && node --check scripts/build-sample.js",
+    "build:sample": "node scripts/build-sample.js",
+    "test": "npm run check && npm run build:sample",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^43.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "world.wk42.htmlppt",
+    "productName": "PPT.html Studio",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "styles.css",
+      "app.js",
+      "renderer.js",
+      "README.md",
+      "LICENSE",
+      "build/icon.*",
+      "spec/**/*",
+      "docs/**/*",
+      "schema/**/*",
+      "examples/**/*",
+      "electron/**/*"
+    ],
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "artifactName": "htmlppt-${version}-mac-${arch}.${ext}"
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        "portable"
+      ],
+      "artifactName": "htmlppt-${version}-windows-${arch}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "category": "Office",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "artifactName": "htmlppt-${version}-linux-${arch}.${ext}"
+    }
+  }
+}

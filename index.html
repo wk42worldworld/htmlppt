@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PPT.html Studio</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">P</span>
+        <div>
+          <strong>PPT.html Studio</strong>
+          <small>v0.1</small>
+        </div>
+      </div>
+
+      <nav class="top-actions" aria-label="文件操作">
+        <button type="button" id="newDeckBtn">新建</button>
+        <button type="button" id="openDeckBtn">打开</button>
+        <button type="button" id="downloadDeckBtn" class="primary">下载 PPT.html</button>
+        <button type="button" id="jsonBtn">AI JSON</button>
+        <button type="button" id="presentBtn">演示</button>
+      </nav>
+      <input id="fileInput" type="file" accept=".html,.json,application/json,text/html" hidden>
+    </header>
+
+    <main class="main-layout">
+      <aside class="slide-rail" aria-label="幻灯片列表">
+        <div class="rail-head">
+          <span>页面</span>
+          <button type="button" id="addSlideBtn" title="添加页面">+</button>
+        </div>
+        <div class="slide-list" id="slideList"></div>
+        <div class="rail-tools">
+          <button type="button" id="duplicateSlideBtn">复制</button>
+          <button type="button" id="moveSlideUpBtn">上移</button>
+          <button type="button" id="moveSlideDownBtn">下移</button>
+          <button type="button" id="deleteSlideBtn" class="danger">删除</button>
+        </div>
+      </aside>
+
+      <section class="workspace" aria-label="编辑画布">
+        <div class="workspace-head">
+          <div class="deck-title-line">
+            <span id="currentSlideLabel">第 1 页</span>
+            <strong id="currentSlideTitle">标题</strong>
+          </div>
+          <div class="workspace-tools">
+            <button type="button" id="undoBtn">撤销</button>
+            <button type="button" id="redoBtn">重做</button>
+          </div>
+        </div>
+        <div class="stage-viewport" id="stageViewport">
+          <div class="stage-frame" id="stageFrame"></div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="属性面板">
+        <section class="panel-section">
+          <h2>文稿</h2>
+          <label>
+            名称
+            <input id="deckTitleInput" type="text">
+          </label>
+          <label>
+            主题
+            <select id="deckThemeInput">
+              <option value="paper">Paper</option>
+              <option value="launch">Launch</option>
+              <option value="studio">Studio</option>
+              <option value="boardroom">Boardroom</option>
+            </select>
+          </label>
+        </section>
+
+        <section class="panel-section">
+          <h2>页面</h2>
+          <label>
+            版式
+            <select id="slideLayoutInput"></select>
+          </label>
+          <label>
+            眉标
+            <input id="kickerInput" type="text">
+          </label>
+          <label>
+            标题
+            <textarea id="titleInput" rows="2"></textarea>
+          </label>
+          <label>
+            副标题
+            <textarea id="subtitleInput" rows="2"></textarea>
+          </label>
+          <label class="field-group" data-layouts="text,imageRight,imageLeft,section">
+            正文
+            <textarea id="bodyInput" rows="5"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft">
+          <h2>图片</h2>
+          <label>
+            图片 URL 或 Data URI
+            <input id="imageSrcInput" type="text">
+          </label>
+          <label>
+            替代文字
+            <input id="imageAltInput" type="text">
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="text,imageRight,imageLeft,timeline">
+          <h2>列表</h2>
+          <label>
+            每行一条；时间线可用 “标题 | 内容”
+            <textarea id="itemsInput" rows="6"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="compare">
+          <h2>对比</h2>
+          <label>
+            左侧标题
+            <input id="leftTitleInput" type="text">
+          </label>
+          <label>
+            左侧内容
+            <textarea id="leftTextInput" rows="3"></textarea>
+          </label>
+          <label>
+            右侧标题
+            <input id="rightTitleInput" type="text">
+          </label>
+          <label>
+            右侧内容
+            <textarea id="rightTextInput" rows="3"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="threeCards">
+          <h2>卡片</h2>
+          <label>
+            每行一张卡片：标题 | 内容
+            <textarea id="cardsInput" rows="6"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="data">
+          <h2>数据</h2>
+          <label>
+            每行一个指标：数值 | 标签 | 说明
+            <textarea id="metricsInput" rows="6"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="table">
+          <h2>表格</h2>
+          <label>
+            表头，用 | 分隔
+            <input id="tableColumnsInput" type="text">
+          </label>
+          <label>
+            每行一组单元格，用 | 分隔
+            <textarea id="tableRowsInput" rows="6"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="quote">
+          <h2>引用</h2>
+          <label>
+            引文
+            <textarea id="quoteInput" rows="4"></textarea>
+          </label>
+          <label>
+            作者
+            <input id="authorInput" type="text">
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="code">
+          <h2>代码</h2>
+          <label>
+            代码内容
+            <textarea id="codeInput" rows="8" spellcheck="false"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section">
+          <h2>备注</h2>
+          <label>
+            演讲备注
+            <textarea id="notesInput" rows="4"></textarea>
+          </label>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="presenter" id="presenter" hidden>
+    <div class="presenter-stage" id="presenterStage"></div>
+    <div class="presenter-controls">
+      <button type="button" id="presentPrevBtn">上一页</button>
+      <span id="presentCounter">1 / 1</span>
+      <button type="button" id="presentNextBtn">下一页</button>
+      <button type="button" id="presentExitBtn">退出</button>
+    </div>
+  </div>
+
+  <dialog class="json-dialog" id="jsonDialog">
+    <form method="dialog">
+      <header>
+        <strong>AI JSON</strong>
+        <button type="submit">关闭</button>
+      </header>
+      <textarea id="jsonTextarea" spellcheck="false"></textarea>
+      <footer>
+        <button type="button" id="copyJsonBtn">复制当前 JSON</button>
+        <button type="button" id="loadJsonBtn" class="primary">从文本载入</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="./renderer.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
