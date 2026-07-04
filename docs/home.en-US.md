@@ -4,6 +4,8 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 
 ## What Is New
 
+v0.2.8 fixes text insertion and editing smoothness. Clicking `Text` now adds a real visible canvas text box to the current slide instead of silently switching to a text layout. The text box lands away from the title by default, can be edited immediately, dragged, resized, nudged with arrow keys, deleted with Delete/Backspace, and is saved through structured `textBoxes` data. Side-panel typing is also frame-batched and draft persistence is debounced for smoother editing.
+
 v0.2.7 makes `.ppt.html` a true single-file container. Before saving or downloading, external images, videos, video posters, and audio are embedded as Data URI assets inside the same HTML file. Audio is also a first-class insertable, draggable, and replaceable component.
 
 v0.2.6 adds a visible component palette to the main editor. Users can click or drag text, image, video, chart, table, card, metric, timeline, quote, and code components into the current slide. Common toolbar commands are now icon-first with hover tooltips, video is supported as first-class slide content, and the app UI can switch between Chinese, English, Japanese, and Korean.

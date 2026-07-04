@@ -26,7 +26,8 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - `slides` 必须是非空数组。
 - 每页必须包含 `layout` 和 `title`。
 - 使用 `schema/ppt-html-v0.1.schema.json` 作为数据结构参考。
-- 不要生成 CSS、脚本、绝对定位文本框或 PPTX XML。
+- 不要生成 CSS、脚本、自由 HTML 或 PPTX XML。
+- 优先使用结构化版式字段；只有在用户明确需要标注、补充说明或保留人工编辑结果时，才少量使用 `textBoxes`。
 - 可以保留人类编辑产生的 `canvas` 位置和尺寸调整；除非用户明确要求微调位置，不要主动生成大量 `canvas` 坐标。
 
 推荐输出方式：

@@ -70,6 +70,7 @@ project-name.ppt.html
     "caption": "",
     "controls": true
   },
+  "textBoxes": [],
   "items": [],
   "cards": [],
   "metrics": [],
@@ -153,6 +154,31 @@ AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，
 - `caption`：音频说明。
 - `controls`：是否显示浏览器原生播放控件。
 - `autoplay`、`loop`、`muted`：可选播放行为。
+
+## Text Boxes
+
+`textBoxes` 是可选字段，用于保存人类在画布上插入的少量自由文本框。它适合标注、临时补充说明和局部强调；AI 生成主内容时仍应优先使用结构化字段和版式。
+
+```json
+"textBoxes": [
+  {
+    "id": "textbox-1",
+    "text": "双击直接编辑",
+    "x": 450,
+    "y": 270,
+    "w": 380,
+    "h": 96
+  }
+]
+```
+
+字段：
+
+- `text`：文本框内容。
+- `x`、`y`：文本框左上角在 1280 × 720 幻灯片坐标中的位置。
+- `w`：文本框宽度。
+- `h`：文本框最小高度。
+- 人类拖动或缩放后，编辑器也可能在 `canvas["textBoxes.0.text"]` 中保存轻量偏移。
 
 ## Chart Fields
 

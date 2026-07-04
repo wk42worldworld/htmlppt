@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.7";
+  var APP_VERSION_LABEL = "v0.2.8";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
@@ -25,6 +25,10 @@
   var selectedCanvasPath = "";
   var presenterUiTimer = 0;
   var presenterFullscreenActive = false;
+  var liveRenderFrame = 0;
+  var pendingLiveCanvas = false;
+  var pendingLiveSlideList = false;
+  var persistTimer = 0;
 
   var els = {};
   var I18N = {
@@ -65,7 +69,7 @@
       "insert.timeline": "时间线",
       "insert.quote": "引用",
       "insert.code": "代码",
-      "insert.text.title": "插入文本页面",
+      "insert.text.title": "新增可编辑文本框",
       "insert.image.title": "插入图片，或拖到画布创建图片页",
       "insert.video.title": "插入视频，或拖到画布创建视频页",
       "insert.chart.title": "插入可编辑图表",
@@ -174,6 +178,7 @@
       "canvas.cards": "卡片组",
       "canvas.metrics": "数据组",
       "canvas.timeline": "时间线",
+      "canvas.textBox": "文本框",
       "canvas.reset": "重置",
       "canvas.resetTitle": "重置这个元素的位置和尺寸",
       "canvas.resize": "拖拽调整尺寸",
@@ -205,6 +210,7 @@
       "sample.newSlideSubtitle": "在右侧面板编辑内容",
       "sample.textTitle": "新的文本页",
       "sample.textBody": "双击文字可以直接编辑；拖拽文字块可以移动位置。",
+      "sample.textBox": "新文本框",
       "sample.point1": "第一个要点",
       "sample.point2": "第二个要点",
       "sample.imageTitle": "图片展示",
@@ -291,7 +297,7 @@
     "insert.timeline": "Timeline",
     "insert.quote": "Quote",
     "insert.code": "Code",
-    "insert.text.title": "Insert a text slide",
+    "insert.text.title": "Add editable text box",
     "insert.image.title": "Insert an image, or drag to the canvas",
     "insert.video.title": "Insert a video, or drag to the canvas",
     "insert.chart.title": "Insert an editable chart",
@@ -398,6 +404,7 @@
     "canvas.cards": "Cards",
     "canvas.metrics": "Metrics",
     "canvas.timeline": "Timeline",
+    "canvas.textBox": "Text box",
     "canvas.reset": "Reset",
     "canvas.resetTitle": "Reset this element position and size",
     "canvas.resize": "Drag to resize",
@@ -429,6 +436,7 @@
     "sample.newSlideSubtitle": "Edit content in the right panel",
     "sample.textTitle": "New Text Slide",
     "sample.textBody": "Double-click text to edit it directly; drag text blocks to move them.",
+    "sample.textBox": "New text box",
     "sample.point1": "First point",
     "sample.point2": "Second point",
     "sample.imageTitle": "Image Showcase",
@@ -510,7 +518,7 @@
     "insert.timeline": "タイムライン",
     "insert.quote": "引用",
     "insert.code": "コード",
-    "insert.text.title": "テキストスライドを挿入",
+    "insert.text.title": "編集可能なテキストボックスを追加",
     "insert.image.title": "画像を挿入、またはキャンバスへドラッグ",
     "insert.video.title": "動画を挿入、またはキャンバスへドラッグ",
     "insert.chart.title": "編集可能なグラフを挿入",
@@ -659,7 +667,7 @@
     "insert.timeline": "타임라인",
     "insert.quote": "인용",
     "insert.code": "코드",
-    "insert.text.title": "텍스트 슬라이드 삽입",
+    "insert.text.title": "편집 가능한 텍스트 상자 추가",
     "insert.image.title": "이미지를 삽입하거나 캔버스로 드래그",
     "insert.video.title": "비디오를 삽입하거나 캔버스로 드래그",
     "insert.chart.title": "편집 가능한 차트 삽입",
@@ -878,12 +886,14 @@
     "field.audioSrc": "音声 URL または Data URI",
     "layout.audio": "音声",
     "canvas.audio": "音声",
+    "canvas.textBox": "テキストボックス",
     "toast.audioAdded": "音声を追加しました",
     "toast.assetsEmbedded": "{count} 個の外部アセットを単一ファイルに埋め込みました",
     "alert.assetPackageFailed": "保存前にすべてのアセットを単一ファイルへ埋め込む必要がありますが、次のアセットを読み込めませんでした:\n{details}\nローカルファイルを選ぶか、アクセス可能な URL に変更してください。",
     "asset.failureLine": "{slide} 枚目 {path}: {src} ({message})",
     "sample.audioTitle": "音声再生",
-    "sample.audioCaption": "音声をダブルクリックして差し替え"
+    "sample.audioCaption": "音声をダブルクリックして差し替え",
+    "sample.textBox": "新しいテキストボックス"
   });
 
   Object.assign(I18N["ko-KR"], {
@@ -894,12 +904,14 @@
     "field.audioSrc": "오디오 URL 또는 Data URI",
     "layout.audio": "오디오",
     "canvas.audio": "오디오",
+    "canvas.textBox": "텍스트 상자",
     "toast.audioAdded": "오디오가 추가되었습니다",
     "toast.assetsEmbedded": "외부 자산 {count}개를 단일 파일에 포함했습니다",
     "alert.assetPackageFailed": "저장하려면 모든 자산을 단일 파일에 포함해야 하지만 다음 자산을 읽을 수 없습니다:\n{details}\n로컬 파일을 선택하거나 접근 가능한 URL로 바꾸세요.",
     "asset.failureLine": "{slide}번 슬라이드 {path}: {src} ({message})",
     "sample.audioTitle": "오디오 재생",
-    "sample.audioCaption": "오디오 블록을 더블 클릭해 교체"
+    "sample.audioCaption": "오디오 블록을 더블 클릭해 교체",
+    "sample.textBox": "새 텍스트 상자"
   });
 
   document.addEventListener("DOMContentLoaded", init);
@@ -1328,6 +1340,19 @@
 
   function insertComponent(type, options) {
     var settings = options || {};
+    if (type === "text") {
+      var nextPath = "";
+      commit(function () {
+        nextPath = addTextBoxToSlide(currentSlide(), settings.point);
+        selectedCanvasPath = nextPath;
+      });
+      toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
+      window.setTimeout(function () {
+        var node = canvasNodeByPath(nextPath);
+        if (node) startCanvasEdit(node);
+      }, 0);
+      return;
+    }
     if (type === "image" && settings.source === "click") {
       openImagePicker();
       return;
@@ -1452,6 +1477,24 @@
     }
   }
 
+  function addTextBoxToSlide(slide, point) {
+    slide.textBoxes = Array.isArray(slide.textBoxes) ? slide.textBoxes : [];
+    var index = slide.textBoxes.length;
+    var x = point && isFinite(point.x) ? point.x - 190 : 730 + (index % 3) * 28;
+    var y = point && isFinite(point.y) ? point.y - 48 : 430 + (index % 4) * 30;
+    x = clamp(x, 40, 1040);
+    y = clamp(y, 40, 620);
+    slide.textBoxes.push({
+      id: PPTHtml.uid("textbox"),
+      text: t("sample.textBox"),
+      x: Math.round(x),
+      y: Math.round(y),
+      w: 380,
+      h: 96
+    });
+    return "textBoxes." + index + ".text";
+  }
+
   function insertLabel(type) {
     return t("insert." + type) || type;
   }
@@ -1539,7 +1582,9 @@
   }
 
   function isTextEditingTarget(target) {
-    return target && /INPUT|TEXTAREA|SELECT/.test(target.tagName);
+    return target && (/INPUT|TEXTAREA|SELECT/.test(target.tagName)
+      || target.isContentEditable
+      || Boolean(target.closest && target.closest("[contenteditable='true']")));
   }
 
   function bindDeckInput(input, setter) {
@@ -1561,10 +1606,9 @@
       pushLiveHistory();
       setter(input.value);
       markDirty();
-      renderCanvas();
-      renderSlideList();
       updateButtons();
-      persist();
+      updateFileStatus();
+      schedulePersist();
     });
   }
 
@@ -1587,10 +1631,11 @@
       pushLiveHistory();
       setter(currentSlide(), input.value);
       markDirty();
-      renderCanvas();
-      renderSlideList();
-      updateButtons();
-      persist();
+      scheduleLiveRender({
+        canvas: input !== els.notesInput,
+        slideList: input === els.titleInput
+      });
+      schedulePersist();
     });
   }
 
@@ -1606,6 +1651,39 @@
     if (history.length > 80) history.shift();
     future = [];
     activeEditPushed = true;
+  }
+
+  function scheduleLiveRender(options) {
+    var settings = options || {};
+    pendingLiveCanvas = pendingLiveCanvas || Boolean(settings.canvas);
+    pendingLiveSlideList = pendingLiveSlideList || Boolean(settings.slideList);
+    if (liveRenderFrame) return;
+    liveRenderFrame = window.requestAnimationFrame(function () {
+      liveRenderFrame = 0;
+      if (pendingLiveCanvas) renderCanvas();
+      if (pendingLiveSlideList) renderSlideList();
+      pendingLiveCanvas = false;
+      pendingLiveSlideList = false;
+      updateButtons();
+      updateFileStatus();
+    });
+  }
+
+  function cancelLiveRender() {
+    if (liveRenderFrame) {
+      window.cancelAnimationFrame(liveRenderFrame);
+      liveRenderFrame = 0;
+    }
+    pendingLiveCanvas = false;
+    pendingLiveSlideList = false;
+  }
+
+  function schedulePersist() {
+    window.clearTimeout(persistTimer);
+    persistTimer = window.setTimeout(function () {
+      persistTimer = 0;
+      persist();
+    }, 220);
   }
 
   function commit(mutator) {
@@ -1639,6 +1717,7 @@
   }
 
   function renderAll() {
+    cancelLiveRender();
     renderSlideList();
     renderCanvas();
     syncInspector();
@@ -1735,6 +1814,7 @@
     bindCanvasMetrics();
     bindCanvasTable();
     bindCanvasChartLegend();
+    bindCanvasTextBoxes();
     bindCanvasText(".ppt-code", "code", { multiline: true, preserveWhitespace: true });
     applyCanvasOffsets();
   }
@@ -1812,6 +1892,12 @@
     });
   }
 
+  function bindCanvasTextBoxes() {
+    els.stageFrame.querySelectorAll(".ppt-textbox").forEach(function (node, index) {
+      registerCanvasEdit(node, "textBoxes." + index + ".text", { labelKey: "canvas.textBox" });
+    });
+  }
+
   function applyCanvasOffsets() {
     els.stageFrame.querySelectorAll("[data-canvas-edit]").forEach(function (node) {
       setCanvasOffsetStyle(node, getCanvasOffset(node.getAttribute("data-canvas-edit")));
@@ -1885,8 +1971,10 @@
     setCanvasOffset(drag.path, offset);
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
-    renderAll();
-    persist();
+    renderCanvasControls();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
   }
 
   function handleCanvasViewportPointerDown(event) {
@@ -2068,8 +2156,10 @@
     setCanvasOffset(resize.path, offset);
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
-    renderAll();
-    persist();
+    renderCanvasControls();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
   }
 
   function handleCanvasShortcut(event) {
@@ -2089,7 +2179,7 @@
 
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
-      resetSelectedCanvasOffset();
+      if (!deleteSelectedTextBox()) resetSelectedCanvasOffset();
       return true;
     }
 
@@ -2114,15 +2204,19 @@
     if (history.length > 80) history.shift();
     future = [];
     setCanvasOffset(selectedCanvasPath, next);
+    setCanvasOffsetStyle(node, next);
+    positionCanvasSelectionBox(node);
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
-    renderAll();
-    persist();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
     return true;
   }
 
   function resetSelectedCanvasOffset() {
     if (!selectedCanvasPath) return;
+    var node = canvasNodeByPath(selectedCanvasPath);
     var slide = currentSlide();
     var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
     if (!canvas[selectedCanvasPath]) return;
@@ -2133,8 +2227,52 @@
     if (!Object.keys(canvas).length) delete slide.canvas;
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
+    if (node) {
+      setCanvasOffsetStyle(node, getCanvasOffset(selectedCanvasPath));
+      positionCanvasSelectionBox(node);
+    }
+    renderCanvasControls();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+  }
+
+  function deleteSelectedTextBox() {
+    var match = String(selectedCanvasPath || "").match(/^textBoxes\.(\d+)\.text$/);
+    if (!match) return false;
+    var slide = currentSlide();
+    var index = Number(match[1]);
+    if (!Array.isArray(slide.textBoxes) || !slide.textBoxes[index]) return false;
+
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+    slide.textBoxes.splice(index, 1);
+    remapTextBoxCanvasPaths(slide, index);
+    selectedCanvasPath = "";
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
     renderAll();
-    persist();
+    schedulePersist();
+    return true;
+  }
+
+  function remapTextBoxCanvasPaths(slide, removedIndex) {
+    var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
+    var nextCanvas = {};
+    Object.keys(canvas).forEach(function (path) {
+      var match = path.match(/^textBoxes\.(\d+)\.text$/);
+      if (!match) {
+        nextCanvas[path] = canvas[path];
+        return;
+      }
+      var index = Number(match[1]);
+      if (index === removedIndex) return;
+      var nextPath = index > removedIndex ? "textBoxes." + (index - 1) + ".text" : path;
+      nextCanvas[nextPath] = canvas[path];
+    });
+    if (Object.keys(nextCanvas).length) slide.canvas = nextCanvas;
+    else delete slide.canvas;
   }
 
   function currentFrameScale() {
@@ -2182,6 +2320,11 @@
   }
 
   function setCanvasOffsetStyle(node, offset) {
+    var isTextBox = node.classList.contains("ppt-textbox");
+    if (isTextBox && !node.dataset.canvasBaseWidth) {
+      node.dataset.canvasBaseWidth = node.style.width || "";
+      node.dataset.canvasBaseMinHeight = node.style.minHeight || "";
+    }
     var x = Number(offset && offset.x) || 0;
     var y = Number(offset && offset.y) || 0;
     var w = Math.max(0, Number(offset && offset.w) || 0);
@@ -2194,26 +2337,26 @@
       node.style.width = w + "px";
       node.style.maxWidth = w + "px";
     } else {
-      node.style.width = "";
+      node.style.width = isTextBox ? node.dataset.canvasBaseWidth || "" : "";
       node.style.maxWidth = "";
     }
     if (h) {
       node.style.minHeight = h + "px";
     } else {
-      node.style.minHeight = "";
+      node.style.minHeight = isTextBox ? node.dataset.canvasBaseMinHeight || "" : "";
     }
     if (!x && !y) {
       node.style.transform = "";
       if (!w && !h) {
-        node.style.position = "";
+        if (!isTextBox) node.style.position = "";
         node.style.zIndex = "";
       } else {
-        node.style.position = "relative";
+        if (!isTextBox) node.style.position = "relative";
         node.style.zIndex = "5";
       }
       return;
     }
-    node.style.position = "relative";
+    if (!isTextBox) node.style.position = "relative";
     node.style.zIndex = "5";
     node.style.transform = "translate(" + x + "px, " + y + "px)";
   }
@@ -2296,11 +2439,13 @@
     if (!activeCanvasEdit) return;
     if (event.key === "Escape") {
       event.preventDefault();
+      event.stopPropagation();
       finishCanvasEdit(false);
       return;
     }
     if (event.key === "Enter" && (activeCanvasEdit.options.singleLine || event.metaKey || event.ctrlKey)) {
       event.preventDefault();
+      event.stopPropagation();
       finishCanvasEdit(true);
     }
   }
@@ -2403,7 +2548,7 @@
     els.stageViewport.classList.remove("is-drop-target");
     var componentType = event.dataTransfer.getData("application/x-htmlppt-component");
     if (componentType) {
-      insertComponent(componentType, { source: "drop" });
+      insertComponent(componentType, { source: "drop", point: canvasPointFromEvent(event) });
       return;
     }
 
@@ -2423,6 +2568,15 @@
     if (audioFile) {
       readAudioFile(audioFile);
     }
+  }
+
+  function canvasPointFromEvent(event) {
+    var frameRect = els.stageFrame.getBoundingClientRect();
+    var scale = currentFrameScale();
+    return {
+      x: clamp((event.clientX - frameRect.left) / scale, 0, PPTHtml.baseWidth),
+      y: clamp((event.clientY - frameRect.top) / scale, 0, PPTHtml.baseHeight)
+    };
   }
 
   function hasImageFile(dataTransfer) {
@@ -2906,6 +3060,10 @@
   }
 
   function persist() {
+    if (persistTimer) {
+      window.clearTimeout(persistTimer);
+      persistTimer = 0;
+    }
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(deck));
     } catch (error) {

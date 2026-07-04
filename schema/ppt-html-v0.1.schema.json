@@ -206,6 +206,30 @@
         }
       }
     },
+    "textBox": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
+        }
+      }
+    },
     "canvasOffset": {
       "type": "object",
       "additionalProperties": false,
@@ -281,6 +305,12 @@
         },
         "audio": {
           "$ref": "#/$defs/audio"
+        },
+        "textBoxes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/textBox"
+          }
         },
         "items": {
           "type": "array",

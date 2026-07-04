@@ -26,7 +26,8 @@ Requirements:
 - `slides` must be a non-empty array.
 - Every slide must include `layout` and `title`.
 - Use `schema/ppt-html-v0.1.schema.json` as the structure reference.
-- Do not generate CSS, scripts, absolute-positioned text boxes, or PPTX XML.
+- Do not generate CSS, scripts, free-form HTML, or PPTX XML.
+- Prefer structured layout fields. Use `textBoxes` sparingly only when the user needs annotations, extra callouts, or preservation of human edits.
 - Preserve human-created `canvas` position and size adjustments when they already exist. Do not generate many `canvas` coordinates unless the user explicitly asks for position tweaking.
 
 Recommended output:

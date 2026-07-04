@@ -140,7 +140,7 @@ Delete is disabled when only one slide remains, so the deck cannot become empty.
 
 The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas:
 
-- `Text`: creates a normal text slide.
+- `Text`: adds a visible text box to the current slide; double-click to edit it or drag it to a specific canvas position.
 - `Image`: click to choose a local image; drag to create an image slide placeholder.
 - `Video`: click to choose a local video; drag to create a video slide placeholder.
 - `Audio`: click to choose a local audio file; drag to create an audio slide placeholder.

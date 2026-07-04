@@ -173,6 +173,30 @@ assert.match(canvasHtml, /data-ppt-path/);
 assert.match(canvasHtml, /24/);
 assert.match(canvasHtml, /420/);
 
+const textBoxDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Text box deck",
+  slides: [
+    {
+      layout: "hero",
+      title: "Visible text box",
+      textBoxes: [
+        { id: "textbox-test", text: "Editable overlay", x: 440, y: 260, w: 360, h: 88 }
+      ],
+      canvas: {
+        "textBoxes.0.text": { x: 12, y: -8, w: 400, h: 100 }
+      }
+    }
+  ]
+});
+assert.equal(textBoxDeck.slides[0].textBoxes.length, 1);
+assert.equal(textBoxDeck.slides[0].textBoxes[0].text, "Editable overlay");
+assert.equal(textBoxDeck.slides[0].canvas["textBoxes.0.text"].w, 400);
+const textBoxHtml = ppt.exportStandalone(textBoxDeck);
+assert.match(textBoxHtml, /ppt-textbox/);
+assert.match(textBoxHtml, /Editable overlay/);
+assert.match(textBoxHtml, /textBoxes\.0\.text/);
+
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);

@@ -43,6 +43,8 @@
     ".ppt-list{display:grid;gap:18px;margin:0;padding:0;list-style:none}",
     ".ppt-list li{position:relative;padding-left:34px;color:var(--ppt-text);font-size:27px;line-height:1.38}",
     ".ppt-list li:before{content:'';position:absolute;left:0;top:14px;width:12px;height:12px;border-radius:50%;background:var(--ppt-accent)}",
+    ".ppt-textbox{position:absolute;z-index:7;padding:14px 16px;border:1px solid var(--ppt-line);border-radius:8px;background:rgba(255,255,255,.88);color:var(--ppt-text);font-size:28px;line-height:1.26;font-weight:650;white-space:pre-wrap;box-shadow:0 14px 34px rgba(18,24,38,.14);backdrop-filter:blur(8px)}",
+    ".ppt-theme-launch .ppt-textbox{background:rgba(35,35,35,.86);color:var(--ppt-text);box-shadow:0 14px 34px rgba(0,0,0,.28)}",
     ".ppt-media{position:relative;overflow:hidden;margin:0;border-radius:8px;background:var(--ppt-surface);border:1px solid var(--ppt-line);min-height:260px}",
     ".ppt-media img{display:block;width:100%;height:100%;object-fit:cover}",
     ".ppt-media[data-fit='contain'] img{object-fit:contain;background:var(--ppt-surface)}",
@@ -190,6 +192,22 @@
     return audio;
   }
 
+  function normalizeTextBox(rawTextBox, index) {
+    var box = rawTextBox && typeof rawTextBox === "object" ? clone(rawTextBox) : {};
+    var x = Number(box.x);
+    var y = Number(box.y);
+    var w = Number(box.w);
+    var h = Number(box.h);
+    return {
+      id: safeText(box.id || "textbox-" + (index + 1)),
+      text: safeText(box.text == null ? "Double-click to edit" : box.text),
+      x: isFinite(x) ? x : 730 + index * 28,
+      y: isFinite(y) ? y : 430 + index * 30,
+      w: isFinite(w) && w > 0 ? w : 380,
+      h: isFinite(h) && h > 0 ? h : 96
+    };
+  }
+
   function normalizeChart(rawChart) {
     var chart = rawChart && typeof rawChart === "object" ? clone(rawChart) : {};
     chart.kind = CHART_KINDS.indexOf(chart.kind) !== -1 ? chart.kind : "bar";
@@ -317,6 +335,19 @@
     appendText(stack, "p", "ppt-body", slide.body);
     if (includeList && asArray(slide.items).length) stack.appendChild(createList(slide.items));
     return stack;
+  }
+
+  function appendTextBoxes(article, slide) {
+    asArray(slide.textBoxes).forEach(function (item, index) {
+      var box = normalizeTextBox(item, index);
+      var node = el("div", "ppt-textbox", box.text);
+      node.style.left = box.x + "px";
+      node.style.top = box.y + "px";
+      node.style.width = box.w + "px";
+      node.style.minHeight = box.h + "px";
+      node.setAttribute("data-textbox-id", box.id);
+      article.appendChild(node);
+    });
   }
 
   function svgEl(tag, attrs) {
@@ -570,6 +601,9 @@
     tagPath(article.querySelector(".ppt-card-grid"), "cards");
     tagPath(article.querySelector(".ppt-metric-grid"), "metrics");
     tagPath(article.querySelector(".ppt-timeline"), "timeline");
+    article.querySelectorAll(".ppt-textbox").forEach(function (node, index) {
+      tagPath(node, "textBoxes." + index + ".text");
+    });
 
     if (slide.layout === "quote") {
       tagPath(article.querySelector(".ppt-quote"), "quote");
@@ -627,7 +661,7 @@
       var w = Math.max(0, Number(offset.w) || 0);
       var h = Math.max(0, Number(offset.h) || 0);
       if (!x && !y && !w && !h) return;
-      node.style.position = "relative";
+      if (!node.classList.contains("ppt-textbox")) node.style.position = "relative";
       node.style.zIndex = "5";
       if (x || y) node.style.transform = "translate(" + x + "px, " + y + "px)";
       if (w) {
@@ -639,6 +673,7 @@
   }
 
   function finalizeSlide(article, slide) {
+    appendTextBoxes(article, slide);
     applyCanvasOffsets(article, slide);
     return article;
   }
@@ -879,6 +914,7 @@
     slide.image = normalizeImage(slide.image);
     slide.video = normalizeVideo(slide.video);
     slide.audio = normalizeAudio(slide.audio);
+    slide.textBoxes = asArray(slide.textBoxes).map(normalizeTextBox);
     slide.items = asArray(slide.items);
     slide.cards = asArray(slide.cards);
     slide.metrics = asArray(slide.metrics);
@@ -1368,6 +1404,7 @@
       "function media(m){m=m||{};var b=e('figure','ppt-media');b.setAttribute('data-fit',m.fit==='contain'?'contain':'cover');if(m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));a(b,'figcaption','ppt-caption',m.caption);return b}" +
       "function vid(v){v=v||{};var b=e('figure','ppt-video');b.setAttribute('data-fit',v.fit==='contain'?'contain':'cover');if(v.src){var n=document.createElement('video');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);n.playsInline=true;if(v.poster)n.poster=v.poster;b.appendChild(n)}else b.appendChild(e('div','ppt-video-placeholder','Video'));a(b,'figcaption','ppt-caption',v.caption);return b}" +
       "function aud(v){v=v||{};var b=e('figure','ppt-audio');if(v.src){var n=document.createElement('audio');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);b.appendChild(n)}else b.appendChild(e('div','ppt-audio-placeholder','Audio'));a(b,'figcaption','ppt-caption',v.caption);return b}" +
+      "function tbs(n,s){arr(s.textBoxes).forEach(function(o,j){o=o||{};var b=e('div','ppt-textbox',o.text==null?'Double-click to edit':o.text);b.style.left=num(o.x==null?730+j*28:o.x)+'px';b.style.top=num(o.y==null?430+j*30:o.y)+'px';b.style.width=Math.max(80,num(o.w)||380)+'px';b.style.minHeight=Math.max(32,num(o.h)||96)+'px';n.appendChild(b)})}" +
       "function list(items){var u=e('ul','ppt-list');arr(items).slice(0,6).forEach(function(it){var x=typeof it==='string'?it:(it.text||it.title||'');if(x)u.appendChild(e('li','',x))});return u}" +
       "function stack(s,li){var x=e('div','ppt-content-stack');a(x,'div','ppt-kicker',s.kicker);a(x,'h1','ppt-title',s.title);a(x,'p','ppt-subtitle',s.subtitle);a(x,'p','ppt-body',s.body);if(li&&arr(s.items).length)x.appendChild(list(s.items));return x}" +
       "function se(t,o){var n=document.createElementNS('http://www.w3.org/2000/svg',t);Object.keys(o||{}).forEach(function(k){if(o[k]!=null)n.setAttribute(k,o[k])});return n}" +
@@ -1384,13 +1421,13 @@
       "function li(l,j,t,v,u){var it=e('div','ppt-chart-legend-item'),sw=e('span','ppt-chart-swatch '+cc(j)),b=e('div','');it.appendChild(sw);a(b,'strong','',t);if(v!=null)a(b,'small','',v+(u?' '+u:''));it.appendChild(b);l.appendChild(it)}" +
       "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
       "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
-      "function tp(n,p){if(n)n.setAttribute('data-ppt-path',p)}function off(n,s){tp(n.querySelector('.ppt-kicker'),'kicker');tp(n.querySelector('.ppt-title'),'title');tp(n.querySelector('.ppt-subtitle'),'subtitle');tp(n.querySelector('.ppt-body'),'body');tp(n.querySelector('.ppt-media'),'image');tp(n.querySelector('.ppt-caption'),'image.caption');tp(n.querySelector('.ppt-video'),'video');if(n.querySelector('.ppt-video .ppt-caption'))tp(n.querySelector('.ppt-video .ppt-caption'),'video.caption');tp(n.querySelector('.ppt-audio'),'audio');if(n.querySelector('.ppt-audio .ppt-caption'))tp(n.querySelector('.ppt-audio .ppt-caption'),'audio.caption');tp(n.querySelector('.ppt-chart-wrap'),'chart');tp(n.querySelector('.ppt-table'),'table');tp(n.querySelector('.ppt-card-grid'),'cards');tp(n.querySelector('.ppt-metric-grid'),'metrics');tp(n.querySelector('.ppt-timeline'),'timeline');if(s.layout==='quote'){tp(n.querySelector('.ppt-quote'),'quote');tp(n.querySelector('.ppt-author'),'author')}n.querySelectorAll('.ppt-list li').forEach(function(x,j){tp(x,'items.'+j+'.text')});['left','right'].forEach(function(side,j){var c=n.querySelectorAll('.ppt-compare-card')[j];if(c){tp(c.querySelector('h2'),side+'.title');tp(c.querySelector('p'),side+'.text')}});n.querySelectorAll('.ppt-card').forEach(function(c,j){tp(c.querySelector('h2'),'cards.'+j+'.title');tp(c.querySelector('p'),'cards.'+j+'.text')});n.querySelectorAll('.ppt-time-item').forEach(function(c,j){tp(c.querySelector('h2'),'items.'+j+'.title');tp(c.querySelector('p'),'items.'+j+'.text')});n.querySelectorAll('.ppt-metric').forEach(function(c,j){tp(c.querySelector('strong'),'metrics.'+j+'.value');tp(c.querySelector('span'),'metrics.'+j+'.label');tp(c.querySelector('p'),'metrics.'+j+'.detail')});n.querySelectorAll('.ppt-table th').forEach(function(c,j){tp(c,'table.columns.'+j)});n.querySelectorAll('.ppt-table tbody tr').forEach(function(r,ri){r.querySelectorAll('td').forEach(function(c,ci){tp(c,'table.rows.'+ri+'.'+ci)})});n.querySelectorAll('.ppt-chart-legend-item strong').forEach(function(x,j){tp(x,s.chart&&s.chart.kind==='donut'?'chart.labels.'+j:'chart.series.'+j+'.name')});if(s.chart&&s.chart.kind==='donut')n.querySelectorAll('.ppt-chart-legend-item small').forEach(function(x,j){tp(x,'chart.series.0.values.'+j)});tp(n.querySelector('.ppt-code'),'code');var cv=s.canvas&&typeof s.canvas==='object'?s.canvas:{};n.querySelectorAll('[data-ppt-path]').forEach(function(x){var o=cv[x.getAttribute('data-ppt-path')]||{},dx=num(o.x),dy=num(o.y),ww=Math.max(0,num(o.w)),hh=Math.max(0,num(o.h));if(!dx&&!dy&&!ww&&!hh)return;x.style.position='relative';x.style.zIndex='5';if(dx||dy)x.style.transform='translate('+dx+'px, '+dy+'px)';if(ww){x.style.width=ww+'px';x.style.maxWidth=ww+'px'}if(hh)x.style.minHeight=hh+'px'})}" +
+      "function tp(n,p){if(n)n.setAttribute('data-ppt-path',p)}function off(n,s){tp(n.querySelector('.ppt-kicker'),'kicker');tp(n.querySelector('.ppt-title'),'title');tp(n.querySelector('.ppt-subtitle'),'subtitle');tp(n.querySelector('.ppt-body'),'body');tp(n.querySelector('.ppt-media'),'image');tp(n.querySelector('.ppt-caption'),'image.caption');tp(n.querySelector('.ppt-video'),'video');if(n.querySelector('.ppt-video .ppt-caption'))tp(n.querySelector('.ppt-video .ppt-caption'),'video.caption');tp(n.querySelector('.ppt-audio'),'audio');if(n.querySelector('.ppt-audio .ppt-caption'))tp(n.querySelector('.ppt-audio .ppt-caption'),'audio.caption');tp(n.querySelector('.ppt-chart-wrap'),'chart');tp(n.querySelector('.ppt-table'),'table');tp(n.querySelector('.ppt-card-grid'),'cards');tp(n.querySelector('.ppt-metric-grid'),'metrics');tp(n.querySelector('.ppt-timeline'),'timeline');n.querySelectorAll('.ppt-textbox').forEach(function(x,j){tp(x,'textBoxes.'+j+'.text')});if(s.layout==='quote'){tp(n.querySelector('.ppt-quote'),'quote');tp(n.querySelector('.ppt-author'),'author')}n.querySelectorAll('.ppt-list li').forEach(function(x,j){tp(x,'items.'+j+'.text')});['left','right'].forEach(function(side,j){var c=n.querySelectorAll('.ppt-compare-card')[j];if(c){tp(c.querySelector('h2'),side+'.title');tp(c.querySelector('p'),side+'.text')}});n.querySelectorAll('.ppt-card').forEach(function(c,j){tp(c.querySelector('h2'),'cards.'+j+'.title');tp(c.querySelector('p'),'cards.'+j+'.text')});n.querySelectorAll('.ppt-time-item').forEach(function(c,j){tp(c.querySelector('h2'),'items.'+j+'.title');tp(c.querySelector('p'),'items.'+j+'.text')});n.querySelectorAll('.ppt-metric').forEach(function(c,j){tp(c.querySelector('strong'),'metrics.'+j+'.value');tp(c.querySelector('span'),'metrics.'+j+'.label');tp(c.querySelector('p'),'metrics.'+j+'.detail')});n.querySelectorAll('.ppt-table th').forEach(function(c,j){tp(c,'table.columns.'+j)});n.querySelectorAll('.ppt-table tbody tr').forEach(function(r,ri){r.querySelectorAll('td').forEach(function(c,ci){tp(c,'table.rows.'+ri+'.'+ci)})});n.querySelectorAll('.ppt-chart-legend-item strong').forEach(function(x,j){tp(x,s.chart&&s.chart.kind==='donut'?'chart.labels.'+j:'chart.series.'+j+'.name')});if(s.chart&&s.chart.kind==='donut')n.querySelectorAll('.ppt-chart-legend-item small').forEach(function(x,j){tp(x,'chart.series.0.values.'+j)});tp(n.querySelector('.ppt-code'),'code');var cv=s.canvas&&typeof s.canvas==='object'?s.canvas:{};n.querySelectorAll('[data-ppt-path]').forEach(function(x){var o=cv[x.getAttribute('data-ppt-path')]||{},dx=num(o.x),dy=num(o.y),ww=Math.max(0,num(o.w)),hh=Math.max(0,num(o.h));if(!dx&&!dy&&!ww&&!hh)return;if(!x.classList.contains('ppt-textbox'))x.style.position='relative';x.style.zIndex='5';if(dx||dy)x.style.transform='translate('+dx+'px, '+dy+'px)';if(ww){x.style.width=ww+'px';x.style.maxWidth=ww+'px'}if(hh)x.style.minHeight=hh+'px'})}" +
       "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='video'){n.appendChild(stack(s,false));n.appendChild(vid(s.video));return n}if(s.layout==='audio'){n.appendChild(stack(s,false));n.appendChild(aud(s.audio));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
       "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
       "function fit(){var sc=Math.min(window.innerWidth/w,window.innerHeight/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
       "function bg(){var sl=stage.querySelector('.ppt-slide');if(sl)root.style.background=getComputedStyle(sl).backgroundColor||''}" +
       "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}" +
-      "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';var sd=arr(d.slides)[i]||{},sn=slide(sd);off(sn,sd);stage.appendChild(sn);count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
+      "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';var sd=arr(d.slides)[i]||{},sn=slide(sd);tbs(sn,sd);off(sn,sd);stage.appendChild(sn);count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
       "function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}" +
       "function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}" +
       "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;" +
