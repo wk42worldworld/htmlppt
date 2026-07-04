@@ -42,7 +42,7 @@
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
-      "imageFileBtn", "imageSrcInput", "imageAltInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
+      "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "cardsInput", "metricsInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
@@ -230,8 +230,10 @@
     bindSlideInput(els.titleInput, function (slide, value) { slide.title = value; });
     bindSlideInput(els.subtitleInput, function (slide, value) { slide.subtitle = value; });
     bindSlideInput(els.bodyInput, function (slide, value) { slide.body = value; });
+    bindSlideInput(els.imageFitInput, function (slide, value) { slide.image.fit = value; });
     bindSlideInput(els.imageSrcInput, function (slide, value) { slide.image.src = value; });
     bindSlideInput(els.imageAltInput, function (slide, value) { slide.image.alt = value; });
+    bindSlideInput(els.imageCaptionInput, function (slide, value) { slide.image.caption = value; });
     bindSlideInput(els.itemsInput, function (slide, value) { slide.items = parseRows(value); });
     bindSlideInput(els.leftTitleInput, function (slide, value) { slide.left.title = value; });
     bindSlideInput(els.leftTextInput, function (slide, value) { slide.left.text = value; });
@@ -512,8 +514,10 @@
     els.titleInput.value = slide.title;
     els.subtitleInput.value = slide.subtitle;
     els.bodyInput.value = slide.body;
+    els.imageFitInput.value = slide.image.fit || "cover";
     els.imageSrcInput.value = slide.image.src || "";
     els.imageAltInput.value = slide.image.alt || "";
+    els.imageCaptionInput.value = slide.image.caption || "";
     els.itemsInput.value = stringifyRows(slide.items);
     els.leftTitleInput.value = slide.left.title || "";
     els.leftTextInput.value = slide.left.text || "";

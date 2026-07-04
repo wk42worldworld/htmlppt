@@ -99,17 +99,24 @@
             副标题
             <textarea id="subtitleInput" rows="2"></textarea>
           </label>
-          <label class="field-group" data-layouts="text,imageRight,imageLeft,section">
+          <label class="field-group" data-layouts="text,imageRight,imageLeft,imageBackground,section">
             正文
             <textarea id="bodyInput" rows="5"></textarea>
           </label>
         </section>
 
-        <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft">
+        <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft,imageFull,imageBackground">
           <h2>图片</h2>
           <div class="inline-tools">
             <button type="button" id="imageFileBtn">选择本地图片</button>
           </div>
+          <label>
+            适配
+            <select id="imageFitInput">
+              <option value="cover">填充裁切</option>
+              <option value="contain">完整显示</option>
+            </select>
+          </label>
           <label>
             图片 URL 或 Data URI
             <input id="imageSrcInput" type="text">
@@ -117,6 +124,10 @@
           <label>
             替代文字
             <input id="imageAltInput" type="text">
+          </label>
+          <label>
+            图片说明
+            <input id="imageCaptionInput" type="text">
           </label>
         </section>
 

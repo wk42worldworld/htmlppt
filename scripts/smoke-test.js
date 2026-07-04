@@ -37,6 +37,25 @@ assert.equal(badResult.ok, false);
 assert.ok(badResult.errors.some((item) => item.path === "slides[0].layout"));
 assert.match(ppt.formatValidationReport(badDeck, badResult), /AI repair instruction/);
 
+const imageDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Image deck",
+  slides: [
+    {
+      layout: "imageFull",
+      title: "Full image",
+      image: {
+        src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E",
+        alt: "Example image",
+        caption: "Image caption",
+        fit: "contain"
+      }
+    }
+  ]
+});
+assert.equal(imageDeck.slides[0].image.fit, "contain");
+assert.equal(ppt.validateDeck(imageDeck).ok, true);
+
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);

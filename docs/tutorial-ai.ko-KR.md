@@ -109,6 +109,8 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 | `text` | 본문과 목록 | `title`, `body`, `items` |
 | `imageRight` | 왼쪽 텍스트, 오른쪽 이미지 | `title`, `body`, `items`, `image` |
 | `imageLeft` | 왼쪽 이미지, 오른쪽 텍스트 | `title`, `body`, `items`, `image` |
+| `imageFull` | 전체 슬라이드 이미지 | `title`, `subtitle`, `image` |
+| `imageBackground` | 이미지 배경과 텍스트 | `title`, `subtitle`, `body`, `items`, `image` |
 | `compare` | 2열 비교 | `left`, `right` |
 | `threeCards` | 세 가지 핵심 | `cards` |
 | `quote` | 인용, 주장 | `quote`, `author` |
@@ -135,11 +137,13 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 ```json
 "image": {
   "src": "https://example.com/image.png",
-  "alt": "제품 UI 스크린샷"
+  "alt": "제품 UI 스크린샷",
+  "caption": "선택적 이미지 캡션",
+  "fit": "cover"
 }
 ```
 
-`src` 는 URL 또는 `data:image/...;base64,...` 값을 사용할 수 있습니다. 이미지 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 이미지를 선택하게 합니다.
+`src` 는 URL 또는 `data:image/...;base64,...` 값을 사용할 수 있습니다. `fit` 은 채우기 crop에는 `cover`, 전체 표시에는 `contain` 을 사용합니다. 이미지 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 이미지를 선택하게 합니다.
 
 목록 또는 타임라인:
 

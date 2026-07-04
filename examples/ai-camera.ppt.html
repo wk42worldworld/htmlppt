@@ -20,8 +20,10 @@
 .ppt-list{display:grid;gap:18px;margin:0;padding:0;list-style:none}
 .ppt-list li{position:relative;padding-left:34px;color:var(--ppt-text);font-size:27px;line-height:1.38}
 .ppt-list li:before{content:'';position:absolute;left:0;top:14px;width:12px;height:12px;border-radius:50%;background:var(--ppt-accent)}
-.ppt-media{overflow:hidden;border-radius:8px;background:var(--ppt-surface);border:1px solid var(--ppt-line);min-height:260px}
+.ppt-media{position:relative;overflow:hidden;margin:0;border-radius:8px;background:var(--ppt-surface);border:1px solid var(--ppt-line);min-height:260px}
 .ppt-media img{display:block;width:100%;height:100%;object-fit:cover}
+.ppt-media[data-fit='contain'] img{object-fit:contain;background:var(--ppt-surface)}
+.ppt-caption{position:absolute;left:18px;right:18px;bottom:14px;padding:8px 10px;border-radius:6px;background:rgba(0,0,0,.48);color:#fff;font-size:17px;line-height:1.3}
 .ppt-image-placeholder{display:grid;place-items:center;width:100%;height:100%;min-height:360px;color:var(--ppt-muted);font-size:22px;background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(0,0,0,.04))}
 .ppt-layout-hero{display:flex;flex-direction:column;justify-content:center;gap:28px}
 .ppt-layout-hero .ppt-title{font-size:82px;max-width:1040px}
@@ -35,6 +37,17 @@
 .ppt-layout-imageLeft{grid-template-columns:480px 1fr}
 .ppt-content-stack{display:flex;flex-direction:column;gap:24px}
 .ppt-layout-imageRight .ppt-media,.ppt-layout-imageLeft .ppt-media{height:470px}
+.ppt-layout-imageFull{padding:0}
+.ppt-layout-imageFull .ppt-full-media{position:absolute;inset:0;border:0;border-radius:0;min-height:0}
+.ppt-layout-imageFull .ppt-image-overlay{position:absolute;left:72px;bottom:72px;max-width:760px;padding:28px 32px;border-radius:8px;background:rgba(16,18,20,.68);backdrop-filter:blur(10px)}
+.ppt-layout-imageFull .ppt-image-overlay .ppt-title{color:#fff;font-size:54px}
+.ppt-layout-imageFull .ppt-image-overlay .ppt-subtitle{color:rgba(255,255,255,.82);font-size:25px}
+.ppt-layout-imageBackground{display:flex;align-items:center}
+.ppt-background-media{position:absolute;inset:0;border:0;border-radius:0;min-height:0}
+.ppt-background-media:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,10,12,.78),rgba(8,10,12,.34),rgba(8,10,12,.08))}
+.ppt-layout-imageBackground .ppt-content-stack{position:relative;z-index:1;max-width:760px;padding:34px;border-radius:8px;background:rgba(16,18,20,.58);backdrop-filter:blur(10px)}
+.ppt-layout-imageBackground .ppt-title,.ppt-layout-imageBackground .ppt-body{color:#fff}
+.ppt-layout-imageBackground .ppt-subtitle{color:rgba(255,255,255,.82)}
 .ppt-layout-compare{display:flex;flex-direction:column;gap:34px}
 .ppt-compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .ppt-compare-card{min-height:350px;padding:34px;border-radius:8px;background:var(--ppt-surface);border:1px solid var(--ppt-line)}
@@ -90,7 +103,9 @@
       "subtitle": "让普通人像导演一样设计镜头",
       "image": {
         "src": "",
-        "alt": "产品示意图"
+        "alt": "产品示意图",
+        "caption": "",
+        "fit": "cover"
       },
       "notes": "开场用一句话讲清楚产品。",
       "body": "",
@@ -130,7 +145,9 @@
       "body": "",
       "image": {
         "src": "",
-        "alt": ""
+        "alt": "",
+        "caption": "",
+        "fit": "cover"
       },
       "items": [],
       "cards": [],
@@ -167,7 +184,9 @@
       "body": "",
       "image": {
         "src": "",
-        "alt": ""
+        "alt": "",
+        "caption": "",
+        "fit": "cover"
       },
       "items": [],
       "metrics": [],
@@ -214,7 +233,9 @@
       "body": "",
       "image": {
         "src": "",
-        "alt": ""
+        "alt": "",
+        "caption": "",
+        "fit": "cover"
       },
       "items": [],
       "cards": [],
@@ -244,7 +265,9 @@
       "body": "",
       "image": {
         "src": "",
-        "alt": ""
+        "alt": "",
+        "caption": "",
+        "fit": "cover"
       },
       "items": [],
       "cards": [],
@@ -273,7 +296,7 @@
 <body>
   <main id="ppt-player-root"></main>
   <script>
-(function(){'use strict';var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0;function e(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x)n.textContent=x;return n}function a(p,t,c,x){if(x==null||x==='')return;var n=e(t,c,x);p.appendChild(n);return n}function arr(v){return Array.isArray(v)?v:[]}function media(m){var b=e('div','ppt-media');if(m&&m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));return b}function list(items){var u=e('ul','ppt-list');arr(items).slice(0,6).forEach(function(it){var x=typeof it==='string'?it:(it.text||it.title||'');if(x)u.appendChild(e('li','',x))});return u}function stack(s,li){var x=e('div','ppt-content-stack');a(x,'div','ppt-kicker',s.kicker);a(x,'h1','ppt-title',s.title);a(x,'p','ppt-subtitle',s.subtitle);a(x,'p','ppt-body',s.body);if(li&&arr(s.items).length)x.appendChild(list(s.items));return x}function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);function fit(){var sc=Math.min(window.innerWidth/w,(window.innerHeight-72)/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';stage.appendChild(slide(arr(d.slides)[i]||{}));count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();chrome()}function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;document.addEventListener('keydown',function(ev){var k=ev.key;if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();show(i-1);return}if(k==='Home'){ev.preventDefault();show(0);return}if(k==='End'){ev.preventDefault();show(arr(d.slides).length-1)}});window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\D/g,''),10)-1||0);})();
+(function(){'use strict';var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0;function e(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x)n.textContent=x;return n}function a(p,t,c,x){if(x==null||x==='')return;var n=e(t,c,x);p.appendChild(n);return n}function arr(v){return Array.isArray(v)?v:[]}function media(m){m=m||{};var b=e('figure','ppt-media');b.setAttribute('data-fit',m.fit==='contain'?'contain':'cover');if(m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));a(b,'figcaption','ppt-caption',m.caption);return b}function list(items){var u=e('ul','ppt-list');arr(items).slice(0,6).forEach(function(it){var x=typeof it==='string'?it:(it.text||it.title||'');if(x)u.appendChild(e('li','',x))});return u}function stack(s,li){var x=e('div','ppt-content-stack');a(x,'div','ppt-kicker',s.kicker);a(x,'h1','ppt-title',s.title);a(x,'p','ppt-subtitle',s.subtitle);a(x,'p','ppt-body',s.body);if(li&&arr(s.items).length)x.appendChild(list(s.items));return x}function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);function fit(){var sc=Math.min(window.innerWidth/w,(window.innerHeight-72)/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';stage.appendChild(slide(arr(d.slides)[i]||{}));count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();chrome()}function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;document.addEventListener('keydown',function(ev){var k=ev.key;if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();show(i-1);return}if(k==='Home'){ev.preventDefault();show(0);return}if(k==='End'){ev.preventDefault();show(arr(d.slides).length-1)}});window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\D/g,''),10)-1||0);})();
   </script>
 </body>
 </html>

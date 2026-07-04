@@ -109,6 +109,8 @@ Supported layouts:
 | `text` | Body and list | `title`, `body`, `items` |
 | `imageRight` | Text left, image right | `title`, `body`, `items`, `image` |
 | `imageLeft` | Image left, text right | `title`, `body`, `items`, `image` |
+| `imageFull` | Full-slide image | `title`, `subtitle`, `image` |
+| `imageBackground` | Image background with text overlay | `title`, `subtitle`, `body`, `items`, `image` |
 | `compare` | Two-column comparison | `left`, `right` |
 | `threeCards` | Three ideas | `cards` |
 | `quote` | Quote or statement | `quote`, `author` |
@@ -135,11 +137,13 @@ Image:
 ```json
 "image": {
   "src": "https://example.com/image.png",
-  "alt": "Product UI screenshot"
+  "alt": "Product UI screenshot",
+  "caption": "Optional image caption",
+  "fit": "cover"
 }
 ```
 
-`src` can be a URL or a `data:image/...;base64,...` value. If the image source is unknown, leave it empty and let the human user choose a local image in the editor.
+`src` can be a URL or a `data:image/...;base64,...` value. `fit` should be `cover` for cropped fill or `contain` for full image display. If the image source is unknown, leave it empty and let the human user choose a local image in the editor.
 
 List or timeline:
 

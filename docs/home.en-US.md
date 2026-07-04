@@ -20,6 +20,7 @@ The product principle is simple: AI writes structure, humans make decisions, and
 - Open, save, and save as `.ppt.html` files in the desktop app
 - Starter templates for product pitches, lessons, and project updates
 - Visual editing for titles, text, images, comparisons, cards, data, tables, and code
+- Images support local embedding, cover/contain fit, captions, full-image slides, and image-background slides
 - AI JSON import
 - Validation reports that humans can read and AI can repair from
 - 12 starter layouts and 4 themes

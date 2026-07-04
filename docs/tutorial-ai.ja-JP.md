@@ -109,6 +109,8 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 | `text` | 本文とリスト | `title`、`body`、`items` |
 | `imageRight` | 左に文章、右に画像 | `title`、`body`、`items`、`image` |
 | `imageLeft` | 左に画像、右に文章 | `title`、`body`、`items`、`image` |
+| `imageFull` | 全画面画像 | `title`、`subtitle`、`image` |
+| `imageBackground` | 背景画像とテキスト | `title`、`subtitle`、`body`、`items`、`image` |
 | `compare` | 2 列比較 | `left`、`right` |
 | `threeCards` | 3 つの要点 | `cards` |
 | `quote` | 引用、主張 | `quote`、`author` |
@@ -135,11 +137,13 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 ```json
 "image": {
   "src": "https://example.com/image.png",
-  "alt": "製品 UI スクリーンショット"
+  "alt": "製品 UI スクリーンショット",
+  "caption": "任意の画像キャプション",
+  "fit": "cover"
 }
 ```
 
-`src` は URL または `data:image/...;base64,...` を使えます。画像が未確定の場合は空にして、人間がエディタでローカル画像を選べるようにします。
+`src` は URL または `data:image/...;base64,...` を使えます。`fit` は塗りつぶし裁切なら `cover`、全体表示なら `contain` を使います。画像が未確定の場合は空にして、人間がエディタでローカル画像を選べるようにします。
 
 リストまたはタイムライン：
 

@@ -109,6 +109,8 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 | `text` | 正文和列表 | `title`、`body`、`items` |
 | `imageRight` | 左文右图 | `title`、`body`、`items`、`image` |
 | `imageLeft` | 左图右文 | `title`、`body`、`items`、`image` |
+| `imageFull` | 全屏图片 | `title`、`subtitle`、`image` |
+| `imageBackground` | 背景图文 | `title`、`subtitle`、`body`、`items`、`image` |
 | `compare` | 左右对比 | `left`、`right` |
 | `threeCards` | 三个观点 | `cards` |
 | `quote` | 引用或观点 | `quote`、`author` |
@@ -135,11 +137,13 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 ```json
 "image": {
   "src": "https://example.com/image.png",
-  "alt": "产品界面截图"
+  "alt": "产品界面截图",
+  "caption": "可选图片说明",
+  "fit": "cover"
 }
 ```
 
-`src` 可以是 URL，也可以是 `data:image/...;base64,...`。如果不确定图片来源，可以先留空，让人类在编辑器中选择本地图片。
+`src` 可以是 URL，也可以是 `data:image/...;base64,...`。`fit` 使用 `cover` 表示填充裁切，使用 `contain` 表示完整显示。如果不确定图片来源，可以先留空，让人类在编辑器中选择本地图片。
 
 列表或时间线：
 

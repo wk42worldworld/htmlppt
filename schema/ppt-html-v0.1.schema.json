@@ -42,6 +42,14 @@
         },
         "alt": {
           "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "fit": {
+          "type": "string",
+          "enum": ["cover", "contain"],
+          "default": "cover"
         }
       }
     },
@@ -109,6 +117,8 @@
             "text",
             "imageRight",
             "imageLeft",
+            "imageFull",
+            "imageBackground",
             "compare",
             "threeCards",
             "quote",
@@ -184,4 +194,3 @@
     }
   }
 }
-

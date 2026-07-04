@@ -124,9 +124,11 @@ Delete is disabled when only one slide remains, so the deck cannot become empty.
 
 Images:
 
-1. Change the layout to `hero`, `imageRight`, or `imageLeft`.
+1. Change the layout to `hero`, `imageRight`, `imageLeft`, `imageFull`, or `imageBackground`.
 2. Click `Choose local image`.
 3. The image is embedded into the `.ppt.html` file as a Data URI.
+4. Use `Fit` to choose cropped fill or full containment.
+5. Add alt text and an optional caption.
 
 Data slides:
 
