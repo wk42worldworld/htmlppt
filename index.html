@@ -313,6 +313,67 @@
           </label>
         </section>
 
+        <section class="panel-section style-panel" id="stylePanel">
+          <h2 data-i18n="panel.style">元素样式</h2>
+          <p class="style-target" id="styleTargetLabel" data-i18n="style.noSelection">选中画布上的文字或组件后，可调整样式。</p>
+          <div class="style-grid">
+            <label>
+              <span data-i18n="field.fontSize">字号</span>
+              <input id="styleFontSizeInput" data-style-control type="number" min="8" max="180" step="1" placeholder="Auto">
+            </label>
+            <label>
+              <span data-i18n="field.textAlign">对齐</span>
+              <select id="styleAlignInput" data-style-control>
+                <option value="" data-i18n="align.default">默认</option>
+                <option value="left" data-i18n="align.left">左对齐</option>
+                <option value="center" data-i18n="align.center">居中</option>
+                <option value="right" data-i18n="align.right">右对齐</option>
+                <option value="justify" data-i18n="align.justify">两端对齐</option>
+              </select>
+            </label>
+          </div>
+          <div class="style-button-row">
+            <button type="button" id="styleBoldBtn" class="style-toggle" data-style-control data-i18n-title="style.bold"><strong>B</strong><span data-i18n="style.bold">加粗</span></button>
+            <button type="button" id="styleItalicBtn" class="style-toggle" data-style-control data-i18n-title="style.italic"><em>I</em><span data-i18n="style.italic">斜体</span></button>
+          </div>
+          <label>
+            <span data-i18n="field.textColor">文字颜色</span>
+            <div class="color-control">
+              <input id="styleColorInput" data-style-control type="color" value="#111827">
+              <button type="button" id="styleColorResetBtn" class="mini-button" data-style-control data-i18n-title="style.clearColor">×</button>
+            </div>
+          </label>
+          <label>
+            <span data-i18n="field.backgroundColor">背景色</span>
+            <div class="color-control">
+              <input id="styleBackgroundInput" data-style-control type="color" value="#ffffff">
+              <button type="button" id="styleBackgroundResetBtn" class="mini-button" data-style-control data-i18n-title="style.clearBackground">×</button>
+            </div>
+          </label>
+          <label>
+            <span data-i18n="field.borderColor">边框色</span>
+            <div class="color-control">
+              <input id="styleBorderColorInput" data-style-control type="color" value="#d1d5db">
+              <button type="button" id="styleBorderColorResetBtn" class="mini-button" data-style-control data-i18n-title="style.clearBorder">×</button>
+            </div>
+          </label>
+          <div class="style-grid">
+            <label>
+              <span data-i18n="field.borderWidth">边框粗细</span>
+              <input id="styleBorderWidthInput" data-style-control type="number" min="0" max="24" step="1" placeholder="0">
+            </label>
+            <label>
+              <span data-i18n="field.cornerRadius">圆角</span>
+              <input id="styleRadiusInput" data-style-control type="number" min="0" max="96" step="1" placeholder="Auto">
+            </label>
+          </div>
+          <label>
+            <span data-i18n="field.opacity">透明度</span>
+            <input id="styleOpacityInput" data-style-control type="range" min="0.1" max="1" step="0.05" value="1">
+          </label>
+          <button type="button" id="styleResetBtn" class="secondary full-width" data-style-control data-i18n="style.reset" data-i18n-title="style.reset">清除样式</button>
+        </section>
+
         <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft,imageFull,imageBackground">
           <h2 data-i18n="panel.image">图片</h2>
           <div class="inline-tools">

@@ -91,7 +91,8 @@ project-name.ppt.html
   "author": "",
   "code": "",
   "notes": "",
-  "canvas": {}
+  "canvas": {},
+  "styles": {}
 }
 ```
 
@@ -235,6 +236,35 @@ AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，
 - `w` 和 `h` 是可选字段，用于保存编辑器画布缩放后的宽度和最小高度。
 - AI 修改内容时应保留已有 `canvas`，除非用户要求重置布局。
 - 大范围排版变化仍应通过切换 `layout`、拆页或修改结构字段完成。
+
+## Element Styles
+
+`styles` 是可选字段，用于保存人类或 AI 对单个画布对象做出的轻量视觉覆盖。它和 `canvas` 分开：`canvas` 只保存位置和尺寸，`styles` 只保存视觉样式。
+
+```json
+"styles": {
+  "title": {
+    "fontSize": 88,
+    "color": "#ff3366",
+    "textAlign": "center",
+    "fontWeight": "800"
+  },
+  "table.rows.1.2": {
+    "backgroundColor": "#fff7ed",
+    "borderColor": "#fb923c",
+    "borderWidth": 2,
+    "borderRadius": 8
+  }
+}
+```
+
+约定：
+
+- 键名仍然是结构化字段路径，例如 `title`、`subtitle`、`body`、`cards.0.text`、`metrics.1.value`、`table.rows.1.2`、`textBoxes.0.text`。
+- 支持字段：`fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle`。
+- 颜色使用 hex 或 `rgb()` / `rgba()`。不要写自由 CSS、类名、选择器或脚本。
+- `fontSize` 是像素数；`textAlign` 可用 `left`、`center`、`right`、`justify`；`fontWeight` 建议使用 `"400"` 到 `"900"`；`fontStyle` 当前只支持 `"italic"`。
+- AI 修正文案时应保留已有 `styles`，除非用户明确要求“清除样式”或“恢复默认主题”。
 
 ## AI 输出建议
 

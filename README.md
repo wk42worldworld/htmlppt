@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.9
+
+PPT.html Studio now has a first object style inspector. Click text, text boxes, cards, table cells, metrics, chart legends, or media blocks on the canvas, then adjust font size, text color, alignment, bold, italic, background, border, radius, and opacity in the right panel. These edits are saved as structured `styles[path]` data, preserved in exported `.ppt.html` files, and remain readable for AI agents.
+
 ## New in v0.2.8
 
 PPT.html Studio now inserts real canvas text boxes instead of silently switching the slide to a text layout. Text boxes appear in an open area by default, can be edited immediately, dragged, resized, nudged with arrow keys, deleted with Delete/Backspace, and exported through the structured `textBoxes` format. Live editing is smoother because side-panel typing is frame-batched and draft persistence is debounced.
@@ -134,7 +138,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Start from built-in templates for product pitches, lessons, project updates, or the demo deck.
 - Open, save, and save as `.ppt.html` files in the desktop app.
 - Import local images into image slides as embedded data URIs.
-- Double-click canvas text to edit in place, drag or resize editable slide elements for structured `canvas` geometry, nudge selection with arrow keys, reset a selected element, and drag thumbnails to reorder pages.
+- Double-click canvas text to edit in place, drag or resize editable slide elements for structured `canvas` geometry, style selected elements through structured `styles`, nudge selection with arrow keys, reset a selected element, and drag thumbnails to reorder pages.
 - Create bar, line, and donut charts from structured labels and series.
 - Run `Check` to get a human-readable and AI-readable validation report.
 

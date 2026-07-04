@@ -191,6 +191,38 @@ assert.match(canvasHtml, /data-ppt-path/);
 assert.match(canvasHtml, /24/);
 assert.match(canvasHtml, /420/);
 
+const styleDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Styled deck",
+  slides: [
+    {
+      layout: "hero",
+      title: "Styled title",
+      styles: {
+        title: {
+          fontSize: 88,
+          color: "#ff3366",
+          backgroundColor: "#ffffff",
+          borderColor: "#111827",
+          borderWidth: 2,
+          borderRadius: 12,
+          opacity: 0.9,
+          textAlign: "center",
+          fontWeight: "800",
+          fontStyle: "italic"
+        }
+      }
+    }
+  ]
+});
+assert.equal(styleDeck.slides[0].styles.title.fontSize, 88);
+assert.equal(styleDeck.slides[0].styles.title.textAlign, "center");
+const styleHtml = ppt.exportStandalone(styleDeck);
+assert.match(styleHtml, /"styles"/);
+assert.match(styleHtml, /"fontSize": 88/);
+assert.match(styleHtml, /function sty/);
+assert.match(styleHtml, /style\.fontSize/);
+
 const textBoxDeck = ppt.normalizeDeck({
   version: "0.1",
   title: "Text box deck",

@@ -269,6 +269,27 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 
 `canvas` 는 사람이 캔버스에서 요소를 드래그하거나 크기를 조절했을 때 생기는 가벼운 조정을 저장합니다. 키는 `title`, `subtitle`, `cards.0.title`, `table.rows.1.2` 같은 구조화 필드 경로입니다. `x/y` 는 템플릿 위치 기준 픽셀 오프셋이고, `w/h` 는 선택적 너비와 최소 높이입니다. AI가 문구를 수정할 때는 기존 `canvas` 값을 가능한 한 보존해야 합니다. 사용자가 레이아웃 초기화나 템플릿 위치 복원을 요청할 때만 제거합니다.
 
+요소 스타일:
+
+```json
+"styles": {
+  "title": {
+    "fontSize": 88,
+    "color": "#ff3366",
+    "textAlign": "center",
+    "fontWeight": "800"
+  },
+  "table.rows.1.2": {
+    "backgroundColor": "#fff7ed",
+    "borderColor": "#fb923c",
+    "borderWidth": 2,
+    "borderRadius": 8
+  }
+}
+```
+
+`styles` 는 개별 요소의 시각적 덮어쓰기를 저장하며 같은 구조화 필드 경로를 키로 사용합니다. 사용할 수 있는 필드는 `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, `fontStyle` 입니다. 자유 CSS, 선택자, 클래스 이름, 스크립트를 출력하지 마세요. 문구를 수정할 때는 사용자가 스타일 삭제나 기본 테마 복원을 요청하지 않는 한 기존 `styles` 를 보존해야 합니다.
+
 ## 6. 권장 생성 흐름
 
 1. 사용자의 목표, 청중, 상황, 톤을 이해합니다.

@@ -267,6 +267,63 @@
         "$ref": "#/$defs/canvasOffset"
       }
     },
+    "styleOverride": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fontSize": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 180
+        },
+        "color": {
+          "$ref": "#/$defs/styleColor"
+        },
+        "backgroundColor": {
+          "$ref": "#/$defs/styleColor"
+        },
+        "borderColor": {
+          "$ref": "#/$defs/styleColor"
+        },
+        "borderWidth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 24
+        },
+        "borderRadius": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 96
+        },
+        "opacity": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 1
+        },
+        "textAlign": {
+          "type": "string",
+          "enum": ["left", "center", "right", "justify"]
+        },
+        "fontWeight": {
+          "type": "string",
+          "enum": ["400", "500", "600", "700", "800", "900"]
+        },
+        "fontStyle": {
+          "type": "string",
+          "enum": ["italic"]
+        }
+      }
+    },
+    "styleColor": {
+      "type": "string",
+      "pattern": "^(#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})|rgba?\\(\\s*\\d{1,3}\\s*,\\s*\\d{1,3}\\s*,\\s*\\d{1,3}(\\s*,\\s*(0|1|0?\\.\\d+))?\\s*\\))$"
+    },
+    "styles": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/styleOverride"
+      }
+    },
     "slide": {
       "type": "object",
       "required": ["layout", "title"],
@@ -379,6 +436,9 @@
         },
         "canvas": {
           "$ref": "#/$defs/canvas"
+        },
+        "styles": {
+          "$ref": "#/$defs/styles"
         }
       }
     }

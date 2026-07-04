@@ -116,10 +116,12 @@ Direct canvas editing:
 - Press `Enter` to save single-line edits. For multi-line content, use line breaks and press `Ctrl+Enter` or `Cmd+Enter` to save.
 - Press `Esc` to cancel the current canvas edit.
 - Click editable text or content blocks on the canvas to show a selection frame.
+- After selection, the right `Element Style` panel becomes active. Use it to adjust font size, text color, alignment, bold, italic, background, border color, border width, radius, and opacity.
 - Drag the selected element for light position tweaks. Drag the frame's corner or side handles to change width and height.
 - With an element selected, press arrow keys to nudge by 1 pixel. Hold `Shift` while pressing an arrow key to move by 10 pixels.
 - Click `Reset` on the selection frame, or press `Delete` / `Backspace`, to clear the selected element's saved position and size.
 - Position and size are saved in the current slide's `canvas` data, so exported `.ppt.html` files keep the adjustment.
+- Element style is saved in the current slide's `styles` data. `Clear style` restores visual overrides without deleting text content or position changes.
 - Use `Undo` if a drag lands in the wrong place.
 - Use dragging for small refinements. For major layout changes, switch layouts or split content into more slides so the deck stays friendly to both AI and human editing.
 

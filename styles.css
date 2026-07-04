@@ -506,6 +506,79 @@ textarea:focus {
   margin-bottom: 12px;
 }
 
+.style-target {
+  margin: -4px 0 13px;
+  color: var(--ui-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.style-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.style-button-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.style-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+.style-toggle strong,
+.style-toggle em {
+  min-width: 16px;
+  color: var(--ui-strong);
+  font-size: 15px;
+  line-height: 1;
+}
+
+.style-toggle[aria-pressed="true"] {
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
+  background: rgba(37, 99, 235, .08);
+}
+
+.color-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.color-control input[type="color"] {
+  height: 36px;
+  padding: 3px;
+}
+
+.mini-button {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.style-panel.is-disabled [data-style-control] {
+  opacity: .52;
+}
+
 .presenter {
   position: fixed;
   inset: 0;

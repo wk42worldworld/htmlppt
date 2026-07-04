@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.8";
+  var APP_VERSION_LABEL = "v0.2.9";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
@@ -1491,6 +1491,106 @@
     "transition.zoom": "줌"
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "panel.style": "元素样式",
+    "style.noSelection": "选中画布上的文字或组件后，可调整样式。",
+    "style.target": "对象：{name}",
+    "style.bold": "加粗",
+    "style.italic": "斜体",
+    "style.reset": "清除样式",
+    "style.clearColor": "恢复默认文字色",
+    "style.clearBackground": "清除背景色",
+    "style.clearBorder": "清除边框色",
+    "field.fontSize": "字号",
+    "field.textColor": "文字颜色",
+    "field.backgroundColor": "背景色",
+    "field.borderColor": "边框色",
+    "field.borderWidth": "边框粗细",
+    "field.cornerRadius": "圆角",
+    "field.opacity": "透明度",
+    "field.textAlign": "对齐",
+    "align.default": "默认",
+    "align.left": "左对齐",
+    "align.center": "居中",
+    "align.right": "右对齐",
+    "align.justify": "两端对齐"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "panel.style": "Element Style",
+    "style.noSelection": "Select text or a component on the canvas to edit its style.",
+    "style.target": "Target: {name}",
+    "style.bold": "Bold",
+    "style.italic": "Italic",
+    "style.reset": "Clear style",
+    "style.clearColor": "Restore default text color",
+    "style.clearBackground": "Clear background",
+    "style.clearBorder": "Clear border color",
+    "field.fontSize": "Font size",
+    "field.textColor": "Text color",
+    "field.backgroundColor": "Background",
+    "field.borderColor": "Border color",
+    "field.borderWidth": "Border width",
+    "field.cornerRadius": "Radius",
+    "field.opacity": "Opacity",
+    "field.textAlign": "Align",
+    "align.default": "Default",
+    "align.left": "Left",
+    "align.center": "Center",
+    "align.right": "Right",
+    "align.justify": "Justify"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "panel.style": "要素スタイル",
+    "style.noSelection": "キャンバス上の文字やコンポーネントを選択するとスタイルを編集できます。",
+    "style.target": "対象: {name}",
+    "style.bold": "太字",
+    "style.italic": "斜体",
+    "style.reset": "スタイルをクリア",
+    "style.clearColor": "文字色を既定に戻す",
+    "style.clearBackground": "背景をクリア",
+    "style.clearBorder": "枠線色をクリア",
+    "field.fontSize": "文字サイズ",
+    "field.textColor": "文字色",
+    "field.backgroundColor": "背景色",
+    "field.borderColor": "枠線色",
+    "field.borderWidth": "枠線幅",
+    "field.cornerRadius": "角丸",
+    "field.opacity": "不透明度",
+    "field.textAlign": "揃え",
+    "align.default": "既定",
+    "align.left": "左",
+    "align.center": "中央",
+    "align.right": "右",
+    "align.justify": "両端"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "panel.style": "요소 스타일",
+    "style.noSelection": "캔버스의 텍스트나 컴포넌트를 선택하면 스타일을 편집할 수 있습니다.",
+    "style.target": "대상: {name}",
+    "style.bold": "굵게",
+    "style.italic": "기울임",
+    "style.reset": "스타일 지우기",
+    "style.clearColor": "기본 글자색으로 복원",
+    "style.clearBackground": "배경 지우기",
+    "style.clearBorder": "테두리 색 지우기",
+    "field.fontSize": "글자 크기",
+    "field.textColor": "글자색",
+    "field.backgroundColor": "배경색",
+    "field.borderColor": "테두리 색",
+    "field.borderWidth": "테두리 두께",
+    "field.cornerRadius": "모서리",
+    "field.opacity": "불투명도",
+    "field.textAlign": "정렬",
+    "align.default": "기본",
+    "align.left": "왼쪽",
+    "align.center": "가운데",
+    "align.right": "오른쪽",
+    "align.justify": "양쪽"
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -1514,6 +1614,8 @@
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
+      "stylePanel", "styleTargetLabel", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
+      "styleBackgroundInput", "styleBackgroundResetBtn", "styleBorderColorInput", "styleBorderColorResetBtn", "styleBorderWidthInput", "styleRadiusInput", "styleOpacityInput", "styleResetBtn",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
@@ -1944,6 +2046,23 @@
     bindSlideInput(els.authorInput, function (slide, value) { slide.author = value; });
     bindSlideInput(els.codeInput, function (slide, value) { slide.code = value; });
     bindSlideInput(els.notesInput, function (slide, value) { slide.notes = value; });
+
+    bindStyleInput(els.styleFontSizeInput, "fontSize", { number: true, min: 8, max: 180 });
+    bindStyleInput(els.styleAlignInput, "textAlign");
+    bindStyleInput(els.styleColorInput, "color");
+    bindStyleInput(els.styleBackgroundInput, "backgroundColor");
+    bindStyleInput(els.styleBorderColorInput, "borderColor");
+    bindStyleInput(els.styleBorderWidthInput, "borderWidth", { number: true, min: 0, max: 24 });
+    bindStyleInput(els.styleRadiusInput, "borderRadius", { number: true, min: 0, max: 96 });
+    bindStyleInput(els.styleOpacityInput, "opacity", { number: true, min: 0.1, max: 1 });
+    bindStyleButton(els.styleBoldBtn, "fontWeight", "800");
+    bindStyleButton(els.styleItalicBtn, "fontStyle", "italic");
+    bindStyleReset(els.styleColorResetBtn, "color");
+    bindStyleReset(els.styleBackgroundResetBtn, "backgroundColor");
+    bindStyleReset(els.styleBorderColorResetBtn, "borderColor");
+    els.styleResetBtn.addEventListener("click", function () {
+      resetSelectedStyle();
+    });
 
     els.imageFileBtn.addEventListener("click", function () {
       openImagePicker();
@@ -2545,6 +2664,124 @@
     });
   }
 
+  function bindStyleInput(input, prop, options) {
+    input.addEventListener("focus", captureEditStart);
+    input.addEventListener("input", function () {
+      if (syncing || input.tagName === "SELECT") return;
+      updateSelectedStyleLive(prop, input.value, options || {});
+    });
+    input.addEventListener("change", function () {
+      if (syncing) return;
+      updateSelectedStyleCommit(prop, input.value, options || {});
+    });
+  }
+
+  function bindStyleButton(button, prop, activeValue) {
+    button.addEventListener("click", function () {
+      if (!selectedCanvasPath) return;
+      commitStyleMutation(function (style) {
+        if (String(style[prop] || "") === String(activeValue)) delete style[prop];
+        else style[prop] = activeValue;
+      });
+    });
+  }
+
+  function bindStyleReset(button, prop) {
+    button.addEventListener("click", function () {
+      if (!selectedCanvasPath) return;
+      commitStyleMutation(function (style) {
+        delete style[prop];
+      });
+    });
+  }
+
+  function updateSelectedStyleLive(prop, rawValue, options) {
+    if (!selectedCanvasPath) return;
+    pushLiveHistory();
+    setSelectedStyleProperty(prop, rawValue, options || {});
+    markDirty();
+    applySelectedStyleLive();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+  }
+
+  function updateSelectedStyleCommit(prop, rawValue, options) {
+    if (!selectedCanvasPath) return;
+    var before = JSON.stringify(deck);
+    setSelectedStyleProperty(prop, rawValue, options || {});
+    if (!activeEditPushed && before !== JSON.stringify(deck)) pushLiveHistory(before);
+    deck = PPTHtml.normalizeDeck(deck);
+    activeEditSnapshot = "";
+    activeEditPushed = false;
+    if (before !== JSON.stringify(deck)) markDirty();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+  }
+
+  function commitStyleMutation(mutator) {
+    if (!selectedCanvasPath) return;
+    var before = JSON.stringify(deck);
+    var style = ensureStyleOverride(selectedCanvasPath);
+    mutator(style);
+    cleanupStyleOverride(selectedCanvasPath);
+    if (before === JSON.stringify(deck)) {
+      syncStylePanel();
+      return;
+    }
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+  }
+
+  function resetSelectedStyle() {
+    if (!selectedCanvasPath) return;
+    var slide = currentSlide();
+    if (!slide.styles || !slide.styles[selectedCanvasPath]) return;
+    var before = JSON.stringify(deck);
+    delete slide.styles[selectedCanvasPath];
+    if (!Object.keys(slide.styles).length) delete slide.styles;
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+  }
+
+  function setSelectedStyleProperty(prop, rawValue, options) {
+    var value = normalizeStyleInputValue(prop, rawValue, options || {});
+    var style = ensureStyleOverride(selectedCanvasPath);
+    if (value == null || value === "") delete style[prop];
+    else style[prop] = value;
+    cleanupStyleOverride(selectedCanvasPath);
+  }
+
+  function normalizeStyleInputValue(prop, rawValue, options) {
+    if (prop === "textAlign") return ["left", "center", "right", "justify"].indexOf(rawValue) !== -1 ? rawValue : "";
+    if (options.number) {
+      if (rawValue === "") return null;
+      var number = Number(rawValue);
+      if (!isFinite(number)) return null;
+      return Math.round(clamp(number, options.min, options.max) * 100) / 100;
+    }
+    return normalizeStyleColor(rawValue);
+  }
+
   function captureEditStart() {
     if (syncing) return;
     activeEditSnapshot = JSON.stringify(deck);
@@ -2926,6 +3163,7 @@
     var node = canvasNodeByPath(selectedCanvasPath);
     if (!node || activeCanvasEdit) {
       if (!node) selectedCanvasPath = "";
+      syncStylePanel();
       return;
     }
 
@@ -2964,11 +3202,148 @@
 
     els.stageFrame.appendChild(box);
     positionCanvasSelectionBox(node, box);
+    syncStylePanel();
   }
 
   function canvasSelectionLabel(node, path) {
     var options = node ? parseCanvasOptions(node) : {};
     return canvasLabel(options, path);
+  }
+
+  function syncStylePanel() {
+    if (!els.stylePanel) return;
+    var node = canvasNodeByPath(selectedCanvasPath);
+    var hasSelection = Boolean(node && !activeCanvasEdit);
+    var previousSyncing = syncing;
+    syncing = true;
+
+    els.stylePanel.classList.toggle("is-disabled", !hasSelection);
+    els.stylePanel.querySelectorAll("[data-style-control]").forEach(function (control) {
+      control.disabled = !hasSelection;
+    });
+
+    if (!hasSelection) {
+      els.styleTargetLabel.textContent = t("style.noSelection");
+      els.styleFontSizeInput.value = "";
+      els.styleAlignInput.value = "";
+      els.styleColorInput.value = "#111827";
+      els.styleBackgroundInput.value = "#ffffff";
+      els.styleBorderColorInput.value = "#d1d5db";
+      els.styleBorderWidthInput.value = "";
+      els.styleRadiusInput.value = "";
+      els.styleOpacityInput.value = "1";
+      setStyleToggleState(els.styleBoldBtn, false);
+      setStyleToggleState(els.styleItalicBtn, false);
+      syncing = previousSyncing;
+      return;
+    }
+
+    var style = currentStyleOverride(selectedCanvasPath);
+    var computed = window.getComputedStyle(node);
+    els.styleTargetLabel.textContent = formatText(t("style.target"), {
+      name: canvasSelectionLabel(node, selectedCanvasPath)
+    });
+    els.styleFontSizeInput.value = style.fontSize != null ? style.fontSize : "";
+    els.styleAlignInput.value = style.textAlign || "";
+    els.styleColorInput.value = colorInputValue(style.color, computed.color, "#111827");
+    els.styleBackgroundInput.value = colorInputValue(style.backgroundColor, computed.backgroundColor, "#ffffff");
+    els.styleBorderColorInput.value = colorInputValue(style.borderColor, computed.borderColor, "#d1d5db");
+    els.styleBorderWidthInput.value = style.borderWidth != null ? style.borderWidth : "";
+    els.styleRadiusInput.value = style.borderRadius != null ? style.borderRadius : "";
+    els.styleOpacityInput.value = style.opacity != null ? style.opacity : "1";
+    setStyleToggleState(els.styleBoldBtn, String(style.fontWeight || "") === "800");
+    setStyleToggleState(els.styleItalicBtn, style.fontStyle === "italic");
+    syncing = previousSyncing;
+  }
+
+  function setStyleToggleState(button, active) {
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+  }
+
+  function currentStyleOverride(path) {
+    var styles = currentSlide().styles || {};
+    return styles[path] && typeof styles[path] === "object" ? styles[path] : {};
+  }
+
+  function ensureStyleOverride(path) {
+    var slide = currentSlide();
+    slide.styles = slide.styles && typeof slide.styles === "object" && !Array.isArray(slide.styles) ? slide.styles : {};
+    slide.styles[path] = slide.styles[path] && typeof slide.styles[path] === "object" && !Array.isArray(slide.styles[path]) ? slide.styles[path] : {};
+    return slide.styles[path];
+  }
+
+  function cleanupStyleOverride(path) {
+    var slide = currentSlide();
+    if (!slide.styles || typeof slide.styles !== "object") return;
+    if (slide.styles[path] && !Object.keys(slide.styles[path]).length) delete slide.styles[path];
+    if (!Object.keys(slide.styles).length) delete slide.styles;
+  }
+
+  function applySelectedStyleLive() {
+    var node = canvasNodeByPath(selectedCanvasPath);
+    if (!node) return;
+    applyStyleOverrideToElement(node, currentStyleOverride(selectedCanvasPath));
+    positionCanvasSelectionBox(node);
+    syncStylePanel();
+  }
+
+  function applyStyleOverrideToElement(node, style) {
+    clearElementStyleOverride(node);
+    if (!style || typeof style !== "object") return;
+    if (style.fontSize) node.style.fontSize = style.fontSize + "px";
+    if (style.color) node.style.color = style.color;
+    if (style.backgroundColor) node.style.backgroundColor = style.backgroundColor;
+    if (style.textAlign) node.style.textAlign = style.textAlign;
+    if (style.fontWeight) node.style.fontWeight = style.fontWeight;
+    if (style.fontStyle) node.style.fontStyle = style.fontStyle;
+    if (style.borderColor) {
+      node.style.borderColor = style.borderColor;
+      node.style.borderStyle = "solid";
+      if (style.borderWidth == null) node.style.borderWidth = "1px";
+    }
+    if (style.borderWidth != null) {
+      node.style.borderWidth = style.borderWidth + "px";
+      node.style.borderStyle = style.borderWidth ? "solid" : "";
+    }
+    if (style.borderRadius != null) node.style.borderRadius = style.borderRadius + "px";
+    if (style.opacity != null) node.style.opacity = style.opacity;
+  }
+
+  function clearElementStyleOverride(node) {
+    [
+      "fontSize", "color", "backgroundColor", "textAlign", "fontWeight", "fontStyle",
+      "borderColor", "borderStyle", "borderWidth", "borderRadius", "opacity"
+    ].forEach(function (prop) {
+      node.style[prop] = "";
+    });
+  }
+
+  function normalizeStyleColor(value) {
+    var color = String(value || "").trim();
+    if (/^#(?:[0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(color)) return color;
+    if (/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}(?:\s*,\s*(?:0|1|0?\.\d+))?\s*\)$/i.test(color)) return color;
+    return "";
+  }
+
+  function colorInputValue(styleValue, computedValue, fallback) {
+    return cssColorToHex(styleValue) || cssColorToHex(computedValue) || fallback;
+  }
+
+  function cssColorToHex(value) {
+    var color = String(value || "").trim();
+    var hex = color.match(/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
+    if (hex) {
+      var body = hex[1];
+      if (body.length === 3) {
+        return "#" + body.split("").map(function (part) { return part + part; }).join("").toLowerCase();
+      }
+      return "#" + body.slice(0, 6).toLowerCase();
+    }
+    var rgb = color.match(/^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\s*\)$/i);
+    if (!rgb || (rgb[4] != null && Number(rgb[4]) === 0)) return "";
+    return "#" + [rgb[1], rgb[2], rgb[3]].map(function (part) {
+      return Math.round(clamp(Number(part), 0, 255)).toString(16).padStart(2, "0");
+    }).join("");
   }
 
   function getNodeFrameBounds(node) {
@@ -3186,21 +3561,26 @@
   }
 
   function remapTextBoxCanvasPaths(slide, removedIndex) {
-    var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
-    var nextCanvas = {};
-    Object.keys(canvas).forEach(function (path) {
+    remapTextBoxPathMap(slide, "canvas", removedIndex);
+    remapTextBoxPathMap(slide, "styles", removedIndex);
+  }
+
+  function remapTextBoxPathMap(slide, key, removedIndex) {
+    var map = slide[key] && typeof slide[key] === "object" ? slide[key] : {};
+    var nextMap = {};
+    Object.keys(map).forEach(function (path) {
       var match = path.match(/^textBoxes\.(\d+)\.text$/);
       if (!match) {
-        nextCanvas[path] = canvas[path];
+        nextMap[path] = map[path];
         return;
       }
       var index = Number(match[1]);
       if (index === removedIndex) return;
       var nextPath = index > removedIndex ? "textBoxes." + (index - 1) + ".text" : path;
-      nextCanvas[nextPath] = canvas[path];
+      nextMap[nextPath] = map[path];
     });
-    if (Object.keys(nextCanvas).length) slide.canvas = nextCanvas;
-    else delete slide.canvas;
+    if (Object.keys(nextMap).length) slide[key] = nextMap;
+    else delete slide[key];
   }
 
   function currentFrameScale() {
@@ -3677,6 +4057,7 @@
     els.codeInput.value = slide.code || "";
     els.notesInput.value = slide.notes || "";
     updateFieldVisibility();
+    syncStylePanel();
     syncing = false;
   }
 

@@ -269,6 +269,27 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 
 `canvas` は、人間がキャンバス上で要素をドラッグまたはサイズ変更したときの軽い調整を保存します。キーは `title`、`subtitle`、`cards.0.title`、`table.rows.1.2` のような構造化フィールドパスです。`x/y` はテンプレート位置からのピクセル単位のずれ、`w/h` は任意の幅と最小高さです。AI が文言を修正する場合は既存の `canvas` をできるだけ保持してください。ユーザーが「レイアウトをリセット」「テンプレート位置に戻す」と求めた場合だけ削除します。
 
+要素スタイル：
+
+```json
+"styles": {
+  "title": {
+    "fontSize": 88,
+    "color": "#ff3366",
+    "textAlign": "center",
+    "fontWeight": "800"
+  },
+  "table.rows.1.2": {
+    "backgroundColor": "#fff7ed",
+    "borderColor": "#fb923c",
+    "borderWidth": 2,
+    "borderRadius": 8
+  }
+}
+```
+
+`styles` は個別要素の見た目の上書きを保存します。キーは同じ構造化フィールドパスです。使用できるフィールドは `fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle` です。自由な CSS、セレクタ、クラス名、スクリプトは出力しないでください。文言を修正する場合、ユーザーがスタイル削除や既定テーマ復元を求めない限り、既存の `styles` を保持してください。
+
 ## 6. 推奨生成フロー
 
 1. ユーザーの目的、受け手、場面、語調を理解する。

@@ -269,6 +269,27 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 
 `canvas` 用于保存人类在画布上拖动或缩放元素后的轻量调整。键名对应结构化字段路径，例如 `title`、`subtitle`、`cards.0.title`、`table.rows.1.2`。`x/y` 表示相对模板位置的偏移像素，`w/h` 表示可选宽度和最小高度。AI 修正文案时应尽量保留已有 `canvas`；只有用户要求“重置布局”或“恢复模板位置”时才删除它。
 
+元素样式：
+
+```json
+"styles": {
+  "title": {
+    "fontSize": 88,
+    "color": "#ff3366",
+    "textAlign": "center",
+    "fontWeight": "800"
+  },
+  "table.rows.1.2": {
+    "backgroundColor": "#fff7ed",
+    "borderColor": "#fb923c",
+    "borderWidth": 2,
+    "borderRadius": 8
+  }
+}
+```
+
+`styles` 用于保存单个元素的视觉覆盖，键名同样是结构化字段路径。可用字段包括 `fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle`。不要输出自由 CSS、选择器、类名或脚本。AI 修正文案时应保留已有 `styles`，除非用户明确要求清除样式或恢复默认主题。
+
 ## 6. 推荐生成流程
 
 1. 先理解用户目标、受众、场景和语气。

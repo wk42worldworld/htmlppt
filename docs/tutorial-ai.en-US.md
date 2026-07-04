@@ -269,6 +269,27 @@ Canvas offsets:
 
 `canvas` stores light adjustments created when a human drags or resizes an element on the canvas. Keys are structured field paths such as `title`, `subtitle`, `cards.0.title`, or `table.rows.1.2`. `x/y` are offset pixels from the template position; `w/h` are optional width and minimum height. When repairing copy, preserve existing `canvas` values. Remove them only when the user asks to reset the layout or restore template positions.
 
+Element styles:
+
+```json
+"styles": {
+  "title": {
+    "fontSize": 88,
+    "color": "#ff3366",
+    "textAlign": "center",
+    "fontWeight": "800"
+  },
+  "table.rows.1.2": {
+    "backgroundColor": "#fff7ed",
+    "borderColor": "#fb923c",
+    "borderWidth": 2,
+    "borderRadius": 8
+  }
+}
+```
+
+`styles` stores visual overrides for individual elements, using the same structured field paths. Allowed fields are `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, and `fontStyle`. Do not output free CSS, selectors, class names, or scripts. When repairing copy, preserve existing `styles` unless the user asks to clear styling or restore the default theme.
+
 ## 6. Recommended Generation Workflow
 
 1. Understand the user's goal, audience, context, and tone.
