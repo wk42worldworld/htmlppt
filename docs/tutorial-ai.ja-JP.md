@@ -118,6 +118,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 | `timeline` | 工程、ロードマップ | `items` |
 | `data` | 主要指標 | `metrics` |
 | `chart` | 推移、グループ値、構成比 | `chart.kind`、`chart.labels`、`chart.series` |
+| `video` | 製品 demo、インタビュー、画面録画 | `video.src`、`video.poster`、`video.caption` |
 | `table` | 計画表、比較表 | `table.columns`、`table.rows` |
 | `code` | コード表示 | `code` |
 | `ending` | 終了スライド | `title`、`subtitle` |
@@ -131,6 +132,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 - 時系列：`timeline`。
 - 数字を強調：`data`。
 - 推移、グループ値、構成比：`chart`。
+- demo、インタビュー、画面録画を見せる：`video`。
 - 計画や状態を示す：`table`。
 
 ## 5. よく使うフィールド形式
@@ -147,6 +149,20 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 ```
 
 `src` は URL または `data:image/...;base64,...` を使えます。`fit` は塗りつぶし裁切なら `cover`、全体表示なら `contain` を使います。画像が未確定の場合は空にして、人間がエディタでローカル画像を選べるようにします。
+
+動画：
+
+```json
+"video": {
+  "src": "https://example.com/demo.mp4",
+  "poster": "https://example.com/poster.png",
+  "caption": "製品 demo クリップ",
+  "fit": "cover",
+  "controls": true
+}
+```
+
+`src` は URL または `data:video/...;base64,...` を使えます。動画ソースが未確定の場合は空にして、人間がエディタでローカル動画を選べるようにします。
 
 リストまたはタイムライン：
 

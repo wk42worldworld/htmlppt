@@ -118,6 +118,7 @@ Supported layouts:
 | `timeline` | Process or roadmap | `items` |
 | `data` | Key metrics | `metrics` |
 | `chart` | Trends or proportions | `chart.kind`, `chart.labels`, `chart.series` |
+| `video` | Product demos, interviews, screen recordings | `video.src`, `video.poster`, `video.caption` |
 | `table` | Plan or comparison table | `table.columns`, `table.rows` |
 | `code` | Code display | `code` |
 | `ending` | Closing slide | `title`, `subtitle` |
@@ -131,6 +132,7 @@ Selection rules:
 - Need time order: use `timeline`.
 - Need numbers: use `data`.
 - Need trends, grouped values, or proportions: use `chart`.
+- Need a demo clip, interview, or screen recording: use `video`.
 - Need status or plan details: use `table`.
 
 ## 5. Common Field Formats
@@ -147,6 +149,20 @@ Image:
 ```
 
 `src` can be a URL or a `data:image/...;base64,...` value. `fit` should be `cover` for cropped fill or `contain` for full image display. If the image source is unknown, leave it empty and let the human user choose a local image in the editor.
+
+Video:
+
+```json
+"video": {
+  "src": "https://example.com/demo.mp4",
+  "poster": "https://example.com/poster.png",
+  "caption": "Product demo clip",
+  "fit": "cover",
+  "controls": true
+}
+```
+
+`src` can be a URL or a `data:video/...;base64,...` value. If the video source is unknown, leave it empty and let the human user choose a local video in the editor.
 
 List or timeline:
 

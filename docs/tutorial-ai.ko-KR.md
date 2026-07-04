@@ -118,6 +118,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 | `timeline` | 과정, 로드맵 | `items` |
 | `data` | 핵심 지표 | `metrics` |
 | `chart` | 추세, 그룹 값, 구성비 | `chart.kind`, `chart.labels`, `chart.series` |
+| `video` | 제품 demo, 인터뷰, 화면 녹화 | `video.src`, `video.poster`, `video.caption` |
 | `table` | 계획표, 비교표 | `table.columns`, `table.rows` |
 | `code` | 코드 표시 | `code` |
 | `ending` | 마무리 | `title`, `subtitle` |
@@ -131,6 +132,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 - 시간 순서라면 `timeline`.
 - 숫자를 강조하려면 `data`.
 - 추세, 그룹 값, 구성비라면 `chart`.
+- demo, 인터뷰, 화면 녹화를 보여주려면 `video`.
 - 계획이나 상태를 보여주려면 `table`.
 
 ## 5. 자주 쓰는 필드 형식
@@ -147,6 +149,20 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 ```
 
 `src` 는 URL 또는 `data:image/...;base64,...` 값을 사용할 수 있습니다. `fit` 은 채우기 crop에는 `cover`, 전체 표시에는 `contain` 을 사용합니다. 이미지 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 이미지를 선택하게 합니다.
+
+비디오:
+
+```json
+"video": {
+  "src": "https://example.com/demo.mp4",
+  "poster": "https://example.com/poster.png",
+  "caption": "제품 demo 클립",
+  "fit": "cover",
+  "controls": true
+}
+```
+
+`src` 는 URL 또는 `data:video/...;base64,...` 값을 사용할 수 있습니다. 비디오 소스가 확실하지 않으면 비워 두고 사용자가 편집기에서 로컬 비디오를 선택하게 합니다.
 
 목록 또는 타임라인:
 

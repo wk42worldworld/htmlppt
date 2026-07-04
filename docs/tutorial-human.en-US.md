@@ -138,6 +138,15 @@ Delete is disabled when only one slide remains, so the deck cannot become empty.
 
 ## 7. Add Images, Data, Charts, Tables, and Code
 
+The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas:
+
+- `Text`: creates a normal text slide.
+- `Image`: click to choose a local image; drag to create an image slide placeholder.
+- `Video`: click to choose a local video; drag to create a video slide placeholder.
+- `Chart`, `Table`, `Cards`, `Data`, `Timeline`, `Quote`, and `Code`: switch the current slide to the matching layout and add editable starter content.
+
+After inserting a component, continue editing it in the right panel, or double-click text, drag components, and resize them directly on the canvas.
+
 Images:
 
 1. Change the layout to `hero`, `imageRight`, `imageLeft`, `imageFull`, or `imageBackground`.

@@ -2,9 +2,11 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
-  var APP_VERSION_LABEL = "v0.2.5";
+  var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
+  var APP_VERSION_LABEL = "v0.2.6";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
+  var uiLang = loadLanguage();
   var currentIndex = 0;
   var currentFilePath = "";
   var dirty = false;
@@ -24,14 +26,824 @@
   var presenterFullscreenActive = false;
 
   var els = {};
+  var I18N = {
+    "zh-CN": {
+      "action.new": "新建",
+      "action.templates": "模板",
+      "action.open": "打开",
+      "action.save": "保存 / 下载",
+      "action.saveDesktop": "保存",
+      "action.saveAs": "另存为",
+      "action.aiJson": "AI JSON",
+      "action.validate": "检查",
+      "action.present": "演示",
+      "action.undo": "撤销",
+      "action.redo": "重做",
+      "action.pickImage": "选择本地图片",
+      "action.pickVideo": "选择本地视频",
+      "aria.fileActions": "文件操作",
+      "aria.slideList": "幻灯片列表",
+      "aria.insertComponents": "插入组件",
+      "aria.workspace": "编辑画布",
+      "aria.inspector": "属性面板",
+      "language.label": "界面语言",
+      "rail.pages": "页面",
+      "rail.addSlide": "添加页面",
+      "rail.duplicate": "复制页面",
+      "rail.moveUp": "上移",
+      "rail.moveDown": "下移",
+      "rail.delete": "删除",
+      "insert.title": "插入",
+      "insert.text": "文本",
+      "insert.image": "图片",
+      "insert.video": "视频",
+      "insert.chart": "图表",
+      "insert.table": "表格",
+      "insert.cards": "卡片",
+      "insert.metrics": "数据",
+      "insert.timeline": "时间线",
+      "insert.quote": "引用",
+      "insert.code": "代码",
+      "insert.text.title": "插入文本页面",
+      "insert.image.title": "插入图片，或拖到画布创建图片页",
+      "insert.video.title": "插入视频，或拖到画布创建视频页",
+      "insert.chart.title": "插入可编辑图表",
+      "insert.table.title": "插入表格",
+      "insert.cards.title": "插入三卡片组件",
+      "insert.metrics.title": "插入数据指标组件",
+      "insert.timeline.title": "插入时间线组件",
+      "insert.quote.title": "插入引用页",
+      "insert.code.title": "插入代码页",
+      "panel.deck": "文稿",
+      "panel.slide": "页面",
+      "panel.image": "图片",
+      "panel.video": "视频",
+      "panel.list": "列表",
+      "panel.compare": "对比",
+      "panel.cards": "卡片",
+      "panel.metrics": "数据",
+      "panel.chart": "图表",
+      "panel.table": "表格",
+      "panel.quote": "引用",
+      "panel.code": "代码",
+      "panel.notes": "备注",
+      "field.deckName": "名称",
+      "field.theme": "主题",
+      "field.layout": "版式",
+      "field.kicker": "眉标",
+      "field.title": "标题",
+      "field.subtitle": "副标题",
+      "field.body": "正文",
+      "field.fit": "适配",
+      "field.imageSrc": "图片 URL 或 Data URI",
+      "field.videoSrc": "视频 URL 或 Data URI",
+      "field.poster": "封面 URL",
+      "field.alt": "替代文字",
+      "field.caption": "说明",
+      "field.listRows": "每行一条；时间线可用 “标题 | 内容”",
+      "field.leftTitle": "左侧标题",
+      "field.leftText": "左侧内容",
+      "field.rightTitle": "右侧标题",
+      "field.rightText": "右侧内容",
+      "field.cardsRows": "每行一张卡片：标题 | 内容",
+      "field.metricsRows": "每行一个指标：数值 | 标签 | 说明",
+      "field.chartKind": "图表类型",
+      "field.chartLabels": "标签，用 | 分隔",
+      "field.chartSeries": "数据系列：每行一个系列，名称 | 数值 | 数值",
+      "field.unit": "单位",
+      "field.tableColumns": "表头，用 | 分隔",
+      "field.tableRows": "每行一组单元格，用 | 分隔",
+      "field.quote": "引文",
+      "field.author": "作者",
+      "field.code": "代码内容",
+      "field.notes": "演讲备注",
+      "option.cover": "填充裁切",
+      "option.contain": "完整显示",
+      "option.bar": "柱状图",
+      "option.line": "折线图",
+      "option.donut": "环形图",
+      "placeholder.chartLabels": "Q1 | Q2 | Q3 | Q4",
+      "placeholder.chartSeries": "收入 | 12 | 20 | 31\n成本 | 8 | 11 | 18",
+      "placeholder.unit": "万元",
+      "present.prev": "上一页",
+      "present.next": "下一页",
+      "present.exit": "退出",
+      "dialog.aiJson": "AI JSON",
+      "dialog.templates": "选择模板",
+      "dialog.validation": "质量检查",
+      "dialog.close": "关闭",
+      "dialog.cancel": "取消",
+      "dialog.copyJson": "复制当前 JSON",
+      "dialog.loadJson": "从文本载入",
+      "dialog.copyReport": "复制报告",
+      "template.aiCamera.name": "AI 导演相机",
+      "template.aiCamera.desc": "产品发布 demo，适合展示一个新想法。",
+      "template.productPitch.name": "产品发布",
+      "template.productPitch.desc": "问题、方案、价值和下一步。",
+      "template.lesson.name": "课程课件",
+      "template.lesson.desc": "学习目标、概念、练习和课后任务。",
+      "template.projectUpdate.name": "项目汇报",
+      "template.projectUpdate.desc": "状态、风险、决策和里程碑。",
+      "layout.hero": "封面",
+      "layout.section": "章节",
+      "layout.text": "文本",
+      "layout.imageRight": "左文右图",
+      "layout.imageLeft": "左图右文",
+      "layout.imageFull": "全屏图片",
+      "layout.imageBackground": "背景图文",
+      "layout.compare": "对比",
+      "layout.threeCards": "三卡片",
+      "layout.quote": "引用",
+      "layout.timeline": "时间线",
+      "layout.data": "数据",
+      "layout.chart": "图表",
+      "layout.video": "视频",
+      "layout.table": "表格",
+      "layout.code": "代码",
+      "layout.ending": "结束",
+      "status.untitled": "未命名",
+      "status.browserDraft": "浏览器草稿",
+      "status.unsaved": "未保存",
+      "slide.untitled": "未命名页面",
+      "slide.current": "第 {number} 页",
+      "canvas.image": "图片",
+      "canvas.video": "视频",
+      "canvas.chart": "图表",
+      "canvas.table": "表格",
+      "canvas.cards": "卡片组",
+      "canvas.metrics": "数据组",
+      "canvas.timeline": "时间线",
+      "canvas.reset": "重置",
+      "canvas.resetTitle": "重置这个元素的位置和尺寸",
+      "canvas.resize": "拖拽调整尺寸",
+      "toast.languageChanged": "语言已切换",
+      "toast.imageAdded": "图片已加入当前页面",
+      "toast.videoAdded": "视频已加入当前页面",
+      "toast.componentInserted": "已插入{name}",
+      "toast.componentSelected": "已选中{name}，可以拖拽或调整尺寸",
+      "toast.jsonCopied": "JSON 已复制",
+      "toast.jsonLoaded": "JSON 已载入",
+      "toast.reportCopied": "检查报告已复制",
+      "toast.newDeck": "已新建演示文稿",
+      "toast.templateCreated": "已从模板创建",
+      "toast.opened": "已打开 {name}",
+      "toast.saved": "已保存 {name}",
+      "toast.downloaded": "已生成单文件 PPT.html",
+      "toast.validationErrors": "{prefix} · 有 {count} 个错误",
+      "toast.validationWarnings": "{prefix} · 有 {count} 个建议",
+      "toast.validationPassed": "{prefix} · 检查通过",
+      "alert.openFailed": "打开失败：{message}",
+      "alert.loadFailed": "载入失败：{message}",
+      "alert.saveFailed": "保存失败：{message}",
+      "confirm.keepOneSlide": "至少保留一页。",
+      "confirm.deleteSlide": "删除当前页面？",
+      "confirm.discard": "当前文稿有未保存修改。继续会丢失这些修改。",
+      "validation.pass": "检查通过：{count} 页，可正常分享。",
+      "validation.needsFix": "需要修复：{errors} 个错误，{warnings} 个警告。",
+      "sample.newSlideTitle": "新页面",
+      "sample.newSlideSubtitle": "在右侧面板编辑内容",
+      "sample.textTitle": "新的文本页",
+      "sample.textBody": "双击文字可以直接编辑；拖拽文字块可以移动位置。",
+      "sample.point1": "第一个要点",
+      "sample.point2": "第二个要点",
+      "sample.imageTitle": "图片展示",
+      "sample.imageCaption": "双击图片可替换本地文件",
+      "sample.videoTitle": "视频展示",
+      "sample.videoCaption": "双击视频可替换本地文件",
+      "sample.chartTitle": "季度增长",
+      "sample.q1": "Q1",
+      "sample.q2": "Q2",
+      "sample.q3": "Q3",
+      "sample.q4": "Q4",
+      "sample.revenue": "收入",
+      "sample.cost": "成本",
+      "sample.unit": "万元",
+      "sample.tableTitle": "项目表格",
+      "sample.phase": "阶段",
+      "sample.owner": "负责人",
+      "sample.status": "状态",
+      "sample.plan": "计划",
+      "sample.team": "团队",
+      "sample.done": "完成",
+      "sample.prototype": "原型",
+      "sample.design": "设计",
+      "sample.progress": "进行中",
+      "sample.cardsTitle": "三个核心点",
+      "sample.card1Title": "清晰",
+      "sample.card1Text": "把复杂内容拆成可理解的结构。",
+      "sample.card2Title": "稳定",
+      "sample.card2Text": "用模板保证每页都能正常展示。",
+      "sample.card3Title": "可编辑",
+      "sample.card3Text": "AI 和人类都能继续修改。",
+      "sample.metricsTitle": "关键数据",
+      "sample.speed": "速度",
+      "sample.speedDetail": "从想法到演示更快。",
+      "sample.growth": "增长",
+      "sample.growthDetail": "用于展示核心趋势。",
+      "sample.fileDetail": "单文件便于分享。",
+      "sample.timelineTitle": "执行步骤",
+      "sample.step1": "第一步",
+      "sample.step1Text": "确定主题和受众。",
+      "sample.step2": "第二步",
+      "sample.step2Text": "生成内容结构。",
+      "sample.step3": "第三步",
+      "sample.step3Text": "演示并继续修改。",
+      "sample.quoteText": "好的演示不是堆满内容，而是让观众跟上你的思路。",
+      "sample.quoteAuthor": "PPT.html Studio",
+      "sample.codeTitle": "代码示例"
+    }
+  };
+
+  extendLang("en-US", {
+    "action.new": "New",
+    "action.templates": "Templates",
+    "action.open": "Open",
+    "action.save": "Save / Download",
+    "action.saveDesktop": "Save",
+    "action.saveAs": "Save As",
+    "action.validate": "Check",
+    "action.present": "Present",
+    "action.undo": "Undo",
+    "action.redo": "Redo",
+    "action.pickImage": "Choose Image",
+    "action.pickVideo": "Choose Video",
+    "aria.fileActions": "File actions",
+    "aria.slideList": "Slide list",
+    "aria.insertComponents": "Insert components",
+    "aria.workspace": "Editing canvas",
+    "aria.inspector": "Inspector",
+    "language.label": "Interface language",
+    "rail.pages": "Slides",
+    "rail.addSlide": "Add slide",
+    "rail.duplicate": "Duplicate slide",
+    "rail.moveUp": "Move up",
+    "rail.moveDown": "Move down",
+    "rail.delete": "Delete",
+    "insert.title": "Insert",
+    "insert.text": "Text",
+    "insert.image": "Image",
+    "insert.video": "Video",
+    "insert.chart": "Chart",
+    "insert.table": "Table",
+    "insert.cards": "Cards",
+    "insert.metrics": "Data",
+    "insert.timeline": "Timeline",
+    "insert.quote": "Quote",
+    "insert.code": "Code",
+    "insert.text.title": "Insert a text slide",
+    "insert.image.title": "Insert an image, or drag to the canvas",
+    "insert.video.title": "Insert a video, or drag to the canvas",
+    "insert.chart.title": "Insert an editable chart",
+    "insert.table.title": "Insert a table",
+    "insert.cards.title": "Insert a three-card section",
+    "insert.metrics.title": "Insert metric cards",
+    "insert.timeline.title": "Insert a timeline",
+    "insert.quote.title": "Insert a quote slide",
+    "insert.code.title": "Insert a code slide",
+    "panel.deck": "Deck",
+    "panel.slide": "Slide",
+    "panel.image": "Image",
+    "panel.video": "Video",
+    "panel.list": "List",
+    "panel.compare": "Compare",
+    "panel.cards": "Cards",
+    "panel.metrics": "Data",
+    "panel.chart": "Chart",
+    "panel.table": "Table",
+    "panel.quote": "Quote",
+    "panel.code": "Code",
+    "panel.notes": "Notes",
+    "field.deckName": "Name",
+    "field.theme": "Theme",
+    "field.layout": "Layout",
+    "field.kicker": "Kicker",
+    "field.title": "Title",
+    "field.subtitle": "Subtitle",
+    "field.body": "Body",
+    "field.fit": "Fit",
+    "field.imageSrc": "Image URL or Data URI",
+    "field.videoSrc": "Video URL or Data URI",
+    "field.poster": "Poster URL",
+    "field.alt": "Alt text",
+    "field.caption": "Caption",
+    "field.listRows": "One item per line; timeline supports Title | Text",
+    "field.leftTitle": "Left title",
+    "field.leftText": "Left text",
+    "field.rightTitle": "Right title",
+    "field.rightText": "Right text",
+    "field.cardsRows": "One card per line: Title | Text",
+    "field.metricsRows": "One metric per line: Value | Label | Detail",
+    "field.chartKind": "Chart type",
+    "field.chartLabels": "Labels, separated by |",
+    "field.chartSeries": "Series: one per line, Name | Value | Value",
+    "field.unit": "Unit",
+    "field.tableColumns": "Headers, separated by |",
+    "field.tableRows": "Rows, cells separated by |",
+    "field.quote": "Quote",
+    "field.author": "Author",
+    "field.code": "Code",
+    "field.notes": "Speaker notes",
+    "option.cover": "Cover",
+    "option.contain": "Contain",
+    "option.bar": "Bar",
+    "option.line": "Line",
+    "option.donut": "Donut",
+    "placeholder.chartSeries": "Revenue | 12 | 20 | 31\nCost | 8 | 11 | 18",
+    "placeholder.unit": "k",
+    "present.prev": "Previous",
+    "present.next": "Next",
+    "present.exit": "Exit",
+    "dialog.templates": "Choose Template",
+    "dialog.validation": "Quality Check",
+    "dialog.close": "Close",
+    "dialog.cancel": "Cancel",
+    "dialog.copyJson": "Copy JSON",
+    "dialog.loadJson": "Load From Text",
+    "dialog.copyReport": "Copy Report",
+    "template.aiCamera.name": "AI Director Camera",
+    "template.aiCamera.desc": "Product launch demo for presenting a new idea.",
+    "template.productPitch.name": "Product Pitch",
+    "template.productPitch.desc": "Problem, solution, value, and next step.",
+    "template.lesson.name": "Lesson Deck",
+    "template.lesson.desc": "Goals, concepts, practice, and homework.",
+    "template.projectUpdate.name": "Project Update",
+    "template.projectUpdate.desc": "Status, risks, decisions, and milestones.",
+    "layout.hero": "Hero",
+    "layout.section": "Section",
+    "layout.text": "Text",
+    "layout.imageRight": "Text + Image",
+    "layout.imageLeft": "Image + Text",
+    "layout.imageFull": "Full Image",
+    "layout.imageBackground": "Image Background",
+    "layout.compare": "Compare",
+    "layout.threeCards": "Three Cards",
+    "layout.quote": "Quote",
+    "layout.timeline": "Timeline",
+    "layout.data": "Data",
+    "layout.chart": "Chart",
+    "layout.video": "Video",
+    "layout.table": "Table",
+    "layout.code": "Code",
+    "layout.ending": "Ending",
+    "status.untitled": "Untitled",
+    "status.browserDraft": "Browser Draft",
+    "status.unsaved": "Unsaved",
+    "slide.untitled": "Untitled Slide",
+    "slide.current": "Slide {number}",
+    "canvas.image": "Image",
+    "canvas.video": "Video",
+    "canvas.chart": "Chart",
+    "canvas.table": "Table",
+    "canvas.cards": "Cards",
+    "canvas.metrics": "Metrics",
+    "canvas.timeline": "Timeline",
+    "canvas.reset": "Reset",
+    "canvas.resetTitle": "Reset this element position and size",
+    "canvas.resize": "Drag to resize",
+    "toast.languageChanged": "Language changed",
+    "toast.imageAdded": "Image added to this slide",
+    "toast.videoAdded": "Video added to this slide",
+    "toast.componentInserted": "Inserted {name}",
+    "toast.componentSelected": "{name} selected. Drag or resize it.",
+    "toast.jsonCopied": "JSON copied",
+    "toast.jsonLoaded": "JSON loaded",
+    "toast.reportCopied": "Report copied",
+    "toast.newDeck": "New deck created",
+    "toast.templateCreated": "Created from template",
+    "toast.opened": "Opened {name}",
+    "toast.saved": "Saved {name}",
+    "toast.downloaded": "Standalone PPT.html generated",
+    "toast.validationErrors": "{prefix} · {count} errors",
+    "toast.validationWarnings": "{prefix} · {count} suggestions",
+    "toast.validationPassed": "{prefix} · Passed",
+    "alert.openFailed": "Open failed: {message}",
+    "alert.loadFailed": "Load failed: {message}",
+    "alert.saveFailed": "Save failed: {message}",
+    "confirm.keepOneSlide": "Keep at least one slide.",
+    "confirm.deleteSlide": "Delete the current slide?",
+    "confirm.discard": "This deck has unsaved changes. Continue and discard them?",
+    "validation.pass": "Passed: {count} slides, ready to share.",
+    "validation.needsFix": "Needs fixes: {errors} errors, {warnings} warnings.",
+    "sample.newSlideTitle": "New Slide",
+    "sample.newSlideSubtitle": "Edit content in the right panel",
+    "sample.textTitle": "New Text Slide",
+    "sample.textBody": "Double-click text to edit it directly; drag text blocks to move them.",
+    "sample.point1": "First point",
+    "sample.point2": "Second point",
+    "sample.imageTitle": "Image Showcase",
+    "sample.imageCaption": "Double-click the image to replace it",
+    "sample.videoTitle": "Video Showcase",
+    "sample.videoCaption": "Double-click the video to replace it",
+    "sample.chartTitle": "Quarterly Growth",
+    "sample.revenue": "Revenue",
+    "sample.cost": "Cost",
+    "sample.unit": "k",
+    "sample.tableTitle": "Project Table",
+    "sample.phase": "Phase",
+    "sample.owner": "Owner",
+    "sample.status": "Status",
+    "sample.plan": "Plan",
+    "sample.team": "Team",
+    "sample.done": "Done",
+    "sample.prototype": "Prototype",
+    "sample.design": "Design",
+    "sample.progress": "In Progress",
+    "sample.cardsTitle": "Three Key Points",
+    "sample.card1Title": "Clear",
+    "sample.card1Text": "Break complex content into understandable structure.",
+    "sample.card2Title": "Stable",
+    "sample.card2Text": "Templates keep every slide presentable.",
+    "sample.card3Title": "Editable",
+    "sample.card3Text": "Both AI and humans can keep editing.",
+    "sample.metricsTitle": "Key Metrics",
+    "sample.speed": "Speed",
+    "sample.speedDetail": "Faster from idea to presentation.",
+    "sample.growth": "Growth",
+    "sample.growthDetail": "Show the main trend.",
+    "sample.fileDetail": "A single file is easy to share.",
+    "sample.timelineTitle": "Execution Steps",
+    "sample.step1": "Step 1",
+    "sample.step1Text": "Define the topic and audience.",
+    "sample.step2": "Step 2",
+    "sample.step2Text": "Generate the content structure.",
+    "sample.step3": "Step 3",
+    "sample.step3Text": "Present and keep refining.",
+    "sample.quoteText": "A good presentation does not fill the slide; it helps the audience follow your thinking.",
+    "sample.quoteAuthor": "PPT.html Studio",
+    "sample.codeTitle": "Code Example"
+  });
+
+  extendLang("ja-JP", {
+    "action.new": "新規",
+    "action.templates": "テンプレート",
+    "action.open": "開く",
+    "action.save": "保存 / ダウンロード",
+    "action.saveDesktop": "保存",
+    "action.saveAs": "別名で保存",
+    "action.validate": "チェック",
+    "action.present": "発表",
+    "action.undo": "元に戻す",
+    "action.redo": "やり直す",
+    "action.pickImage": "画像を選択",
+    "action.pickVideo": "動画を選択",
+    "aria.fileActions": "ファイル操作",
+    "aria.slideList": "スライド一覧",
+    "aria.insertComponents": "コンポーネント挿入",
+    "aria.workspace": "編集キャンバス",
+    "aria.inspector": "プロパティパネル",
+    "language.label": "表示言語",
+    "rail.pages": "スライド",
+    "rail.addSlide": "スライドを追加",
+    "rail.duplicate": "複製",
+    "rail.moveUp": "上へ",
+    "rail.moveDown": "下へ",
+    "rail.delete": "削除",
+    "insert.title": "挿入",
+    "insert.text": "テキスト",
+    "insert.image": "画像",
+    "insert.video": "動画",
+    "insert.chart": "グラフ",
+    "insert.table": "表",
+    "insert.cards": "カード",
+    "insert.metrics": "データ",
+    "insert.timeline": "タイムライン",
+    "insert.quote": "引用",
+    "insert.code": "コード",
+    "insert.text.title": "テキストスライドを挿入",
+    "insert.image.title": "画像を挿入、またはキャンバスへドラッグ",
+    "insert.video.title": "動画を挿入、またはキャンバスへドラッグ",
+    "insert.chart.title": "編集可能なグラフを挿入",
+    "insert.table.title": "表を挿入",
+    "insert.cards.title": "3カードを挿入",
+    "insert.metrics.title": "指標カードを挿入",
+    "insert.timeline.title": "タイムラインを挿入",
+    "insert.quote.title": "引用スライドを挿入",
+    "insert.code.title": "コードスライドを挿入",
+    "panel.deck": "文書",
+    "panel.slide": "スライド",
+    "panel.image": "画像",
+    "panel.video": "動画",
+    "panel.list": "リスト",
+    "panel.compare": "比較",
+    "panel.cards": "カード",
+    "panel.metrics": "データ",
+    "panel.chart": "グラフ",
+    "panel.table": "表",
+    "panel.quote": "引用",
+    "panel.code": "コード",
+    "panel.notes": "ノート",
+    "field.deckName": "名前",
+    "field.theme": "テーマ",
+    "field.layout": "レイアウト",
+    "field.kicker": "ラベル",
+    "field.title": "タイトル",
+    "field.subtitle": "サブタイトル",
+    "field.body": "本文",
+    "field.fit": "表示方法",
+    "field.imageSrc": "画像 URL または Data URI",
+    "field.videoSrc": "動画 URL または Data URI",
+    "field.poster": "ポスター URL",
+    "field.alt": "代替テキスト",
+    "field.caption": "キャプション",
+    "field.listRows": "1行に1項目。タイムラインは タイトル | 本文",
+    "field.chartKind": "グラフ種類",
+    "field.chartLabels": "ラベル。| で区切る",
+    "field.chartSeries": "系列: 1行ずつ 名前 | 値 | 値",
+    "field.unit": "単位",
+    "option.cover": "カバー",
+    "option.contain": "全体表示",
+    "option.bar": "棒",
+    "option.line": "折れ線",
+    "option.donut": "ドーナツ",
+    "present.prev": "前へ",
+    "present.next": "次へ",
+    "present.exit": "終了",
+    "dialog.templates": "テンプレートを選択",
+    "dialog.validation": "品質チェック",
+    "dialog.close": "閉じる",
+    "dialog.cancel": "キャンセル",
+    "dialog.copyJson": "JSON をコピー",
+    "dialog.loadJson": "テキストから読み込み",
+    "dialog.copyReport": "レポートをコピー",
+    "layout.hero": "表紙",
+    "layout.section": "章",
+    "layout.text": "テキスト",
+    "layout.imageRight": "左文右図",
+    "layout.imageLeft": "左図右文",
+    "layout.imageFull": "全画面画像",
+    "layout.imageBackground": "背景画像",
+    "layout.compare": "比較",
+    "layout.threeCards": "3カード",
+    "layout.quote": "引用",
+    "layout.timeline": "タイムライン",
+    "layout.data": "データ",
+    "layout.chart": "グラフ",
+    "layout.video": "動画",
+    "layout.table": "表",
+    "layout.code": "コード",
+    "layout.ending": "終了",
+    "status.untitled": "無題",
+    "status.browserDraft": "ブラウザ下書き",
+    "status.unsaved": "未保存",
+    "slide.untitled": "無題のスライド",
+    "slide.current": "{number} 枚目",
+    "canvas.reset": "リセット",
+    "canvas.resetTitle": "この要素の位置とサイズをリセット",
+    "canvas.resize": "ドラッグしてサイズ変更",
+    "toast.languageChanged": "言語を変更しました",
+    "toast.imageAdded": "画像を追加しました",
+    "toast.videoAdded": "動画を追加しました",
+    "toast.componentInserted": "{name}を挿入しました",
+    "toast.componentSelected": "{name}を選択しました。ドラッグやサイズ変更ができます。",
+    "toast.jsonCopied": "JSON をコピーしました",
+    "toast.jsonLoaded": "JSON を読み込みました",
+    "toast.reportCopied": "レポートをコピーしました",
+    "confirm.keepOneSlide": "少なくとも1枚のスライドが必要です。",
+    "confirm.deleteSlide": "現在のスライドを削除しますか？",
+    "confirm.discard": "未保存の変更があります。続行すると破棄されます。",
+    "validation.pass": "チェック完了: {count} 枚、共有できます。",
+    "validation.needsFix": "修正が必要: エラー {errors} 件、警告 {warnings} 件。",
+    "sample.newSlideTitle": "新しいスライド",
+    "sample.newSlideSubtitle": "右側パネルで内容を編集",
+    "sample.textTitle": "新しいテキストスライド",
+    "sample.textBody": "文字をダブルクリックして編集し、ドラッグして位置を調整できます。",
+    "sample.imageTitle": "画像表示",
+    "sample.imageCaption": "画像をダブルクリックして差し替え",
+    "sample.videoTitle": "動画表示",
+    "sample.videoCaption": "動画をダブルクリックして差し替え",
+    "sample.chartTitle": "四半期成長",
+    "sample.revenue": "売上",
+    "sample.cost": "コスト",
+    "sample.tableTitle": "プロジェクト表",
+    "sample.cardsTitle": "3つの要点",
+    "sample.metricsTitle": "主要指標",
+    "sample.timelineTitle": "実行手順",
+    "sample.quoteText": "良いプレゼンは情報を詰め込むのではなく、聞き手が考えを追えるようにします。",
+    "sample.codeTitle": "コード例"
+  });
+
+  extendLang("ko-KR", {
+    "action.new": "새로 만들기",
+    "action.templates": "템플릿",
+    "action.open": "열기",
+    "action.save": "저장 / 다운로드",
+    "action.saveDesktop": "저장",
+    "action.saveAs": "다른 이름 저장",
+    "action.validate": "검사",
+    "action.present": "발표",
+    "action.undo": "실행 취소",
+    "action.redo": "다시 실행",
+    "action.pickImage": "이미지 선택",
+    "action.pickVideo": "비디오 선택",
+    "aria.fileActions": "파일 작업",
+    "aria.slideList": "슬라이드 목록",
+    "aria.insertComponents": "컴포넌트 삽입",
+    "aria.workspace": "편집 캔버스",
+    "aria.inspector": "속성 패널",
+    "language.label": "인터페이스 언어",
+    "rail.pages": "슬라이드",
+    "rail.addSlide": "슬라이드 추가",
+    "rail.duplicate": "복제",
+    "rail.moveUp": "위로",
+    "rail.moveDown": "아래로",
+    "rail.delete": "삭제",
+    "insert.title": "삽입",
+    "insert.text": "텍스트",
+    "insert.image": "이미지",
+    "insert.video": "비디오",
+    "insert.chart": "차트",
+    "insert.table": "표",
+    "insert.cards": "카드",
+    "insert.metrics": "데이터",
+    "insert.timeline": "타임라인",
+    "insert.quote": "인용",
+    "insert.code": "코드",
+    "insert.text.title": "텍스트 슬라이드 삽입",
+    "insert.image.title": "이미지를 삽입하거나 캔버스로 드래그",
+    "insert.video.title": "비디오를 삽입하거나 캔버스로 드래그",
+    "insert.chart.title": "편집 가능한 차트 삽입",
+    "insert.table.title": "표 삽입",
+    "insert.cards.title": "세 카드 컴포넌트 삽입",
+    "insert.metrics.title": "지표 카드 삽입",
+    "insert.timeline.title": "타임라인 삽입",
+    "insert.quote.title": "인용 슬라이드 삽입",
+    "insert.code.title": "코드 슬라이드 삽입",
+    "panel.deck": "문서",
+    "panel.slide": "슬라이드",
+    "panel.image": "이미지",
+    "panel.video": "비디오",
+    "panel.list": "목록",
+    "panel.compare": "비교",
+    "panel.cards": "카드",
+    "panel.metrics": "데이터",
+    "panel.chart": "차트",
+    "panel.table": "표",
+    "panel.quote": "인용",
+    "panel.code": "코드",
+    "panel.notes": "노트",
+    "field.deckName": "이름",
+    "field.theme": "테마",
+    "field.layout": "레이아웃",
+    "field.kicker": "라벨",
+    "field.title": "제목",
+    "field.subtitle": "부제목",
+    "field.body": "본문",
+    "field.fit": "맞춤",
+    "field.imageSrc": "이미지 URL 또는 Data URI",
+    "field.videoSrc": "비디오 URL 또는 Data URI",
+    "field.poster": "포스터 URL",
+    "field.alt": "대체 텍스트",
+    "field.caption": "캡션",
+    "field.listRows": "한 줄에 한 항목. 타임라인은 제목 | 내용",
+    "field.chartKind": "차트 유형",
+    "field.chartLabels": "라벨, | 로 구분",
+    "field.chartSeries": "시리즈: 한 줄에 이름 | 값 | 값",
+    "field.unit": "단위",
+    "option.cover": "채우기",
+    "option.contain": "전체 표시",
+    "option.bar": "막대",
+    "option.line": "선",
+    "option.donut": "도넛",
+    "present.prev": "이전",
+    "present.next": "다음",
+    "present.exit": "종료",
+    "dialog.templates": "템플릿 선택",
+    "dialog.validation": "품질 검사",
+    "dialog.close": "닫기",
+    "dialog.cancel": "취소",
+    "dialog.copyJson": "JSON 복사",
+    "dialog.loadJson": "텍스트에서 불러오기",
+    "dialog.copyReport": "보고서 복사",
+    "layout.hero": "표지",
+    "layout.section": "섹션",
+    "layout.text": "텍스트",
+    "layout.imageRight": "텍스트+이미지",
+    "layout.imageLeft": "이미지+텍스트",
+    "layout.imageFull": "전체 이미지",
+    "layout.imageBackground": "배경 이미지",
+    "layout.compare": "비교",
+    "layout.threeCards": "세 카드",
+    "layout.quote": "인용",
+    "layout.timeline": "타임라인",
+    "layout.data": "데이터",
+    "layout.chart": "차트",
+    "layout.video": "비디오",
+    "layout.table": "표",
+    "layout.code": "코드",
+    "layout.ending": "마무리",
+    "status.untitled": "제목 없음",
+    "status.browserDraft": "브라우저 초안",
+    "status.unsaved": "저장 안 됨",
+    "slide.untitled": "제목 없는 슬라이드",
+    "slide.current": "{number}번 슬라이드",
+    "canvas.reset": "초기화",
+    "canvas.resetTitle": "이 요소의 위치와 크기를 초기화",
+    "canvas.resize": "드래그하여 크기 조절",
+    "toast.languageChanged": "언어가 변경되었습니다",
+    "toast.imageAdded": "이미지가 추가되었습니다",
+    "toast.videoAdded": "비디오가 추가되었습니다",
+    "toast.componentInserted": "{name} 삽입됨",
+    "toast.componentSelected": "{name} 선택됨. 드래그하거나 크기를 조절하세요.",
+    "toast.jsonCopied": "JSON 복사됨",
+    "toast.jsonLoaded": "JSON 불러옴",
+    "toast.reportCopied": "보고서 복사됨",
+    "confirm.keepOneSlide": "슬라이드는 최소 1장이 필요합니다.",
+    "confirm.deleteSlide": "현재 슬라이드를 삭제할까요?",
+    "confirm.discard": "저장하지 않은 변경 사항이 있습니다. 계속하면 버려집니다.",
+    "validation.pass": "검사 통과: {count}장, 공유할 수 있습니다.",
+    "validation.needsFix": "수정 필요: 오류 {errors}개, 경고 {warnings}개.",
+    "sample.newSlideTitle": "새 슬라이드",
+    "sample.newSlideSubtitle": "오른쪽 패널에서 내용을 편집하세요",
+    "sample.textTitle": "새 텍스트 슬라이드",
+    "sample.textBody": "텍스트를 더블 클릭해 직접 편집하고 드래그해 위치를 옮길 수 있습니다.",
+    "sample.imageTitle": "이미지 쇼케이스",
+    "sample.imageCaption": "이미지를 더블 클릭해 교체",
+    "sample.videoTitle": "비디오 쇼케이스",
+    "sample.videoCaption": "비디오를 더블 클릭해 교체",
+    "sample.chartTitle": "분기 성장",
+    "sample.revenue": "매출",
+    "sample.cost": "비용",
+    "sample.tableTitle": "프로젝트 표",
+    "sample.cardsTitle": "세 가지 핵심",
+    "sample.metricsTitle": "핵심 지표",
+    "sample.timelineTitle": "실행 단계",
+    "sample.quoteText": "좋은 발표는 내용을 가득 채우는 것이 아니라 청중이 생각을 따라오게 합니다.",
+    "sample.codeTitle": "코드 예시"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "field.leftTitle": "Left title",
+    "field.leftText": "Left text",
+    "field.rightTitle": "Right title",
+    "field.rightText": "Right text",
+    "field.cardsRows": "One card per line: Title | Text",
+    "field.metricsRows": "One metric per line: Value | Label | Detail",
+    "field.tableColumns": "Headers, separated by |",
+    "field.tableRows": "Rows, cells separated by |",
+    "field.quote": "Quote",
+    "field.author": "Author",
+    "field.code": "Code",
+    "field.notes": "Speaker notes",
+    "canvas.image": "Image",
+    "canvas.video": "Video",
+    "canvas.chart": "Chart",
+    "canvas.table": "Table",
+    "canvas.cards": "Cards",
+    "canvas.metrics": "Metrics",
+    "canvas.timeline": "Timeline"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "field.leftTitle": "左タイトル",
+    "field.leftText": "左テキスト",
+    "field.rightTitle": "右タイトル",
+    "field.rightText": "右テキスト",
+    "field.cardsRows": "1行に1カード: タイトル | 本文",
+    "field.metricsRows": "1行に1指標: 値 | ラベル | 詳細",
+    "field.tableColumns": "ヘッダー。| で区切る",
+    "field.tableRows": "行。セルは | で区切る",
+    "field.quote": "引用文",
+    "field.author": "著者",
+    "field.code": "コード",
+    "field.notes": "発表者ノート",
+    "canvas.image": "画像",
+    "canvas.video": "動画",
+    "canvas.chart": "グラフ",
+    "canvas.table": "表",
+    "canvas.cards": "カード",
+    "canvas.metrics": "指標",
+    "canvas.timeline": "タイムライン"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "field.leftTitle": "왼쪽 제목",
+    "field.leftText": "왼쪽 내용",
+    "field.rightTitle": "오른쪽 제목",
+    "field.rightText": "오른쪽 내용",
+    "field.cardsRows": "한 줄에 카드 하나: 제목 | 내용",
+    "field.metricsRows": "한 줄에 지표 하나: 값 | 라벨 | 설명",
+    "field.tableColumns": "헤더, | 로 구분",
+    "field.tableRows": "행, 셀은 | 로 구분",
+    "field.quote": "인용문",
+    "field.author": "작성자",
+    "field.code": "코드",
+    "field.notes": "발표자 노트",
+    "canvas.image": "이미지",
+    "canvas.video": "비디오",
+    "canvas.chart": "차트",
+    "canvas.table": "표",
+    "canvas.cards": "카드",
+    "canvas.metrics": "지표",
+    "canvas.timeline": "타임라인"
+  });
 
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
     cacheElements();
-    populateLayoutSelect();
     bindEvents();
     configureRuntime();
+    applyLanguage({ skipRender: true });
     renderAll();
     window.addEventListener("resize", function () {
       fitFrame(els.stageFrame, els.stageViewport);
@@ -43,11 +855,12 @@
   function cacheElements() {
     [
       "newDeckBtn", "templatesBtn", "openDeckBtn", "downloadDeckBtn", "saveAsDeckBtn", "jsonBtn", "validateBtn", "presentBtn",
-      "fileInput", "imageFileInput", "fileStatus",
+      "languageInput", "fileInput", "imageFileInput", "videoFileInput", "fileStatus",
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
+      "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
@@ -57,9 +870,59 @@
     });
   }
 
+  function extendLang(lang, overrides) {
+    I18N[lang] = Object.assign({}, I18N["zh-CN"], overrides || {});
+  }
+
+  function loadLanguage() {
+    try {
+      var saved = localStorage.getItem(LANG_STORAGE_KEY);
+      if (["zh-CN", "en-US", "ja-JP", "ko-KR"].indexOf(saved) !== -1) return saved;
+    } catch (error) {
+      // Ignore storage failures; the UI can still run in Chinese.
+    }
+    return "zh-CN";
+  }
+
+  function t(key) {
+    var lang = I18N[uiLang] ? uiLang : "zh-CN";
+    return (I18N[lang] && I18N[lang][key]) || I18N["zh-CN"][key] || key;
+  }
+
+  function formatText(template, values) {
+    return String(template || "").replace(/\{(\w+)\}/g, function (match, name) {
+      return values && values[name] != null ? values[name] : match;
+    });
+  }
+
+  function applyLanguage(options) {
+    var settings = options || {};
+    if (!I18N[uiLang]) uiLang = "zh-CN";
+    document.documentElement.lang = uiLang;
+    if (els.languageInput) els.languageInput.value = uiLang;
+
+    document.querySelectorAll("[data-i18n]").forEach(function (node) {
+      node.textContent = t(node.getAttribute("data-i18n"));
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach(function (node) {
+      var value = t(node.getAttribute("data-i18n-title"));
+      node.setAttribute("title", value);
+      node.setAttribute("aria-label", value);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (node) {
+      node.setAttribute("placeholder", t(node.getAttribute("data-i18n-placeholder")));
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (node) {
+      node.setAttribute("aria-label", t(node.getAttribute("data-i18n-aria")));
+    });
+
+    populateLayoutSelect();
+    if (!settings.skipRender) renderAll();
+  }
+
   function configureRuntime() {
     if (desktop && desktop.isDesktop) {
-      els.downloadDeckBtn.textContent = "保存";
+      els.downloadDeckBtn.setAttribute("data-i18n-title", "action.saveDesktop");
       els.saveAsDeckBtn.hidden = false;
       desktop.onMenuCommand(function (command) {
         if (command === "new") createNewDeck();
@@ -76,12 +939,15 @@
   }
 
   function populateLayoutSelect() {
+    var currentValue = els.slideLayoutInput.value;
+    els.slideLayoutInput.innerHTML = "";
     PPTHtml.layouts.forEach(function (layout) {
       var option = document.createElement("option");
       option.value = layout[0];
-      option.textContent = layout[1];
+      option.textContent = layoutLabel(layout[0]);
       els.slideLayoutInput.appendChild(option);
     });
+    if (currentValue) els.slideLayoutInput.value = currentValue;
   }
 
   function bindEvents() {
@@ -91,6 +957,13 @@
 
     els.templatesBtn.addEventListener("click", function () {
       els.templateDialog.showModal();
+    });
+
+    els.languageInput.addEventListener("change", function () {
+      uiLang = els.languageInput.value || "zh-CN";
+      localStorage.setItem(LANG_STORAGE_KEY, uiLang);
+      applyLanguage();
+      toast(t("toast.languageChanged"));
     });
 
     els.openDeckBtn.addEventListener("click", function () {
@@ -105,7 +978,7 @@
         try {
           loadDeckText(reader.result, file.name, "");
         } catch (error) {
-          alert("打开失败：" + error.message);
+          alert(formatText(t("alert.openFailed"), { message: error.message }));
         }
       };
       reader.readAsText(file);
@@ -129,11 +1002,11 @@
     els.copyJsonBtn.addEventListener("click", function () {
       els.jsonTextarea.value = JSON.stringify(deck, null, 2);
       navigator.clipboard.writeText(els.jsonTextarea.value).then(function () {
-        toast("JSON 已复制");
+        toast(t("toast.jsonCopied"));
       }).catch(function () {
         els.jsonTextarea.select();
         document.execCommand("copy");
-        toast("JSON 已复制");
+        toast(t("toast.jsonCopied"));
       });
     });
 
@@ -147,9 +1020,9 @@
         currentFilePath = "";
         markDirty();
         els.jsonDialog.close();
-        toastWithValidation("JSON 已载入");
+        toastWithValidation(t("toast.jsonLoaded"));
       } catch (error) {
-        alert("载入失败：" + error.message);
+        alert(formatText(t("alert.loadFailed"), { message: error.message }));
       }
     });
 
@@ -157,11 +1030,11 @@
 
     els.copyValidationBtn.addEventListener("click", function () {
       navigator.clipboard.writeText(els.validationReport.value).then(function () {
-        toast("检查报告已复制");
+        toast(t("toast.reportCopied"));
       }).catch(function () {
         els.validationReport.select();
         document.execCommand("copy");
-        toast("检查报告已复制");
+        toast(t("toast.reportCopied"));
       });
     });
 
@@ -172,6 +1045,18 @@
     els.stageViewport.addEventListener("dragenter", handleCanvasDragEnter);
     els.stageViewport.addEventListener("dragleave", handleCanvasDragLeave);
     els.stageViewport.addEventListener("drop", handleCanvasDrop);
+
+    document.querySelectorAll("[data-insert]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        insertComponent(button.getAttribute("data-insert"), { source: "click" });
+      });
+      button.addEventListener("dragstart", function (event) {
+        var type = button.getAttribute("data-insert");
+        event.dataTransfer.effectAllowed = "copy";
+        event.dataTransfer.setData("application/x-htmlppt-component", type);
+        event.dataTransfer.setData("text/plain", type);
+      });
+    });
 
     els.templateDialog.querySelectorAll("[data-template]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -185,8 +1070,8 @@
           id: PPTHtml.uid("slide"),
           layout: "text",
           kicker: "New Slide",
-          title: "新页面",
-          subtitle: "在右侧面板编辑内容"
+          title: t("sample.newSlideTitle"),
+          subtitle: t("sample.newSlideSubtitle")
         }, currentIndex + 1));
         currentIndex += 1;
       });
@@ -222,10 +1107,10 @@
 
     els.deleteSlideBtn.addEventListener("click", function () {
       if (deck.slides.length <= 1) {
-        alert("至少保留一页。");
+        alert(t("confirm.keepOneSlide"));
         return;
       }
-      if (!confirm("删除当前页面？")) return;
+      if (!confirm(t("confirm.deleteSlide"))) return;
       commit(function () {
         deck.slides.splice(currentIndex, 1);
         currentIndex = Math.max(0, currentIndex - 1);
@@ -266,24 +1151,31 @@
     bindSlideInput(els.notesInput, function (slide, value) { slide.notes = value; });
 
     els.imageFileBtn.addEventListener("click", function () {
-      els.imageFileInput.click();
+      openImagePicker();
     });
 
     els.imageFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
       if (!file) return;
-      var reader = new FileReader();
-      reader.onload = function () {
-        commit(function () {
-          var slide = currentSlide();
-          slide.image.src = reader.result;
-          if (!slide.image.alt) slide.image.alt = file.name.replace(/\.[^.]+$/, "");
-        });
-        toast("图片已加入当前页面");
-      };
-      reader.readAsDataURL(file);
+      readImageFile(file);
       event.target.value = "";
     });
+
+    els.videoFileBtn.addEventListener("click", function () {
+      openVideoPicker();
+    });
+
+    els.videoFileInput.addEventListener("change", function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      readVideoFile(file);
+      event.target.value = "";
+    });
+
+    bindSlideInput(els.videoFitInput, function (slide, value) { slide.video.fit = value; });
+    bindSlideInput(els.videoSrcInput, function (slide, value) { slide.video.src = value; });
+    bindSlideInput(els.videoPosterInput, function (slide, value) { slide.video.poster = value; });
+    bindSlideInput(els.videoCaptionInput, function (slide, value) { slide.video.caption = value; });
 
     els.presentBtn.addEventListener("click", function () { openPresenter(currentIndex); });
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
@@ -296,6 +1188,163 @@
     document.addEventListener("fullscreenchange", handleDocumentFullscreenChange);
 
     document.addEventListener("keydown", handleGlobalKeydown);
+  }
+
+  function readImageFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      commit(function () {
+        var slide = currentSlide();
+        if (["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"].indexOf(slide.layout) === -1) {
+          slide.layout = "imageRight";
+        }
+        slide.image.src = reader.result;
+        if (!slide.image.alt) slide.image.alt = file.name.replace(/\.[^.]+$/, "");
+      });
+      toast(t("toast.imageAdded"));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function readVideoFile(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      commit(function () {
+        var slide = currentSlide();
+        slide.layout = "video";
+        slide.video.src = reader.result;
+        if (!slide.video.caption) slide.video.caption = file.name.replace(/\.[^.]+$/, "");
+      });
+      toast(t("toast.videoAdded"));
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function openImagePicker() {
+    els.imageFileInput.click();
+  }
+
+  function openVideoPicker() {
+    els.videoFileInput.click();
+  }
+
+  function insertComponent(type, options) {
+    var settings = options || {};
+    if (type === "image" && settings.source === "click") {
+      openImagePicker();
+      return;
+    }
+    if (type === "video" && settings.source === "click") {
+      openVideoPicker();
+      return;
+    }
+
+    commit(function () {
+      applyComponentToSlide(currentSlide(), type);
+      selectedCanvasPath = "";
+    });
+    toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
+  }
+
+  function applyComponentToSlide(slide, type) {
+    if (type === "text") {
+      slide.layout = "text";
+      if (!slide.title) slide.title = t("sample.textTitle");
+      if (!slide.body) slide.body = t("sample.textBody");
+      if (!slide.items || !slide.items.length) {
+        slide.items = [
+          { title: t("sample.point1"), text: t("sample.point1") },
+          { title: t("sample.point2"), text: t("sample.point2") }
+        ];
+      }
+      return;
+    }
+    if (type === "image") {
+      slide.layout = "imageRight";
+      if (!slide.title) slide.title = t("sample.imageTitle");
+      slide.image = slide.image || {};
+      slide.image.caption = slide.image.caption || t("sample.imageCaption");
+      return;
+    }
+    if (type === "video") {
+      slide.layout = "video";
+      if (!slide.title) slide.title = t("sample.videoTitle");
+      slide.video = slide.video || {};
+      slide.video.caption = slide.video.caption || t("sample.videoCaption");
+      slide.video.fit = slide.video.fit || "cover";
+      return;
+    }
+    if (type === "chart") {
+      slide.layout = "chart";
+      slide.title = slide.title || t("sample.chartTitle");
+      slide.chart = {
+        kind: "bar",
+        labels: [t("sample.q1"), t("sample.q2"), t("sample.q3"), t("sample.q4")],
+        series: [
+          { name: t("sample.revenue"), values: [12, 20, 31, 42] },
+          { name: t("sample.cost"), values: [8, 11, 18, 24] }
+        ],
+        unit: t("sample.unit")
+      };
+      return;
+    }
+    if (type === "table") {
+      slide.layout = "table";
+      slide.title = slide.title || t("sample.tableTitle");
+      slide.table = {
+        columns: [t("sample.phase"), t("sample.owner"), t("sample.status")],
+        rows: [
+          [t("sample.plan"), t("sample.team"), t("sample.done")],
+          [t("sample.prototype"), t("sample.design"), t("sample.progress")]
+        ]
+      };
+      return;
+    }
+    if (type === "cards") {
+      slide.layout = "threeCards";
+      slide.title = slide.title || t("sample.cardsTitle");
+      slide.cards = [
+        { title: t("sample.card1Title"), text: t("sample.card1Text") },
+        { title: t("sample.card2Title"), text: t("sample.card2Text") },
+        { title: t("sample.card3Title"), text: t("sample.card3Text") }
+      ];
+      return;
+    }
+    if (type === "metrics") {
+      slide.layout = "data";
+      slide.title = slide.title || t("sample.metricsTitle");
+      slide.metrics = [
+        { value: "3x", label: t("sample.speed"), detail: t("sample.speedDetail") },
+        { value: "42%", label: t("sample.growth"), detail: t("sample.growthDetail") },
+        { value: "1 file", label: "PPT.html", detail: t("sample.fileDetail") }
+      ];
+      return;
+    }
+    if (type === "timeline") {
+      slide.layout = "timeline";
+      slide.title = slide.title || t("sample.timelineTitle");
+      slide.items = [
+        { title: t("sample.step1"), text: t("sample.step1Text") },
+        { title: t("sample.step2"), text: t("sample.step2Text") },
+        { title: t("sample.step3"), text: t("sample.step3Text") }
+      ];
+      return;
+    }
+    if (type === "quote") {
+      slide.layout = "quote";
+      slide.quote = slide.quote || t("sample.quoteText");
+      slide.author = slide.author || t("sample.quoteAuthor");
+      return;
+    }
+    if (type === "code") {
+      slide.layout = "code";
+      slide.title = slide.title || t("sample.codeTitle");
+      slide.code = slide.code || "const deck = await createPptHtml();\nawait deck.present();";
+    }
+  }
+
+  function insertLabel(type) {
+    return t("insert." + type) || type;
   }
 
   function handleGlobalKeydown(event) {
@@ -496,7 +1545,7 @@
       button.className = "slide-thumb" + (index === currentIndex ? " active" : "");
       button.innerHTML = "<span>" + (index + 1) + "</span><strong></strong><small></small>";
       button.draggable = true;
-      button.querySelector("strong").textContent = slide.title || "未命名页面";
+      button.querySelector("strong").textContent = slide.title || t("slide.untitled");
       button.querySelector("small").textContent = layoutLabel(slide.layout);
       button.addEventListener("click", function () {
         selectSlide(index);
@@ -541,8 +1590,8 @@
     els.stageFrame.innerHTML = "";
     els.stageFrame.appendChild(PPTHtml.renderSlide(currentSlide(), deck, { index: currentIndex }));
     enhanceCanvasEditing();
-    els.currentSlideLabel.textContent = "第 " + (currentIndex + 1) + " 页";
-    els.currentSlideTitle.textContent = currentSlide().title || "未命名页面";
+    els.currentSlideLabel.textContent = formatText(t("slide.current"), { number: currentIndex + 1 });
+    els.currentSlideTitle.textContent = currentSlide().title || t("slide.untitled");
     fitFrame(els.stageFrame, els.stageViewport);
     renderCanvasControls();
   }
@@ -553,7 +1602,15 @@
     bindCanvasText(".ppt-title", "title", { singleLine: true });
     bindCanvasText(".ppt-subtitle", "subtitle");
     bindCanvasText(".ppt-body", "body");
-    bindCanvasText(".ppt-caption", "image.caption", { singleLine: true });
+    bindCanvasText(".ppt-media .ppt-caption", "image.caption", { singleLine: true });
+    bindCanvasText(".ppt-video .ppt-caption", "video.caption", { singleLine: true });
+    bindCanvasComponent(".ppt-media", "image", { labelKey: "canvas.image", fileAction: "image" });
+    bindCanvasComponent(".ppt-video", "video", { labelKey: "canvas.video", fileAction: "video" });
+    bindCanvasComponent(".ppt-chart-wrap", "chart", { labelKey: "canvas.chart" });
+    bindCanvasComponent(".ppt-table", "table", { labelKey: "canvas.table" });
+    bindCanvasComponent(".ppt-card-grid", "cards", { labelKey: "canvas.cards" });
+    bindCanvasComponent(".ppt-metric-grid", "metrics", { labelKey: "canvas.metrics" });
+    bindCanvasComponent(".ppt-timeline", "timeline", { labelKey: "canvas.timeline" });
 
     if (slide.layout === "quote") {
       bindCanvasText(".ppt-quote", "quote");
@@ -575,6 +1632,13 @@
     var node = els.stageFrame.querySelector(selector);
     if (!node) return;
     registerCanvasEdit(node, path, options);
+  }
+
+  function bindCanvasComponent(selector, path, options) {
+    var node = els.stageFrame.querySelector(selector);
+    if (!node) return;
+    var settings = Object.assign({ draggableOnly: true }, options || {});
+    registerCanvasEdit(node, path, settings);
   }
 
   function bindCanvasListItems() {
@@ -754,14 +1818,14 @@
 
     var label = document.createElement("span");
     label.className = "canvas-selection-label";
-    label.textContent = selectedCanvasPath;
+    label.textContent = canvasSelectionLabel(node, selectedCanvasPath);
     box.appendChild(label);
 
     var reset = document.createElement("button");
     reset.type = "button";
     reset.className = "canvas-reset-button";
-    reset.title = "重置这个元素的位置和尺寸";
-    reset.textContent = "重置";
+    reset.title = t("canvas.resetTitle");
+    reset.textContent = t("canvas.reset");
     reset.addEventListener("pointerdown", function (event) {
       event.stopPropagation();
     });
@@ -776,13 +1840,18 @@
       var control = document.createElement("span");
       control.className = "canvas-resize-handle canvas-resize-" + handle;
       control.setAttribute("data-canvas-handle", handle);
-      control.setAttribute("title", "拖拽调整尺寸");
+      control.setAttribute("title", t("canvas.resize"));
       control.addEventListener("pointerdown", handleCanvasResizePointerDown);
       box.appendChild(control);
     });
 
     els.stageFrame.appendChild(box);
     positionCanvasSelectionBox(node, box);
+  }
+
+  function canvasSelectionLabel(node, path) {
+    var options = node ? parseCanvasOptions(node) : {};
+    return canvasLabel(options, path);
   }
 
   function getNodeFrameBounds(node) {
@@ -1066,6 +2135,13 @@
   function startCanvasEdit(node) {
     if (activeCanvasEdit) finishCanvasEdit(true);
     var options = parseCanvasOptions(node);
+    if (options.draggableOnly) {
+      selectCanvasTarget(node);
+      if (options.fileAction === "image") openImagePicker();
+      else if (options.fileAction === "video") openVideoPicker();
+      else toast(formatText(t("toast.componentSelected"), { name: canvasLabel(options, node.getAttribute("data-canvas-edit")) }));
+      return;
+    }
     activeCanvasEdit = {
       node: node,
       path: node.getAttribute("data-canvas-edit"),
@@ -1089,6 +2165,11 @@
     } catch (error) {
       return {};
     }
+  }
+
+  function canvasLabel(options, path) {
+    if (options && options.labelKey) return t(options.labelKey);
+    return path || "";
   }
 
   function selectEditableContents(node) {
@@ -1188,11 +2269,11 @@
   }
 
   function handleCanvasDragEnter(event) {
-    if (hasImageFile(event.dataTransfer)) els.stageViewport.classList.add("is-drop-target");
+    if (hasCanvasDropPayload(event.dataTransfer)) els.stageViewport.classList.add("is-drop-target");
   }
 
   function handleCanvasDragOver(event) {
-    if (!hasImageFile(event.dataTransfer)) return;
+    if (!hasCanvasDropPayload(event.dataTransfer)) return;
     event.preventDefault();
     event.dataTransfer.dropEffect = "copy";
     els.stageViewport.classList.add("is-drop-target");
@@ -1205,35 +2286,57 @@
   }
 
   function handleCanvasDrop(event) {
-    if (!hasImageFile(event.dataTransfer)) return;
+    if (!hasCanvasDropPayload(event.dataTransfer)) return;
     event.preventDefault();
     els.stageViewport.classList.remove("is-drop-target");
-    var file = Array.prototype.find.call(event.dataTransfer.files || [], function (item) {
-      return item.type && item.type.indexOf("image/") === 0;
-    });
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function () {
-      commit(function () {
-        var slide = currentSlide();
-        if (["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"].indexOf(slide.layout) === -1) {
-          slide.layout = "imageRight";
-        }
-        slide.image.src = reader.result;
-        if (!slide.image.alt) slide.image.alt = file.name.replace(/\.[^.]+$/, "");
-      });
-      toast("图片已拖入当前页面");
-    };
-    reader.readAsDataURL(file);
+    var componentType = event.dataTransfer.getData("application/x-htmlppt-component");
+    if (componentType) {
+      insertComponent(componentType, { source: "drop" });
+      return;
+    }
+
+    var imageFile = droppedFile(event.dataTransfer, "image/");
+    if (imageFile) {
+      readImageFile(imageFile);
+      return;
+    }
+
+    var videoFile = droppedFile(event.dataTransfer, "video/");
+    if (videoFile) {
+      readVideoFile(videoFile);
+    }
   }
 
   function hasImageFile(dataTransfer) {
+    return hasFileType(dataTransfer, "image/");
+  }
+
+  function hasVideoFile(dataTransfer) {
+    return hasFileType(dataTransfer, "video/");
+  }
+
+  function hasComponentPayload(dataTransfer) {
+    if (!dataTransfer || !dataTransfer.types) return false;
+    return Array.prototype.indexOf.call(dataTransfer.types, "application/x-htmlppt-component") !== -1;
+  }
+
+  function hasCanvasDropPayload(dataTransfer) {
+    return hasComponentPayload(dataTransfer) || hasImageFile(dataTransfer) || hasVideoFile(dataTransfer);
+  }
+
+  function hasFileType(dataTransfer, prefix) {
     if (!dataTransfer || !dataTransfer.types) return false;
     if (Array.prototype.some.call(dataTransfer.items || [], function (item) {
-      return item.kind === "file" && item.type.indexOf("image/") === 0;
+      return item.kind === "file" && item.type.indexOf(prefix) === 0;
     })) return true;
     return Array.prototype.some.call(dataTransfer.files || [], function (file) {
-      return file.type && file.type.indexOf("image/") === 0;
+      return file.type && file.type.indexOf(prefix) === 0;
+    });
+  }
+
+  function droppedFile(dataTransfer, prefix) {
+    return Array.prototype.find.call(dataTransfer.files || [], function (item) {
+      return item.type && item.type.indexOf(prefix) === 0;
     });
   }
 
@@ -1267,6 +2370,10 @@
     els.imageSrcInput.value = slide.image.src || "";
     els.imageAltInput.value = slide.image.alt || "";
     els.imageCaptionInput.value = slide.image.caption || "";
+    els.videoFitInput.value = slide.video.fit || "cover";
+    els.videoSrcInput.value = slide.video.src || "";
+    els.videoPosterInput.value = slide.video.poster || "";
+    els.videoCaptionInput.value = slide.video.caption || "";
     els.itemsInput.value = stringifyRows(slide.items);
     els.leftTitleInput.value = slide.left.title || "";
     els.leftTextInput.value = slide.left.text || "";
@@ -1299,14 +2406,14 @@
   function createNewDeck() {
     if (!confirmDiscard()) return;
     replaceDeck(PPTHtml.createDemoDeck(), { filePath: "", dirty: true, keepHistory: false });
-    toast("已新建演示文稿");
+    toast(t("toast.newDeck"));
   }
 
   function createFromTemplate(templateId) {
     if (!confirmDiscard()) return;
     replaceDeck(PPTHtml.createTemplateDeck(templateId), { filePath: "", dirty: true, keepHistory: false });
     els.templateDialog.close();
-    toast("已从模板创建");
+    toast(t("toast.templateCreated"));
   }
 
   function openDeck() {
@@ -1316,7 +2423,7 @@
         if (!result || result.canceled) return;
         loadDeckText(result.content, basename(result.filePath), result.filePath);
       }).catch(function (error) {
-        alert("打开失败：" + error.message);
+        alert(formatText(t("alert.openFailed"), { message: error.message }));
       });
       return;
     }
@@ -1326,7 +2433,7 @@
   function loadDeckText(text, label, filePath) {
     var nextDeck = PPTHtml.parseFileText(text);
     replaceDeck(nextDeck, { filePath: filePath || "", dirty: false, keepHistory: false });
-    toastWithValidation("已打开 " + (label || "文稿"));
+    toastWithValidation(formatText(t("toast.opened"), { name: label || t("panel.deck") }));
   }
 
   function replaceDeck(nextDeck, options) {
@@ -1353,21 +2460,21 @@
         currentFilePath = result.filePath || currentFilePath;
         dirty = false;
         updateFileStatus();
-        toast("已保存 " + basename(currentFilePath));
+        toast(formatText(t("toast.saved"), { name: basename(currentFilePath) }));
       }).catch(function (error) {
-        alert("保存失败：" + error.message);
+        alert(formatText(t("alert.saveFailed"), { message: error.message }));
       });
       return;
     }
     PPTHtml.download(name, html);
     dirty = false;
     updateFileStatus();
-    toast("已生成单文件 PPT.html");
+    toast(t("toast.downloaded"));
   }
 
   function confirmDiscard() {
     if (!dirty) return true;
-    return confirm("当前文稿有未保存修改。继续会丢失这些修改。");
+    return confirm(t("confirm.discard"));
   }
 
   function markDirty() {
@@ -1377,15 +2484,15 @@
 
   function updateFileStatus() {
     if (!els.fileStatus) return;
-    var source = currentFilePath ? basename(currentFilePath) : (desktop && desktop.isDesktop ? "未命名" : "浏览器草稿");
-    els.fileStatus.textContent = APP_VERSION_LABEL + " · " + source + (dirty ? " · 未保存" : "");
+    var source = currentFilePath ? basename(currentFilePath) : (desktop && desktop.isDesktop ? t("status.untitled") : t("status.browserDraft"));
+    els.fileStatus.textContent = APP_VERSION_LABEL + " · " + source + (dirty ? " · " + t("status.unsaved") : "");
   }
 
   function showValidationDialog() {
     var result = PPTHtml.validateDeck(deck);
     els.validationSummary.textContent = result.ok
-      ? "检查通过：" + deck.slides.length + " 页，可正常分享。"
-      : "需要修复：" + result.errors.length + " 个错误，" + result.warnings.length + " 个警告。";
+      ? formatText(t("validation.pass"), { count: deck.slides.length })
+      : formatText(t("validation.needsFix"), { errors: result.errors.length, warnings: result.warnings.length });
     els.validationReport.value = PPTHtml.formatValidationReport(deck, result);
     els.validationDialog.showModal();
   }
@@ -1393,11 +2500,11 @@
   function toastWithValidation(prefix) {
     var result = PPTHtml.validateDeck(deck);
     if (result.errors.length) {
-      toast(prefix + " · 有 " + result.errors.length + " 个错误");
+      toast(formatText(t("toast.validationErrors"), { prefix: prefix, count: result.errors.length }));
     } else if (result.warnings.length) {
-      toast(prefix + " · 有 " + result.warnings.length + " 个建议");
+      toast(formatText(t("toast.validationWarnings"), { prefix: prefix, count: result.warnings.length }));
     } else {
-      toast(prefix + " · 检查通过");
+      toast(formatText(t("toast.validationPassed"), { prefix: prefix }));
     }
   }
 
@@ -1652,7 +2759,7 @@
 
   function layoutLabel(value) {
     var found = PPTHtml.layouts.find(function (item) { return item[0] === value; });
-    return found ? found[1] : value;
+    return found ? t("layout." + found[0]) : value;
   }
 
   function filenameFromTitle(title) {
@@ -1661,7 +2768,7 @@
   }
 
   function basename(filePath) {
-    return String(filePath || "").split(/[\\/]/).pop() || "未命名";
+    return String(filePath || "").split(/[\\/]/).pop() || t("status.untitled");
   }
 
   function clamp(value, min, max) {

@@ -83,6 +83,29 @@ assert.match(chartHtml, /ppt-layout-chart/);
 assert.match(chartHtml, /ppt-chart/);
 assert.match(chartHtml, /Quarterly growth/);
 
+const videoDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Video deck",
+  slides: [
+    {
+      layout: "video",
+      title: "Product demo",
+      video: {
+        src: "data:video/mp4;base64,AAAA",
+        caption: "Demo clip",
+        fit: "contain"
+      }
+    }
+  ]
+});
+assert.equal(videoDeck.slides[0].layout, "video");
+assert.equal(videoDeck.slides[0].video.fit, "contain");
+assert.equal(ppt.validateDeck(videoDeck).ok, true);
+const videoHtml = ppt.exportStandalone(videoDeck);
+assert.match(videoHtml, /ppt-layout-video/);
+assert.match(videoHtml, /ppt-video/);
+assert.match(videoHtml, /Product demo/);
+
 const canvasDeck = ppt.normalizeDeck({
   version: "0.1",
   title: "Canvas deck",

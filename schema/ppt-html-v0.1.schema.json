@@ -53,6 +53,42 @@
         }
       }
     },
+    "video": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "src": {
+          "type": "string"
+        },
+        "poster": {
+          "type": "string"
+        },
+        "caption": {
+          "type": "string"
+        },
+        "fit": {
+          "type": "string",
+          "enum": ["cover", "contain"],
+          "default": "cover"
+        },
+        "controls": {
+          "type": "boolean",
+          "default": true
+        },
+        "autoplay": {
+          "type": "boolean",
+          "default": false
+        },
+        "loop": {
+          "type": "boolean",
+          "default": false
+        },
+        "muted": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
     "textPair": {
       "type": "object",
       "additionalProperties": true,
@@ -190,6 +226,7 @@
             "timeline",
             "data",
             "chart",
+            "video",
             "table",
             "code",
             "ending"
@@ -209,6 +246,9 @@
         },
         "image": {
           "$ref": "#/$defs/image"
+        },
+        "video": {
+          "$ref": "#/$defs/video"
         },
         "items": {
           "type": "array",

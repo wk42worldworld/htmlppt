@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.6
+
+PPT.html Studio now exposes a real component palette in the main editor. Users can click or drag text, image, video, chart, table, card, metric, timeline, quote, and code components into the current slide. Common toolbar commands are icon-first with hover tooltips, videos are supported as first-class slide content, and the app UI can switch between Chinese, English, Japanese, and Korean.
+
 ## New in v0.2.5
 
 PPT.html Studio now has a cleaner, more modern desktop UI inspired by OpenHuman-style local-first app surfaces: a dark compact top bar, lighter panels, refined slide thumbnails, polished form controls, a calmer canvas grid, softer shadows, and better responsive behavior on narrow screens.

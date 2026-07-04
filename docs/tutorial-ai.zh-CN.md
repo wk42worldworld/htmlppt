@@ -118,6 +118,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 | `timeline` | 流程、路线图 | `items` |
 | `data` | 关键指标 | `metrics` |
 | `chart` | 趋势、分组数值、占比 | `chart.kind`、`chart.labels`、`chart.series` |
+| `video` | 产品 demo、访谈、录屏 | `video.src`、`video.poster`、`video.caption` |
 | `table` | 对照表、计划表 | `table.columns`、`table.rows` |
 | `code` | 代码展示 | `code` |
 | `ending` | 结束页 | `title`、`subtitle` |
@@ -131,6 +132,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 需要讲时间顺序：用 `timeline`。
 - 需要突出数字：用 `data`。
 - 需要展示趋势、分组数值或占比：用 `chart`。
+- 需要展示 demo、访谈或录屏：用 `video`。
 - 需要列明计划和状态：用 `table`。
 
 ## 5. 常用字段格式
@@ -147,6 +149,20 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 ```
 
 `src` 可以是 URL，也可以是 `data:image/...;base64,...`。`fit` 使用 `cover` 表示填充裁切，使用 `contain` 表示完整显示。如果不确定图片来源，可以先留空，让人类在编辑器中选择本地图片。
+
+视频：
+
+```json
+"video": {
+  "src": "https://example.com/demo.mp4",
+  "poster": "https://example.com/poster.png",
+  "caption": "产品演示片段",
+  "fit": "cover",
+  "controls": true
+}
+```
+
+`src` 可以是 URL，也可以是 `data:video/...;base64,...`。如果不确定视频来源，可以先留空，让人类在编辑器中选择本地视频。
 
 列表或时间线：
 

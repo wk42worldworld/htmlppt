@@ -4,6 +4,8 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 
 ## What Is New
 
+v0.2.6 adds a visible component palette to the main editor. Users can click or drag text, image, video, chart, table, card, metric, timeline, quote, and code components into the current slide. Common toolbar commands are now icon-first with hover tooltips, video is supported as first-class slide content, and the app UI can switch between Chinese, English, Japanese, and Korean.
+
 v0.2.5 refreshes the whole editor UI with a cleaner local-first desktop app feel inspired by OpenHuman-style surfaces: a compact dark top bar, lighter panels, refined thumbnails, polished controls and dialogs, a calmer canvas grid, softer shadows, and better behavior on narrow screens.
 
 v0.2.4 extends the first canvas layer with proper selection and transform controls. Click an editable slide element to show a selection frame, drag it, resize it with eight handles, nudge it with arrow keys, use `Shift` for faster nudges, and reset the selected element's position and size. The result is saved as structured `canvas` `x/y/w/h` data and preserved in exported `.ppt.html` files.
@@ -26,9 +28,12 @@ The product principle is simple: AI writes structure, humans make decisions, and
 - Open, save, and save as `.ppt.html` files in the desktop app
 - Starter templates for product pitches, lessons, and project updates
 - Visual editing for titles, text, images, comparisons, cards, data, charts, tables, and code
+- Main-editor component palette for clicking or dragging text, images, video, charts, tables, cards, metrics, timelines, quotes, and code
 - Canvas double-click editing, draggable and resizable element geometry, keyboard nudging, image drop onto the stage, and thumbnail drag reordering
 - Images support local embedding, cover/contain fit, captions, full-image slides, and image-background slides
+- Video supports local embedding, URL / Data URI sources, posters, captions, and cover/contain fit
 - Charts support bar, line, and donut rendering from structured labels and series
+- App UI language switching for Chinese, English, Japanese, and Korean
 - AI JSON import
 - Validation reports that humans can read and AI can repair from
 - 16 starter layouts and 4 themes
