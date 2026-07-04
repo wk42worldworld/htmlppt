@@ -116,6 +116,7 @@ Supported layouts:
 | `quote` | Quote or statement | `quote`, `author` |
 | `timeline` | Process or roadmap | `items` |
 | `data` | Key metrics | `metrics` |
+| `chart` | Trends or proportions | `chart.kind`, `chart.labels`, `chart.series` |
 | `table` | Plan or comparison table | `table.columns`, `table.rows` |
 | `code` | Code display | `code` |
 | `ending` | Closing slide | `title`, `subtitle` |
@@ -128,6 +129,7 @@ Selection rules:
 - Need three selling points: use `threeCards`.
 - Need time order: use `timeline`.
 - Need numbers: use `data`.
+- Need trends, grouped values, or proportions: use `chart`.
 - Need status or plan details: use `table`.
 
 ## 5. Common Field Formats
@@ -173,6 +175,22 @@ Metrics:
 ]
 ```
 
+Chart:
+
+```json
+"chart": {
+  "kind": "bar",
+  "labels": ["Q1", "Q2", "Q3", "Q4"],
+  "series": [
+    { "name": "Revenue", "values": [12, 20, 31, 42] },
+    { "name": "Cost", "values": [8, 11, 18, 24] }
+  ],
+  "unit": "k"
+}
+```
+
+Use `bar` for comparisons, `line` for trends, and `donut` for parts of a whole. For donut charts, the first series becomes the segments.
+
 Comparison:
 
 ```json
@@ -214,7 +232,7 @@ Default slide order:
 2. `section` or `text`: background or problem.
 3. `compare`: old way vs new way.
 4. `threeCards`: solution or capabilities.
-5. `data`: key results.
+5. `data` or `chart`: key results.
 6. `timeline` or `table`: plan.
 7. `ending`: summary and next step.
 
@@ -317,7 +335,7 @@ Requirements:
 - create 6 slides
 - use the boardroom theme
 - every slide must have id, layout, and title
-- prefer hero, compare, threeCards, data, table, ending
+- prefer hero, compare, threeCards, data, chart, table, ending
 - do not output free-form HTML
 - do not explain; output JSON only
 
@@ -354,6 +372,7 @@ Before output, check:
 - Does every slide have a `title`?
 - Does `threeCards` have no more than 3 cards?
 - Does `data` have no more than 3 metrics?
+- Does `chart` have labels and numeric series values?
 - Does `timeline` have no more than 5 items?
 - Do images include `alt` text?
 - Did you avoid free-form HTML?

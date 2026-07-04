@@ -116,6 +116,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 | `quote` | 引用、主張 | `quote`、`author` |
 | `timeline` | 工程、ロードマップ | `items` |
 | `data` | 主要指標 | `metrics` |
+| `chart` | 推移、グループ値、構成比 | `chart.kind`、`chart.labels`、`chart.series` |
 | `table` | 計画表、比較表 | `table.columns`、`table.rows` |
 | `code` | コード表示 | `code` |
 | `ending` | 終了スライド | `title`、`subtitle` |
@@ -128,6 +129,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 - 3 つの売りや能力：`threeCards`。
 - 時系列：`timeline`。
 - 数字を強調：`data`。
+- 推移、グループ値、構成比：`chart`。
 - 計画や状態を示す：`table`。
 
 ## 5. よく使うフィールド形式
@@ -173,6 +175,22 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 ]
 ```
 
+グラフ：
+
+```json
+"chart": {
+  "kind": "bar",
+  "labels": ["Q1", "Q2", "Q3", "Q4"],
+  "series": [
+    { "name": "売上", "values": [12, 20, 31, 42] },
+    { "name": "コスト", "values": [8, 11, 18, 24] }
+  ],
+  "unit": "万円"
+}
+```
+
+`bar` は比較、`line` は推移、`donut` は構成比に向いています。ドーナツグラフでは最初の系列が分割として使われます。
+
 比較：
 
 ```json
@@ -214,7 +232,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 2. `section` または `text`：背景や問題。
 3. `compare`：従来方式と新方式。
 4. `threeCards`：解決策や能力。
-5. `data`：主要結果。
+5. `data` または `chart`：主要結果。
 6. `timeline` または `table`：計画。
 7. `ending`：まとめと次の行動。
 
@@ -317,7 +335,7 @@ PPT.html Studio 用の完全な deck JSON を生成してください。
 - 6 枚作成
 - theme は boardroom
 - すべてのスライドに id、layout、title を含める
-- hero、compare、threeCards、data、table、ending を優先
+- hero、compare、threeCards、data、chart、table、ending を優先
 - 自由な HTML は出力しない
 - 説明せず JSON だけ出力
 
@@ -354,6 +372,7 @@ deck JSON を修正してください：
 - すべてのスライドに `title` があるか。
 - `threeCards` は 3 カード以下か。
 - `data` は 3 指標以下か。
+- `chart` にラベルと数値系列があるか。
 - `timeline` は 5 項目以下か。
 - 画像に `alt` があるか。
 - 自由な HTML を出力していないか。

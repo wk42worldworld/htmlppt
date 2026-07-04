@@ -80,6 +80,47 @@
         }
       }
     },
+    "chartSeries": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "chart": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["bar", "line", "donut"],
+          "default": "bar"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "series": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/chartSeries"
+          }
+        },
+        "unit": {
+          "type": "string"
+        }
+      }
+    },
     "table": {
       "type": "object",
       "additionalProperties": true,
@@ -124,6 +165,7 @@
             "quote",
             "timeline",
             "data",
+            "chart",
             "table",
             "code",
             "ending"
@@ -168,6 +210,9 @@
           "items": {
             "$ref": "#/$defs/metric"
           }
+        },
+        "chart": {
+          "$ref": "#/$defs/chart"
         },
         "left": {
           "$ref": "#/$defs/textPair"

@@ -99,7 +99,7 @@
             副标题
             <textarea id="subtitleInput" rows="2"></textarea>
           </label>
-          <label class="field-group" data-layouts="text,imageRight,imageLeft,imageBackground,section">
+          <label class="field-group" data-layouts="text,imageRight,imageLeft,imageBackground,section,chart">
             正文
             <textarea id="bodyInput" rows="5"></textarea>
           </label>
@@ -172,6 +172,30 @@
           <label>
             每行一个指标：数值 | 标签 | 说明
             <textarea id="metricsInput" rows="6"></textarea>
+          </label>
+        </section>
+
+        <section class="panel-section field-group" data-layouts="chart">
+          <h2>图表</h2>
+          <label>
+            图表类型
+            <select id="chartKindInput">
+              <option value="bar">柱状图</option>
+              <option value="line">折线图</option>
+              <option value="donut">环形图</option>
+            </select>
+          </label>
+          <label>
+            标签，用 | 分隔
+            <input id="chartLabelsInput" type="text" placeholder="Q1 | Q2 | Q3 | Q4">
+          </label>
+          <label>
+            数据系列：每行一个系列，名称 | 数值 | 数值
+            <textarea id="chartSeriesInput" rows="6" placeholder="收入 | 12 | 20 | 31&#10;成本 | 8 | 11 | 18"></textarea>
+          </label>
+          <label>
+            单位
+            <input id="chartUnitInput" type="text" placeholder="万元">
           </label>
         </section>
 

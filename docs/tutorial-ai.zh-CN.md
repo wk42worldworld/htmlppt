@@ -116,6 +116,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 | `quote` | 引用或观点 | `quote`、`author` |
 | `timeline` | 流程、路线图 | `items` |
 | `data` | 关键指标 | `metrics` |
+| `chart` | 趋势、分组数值、占比 | `chart.kind`、`chart.labels`、`chart.series` |
 | `table` | 对照表、计划表 | `table.columns`、`table.rows` |
 | `code` | 代码展示 | `code` |
 | `ending` | 结束页 | `title`、`subtitle` |
@@ -128,6 +129,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 需要表达三个卖点：用 `threeCards`。
 - 需要讲时间顺序：用 `timeline`。
 - 需要突出数字：用 `data`。
+- 需要展示趋势、分组数值或占比：用 `chart`。
 - 需要列明计划和状态：用 `table`。
 
 ## 5. 常用字段格式
@@ -173,6 +175,22 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 ]
 ```
 
+图表：
+
+```json
+"chart": {
+  "kind": "bar",
+  "labels": ["Q1", "Q2", "Q3", "Q4"],
+  "series": [
+    { "name": "收入", "values": [12, 20, 31, 42] },
+    { "name": "成本", "values": [8, 11, 18, 24] }
+  ],
+  "unit": "万元"
+}
+```
+
+`bar` 适合对比，`line` 适合趋势，`donut` 适合占比。环形图会使用第一个数据系列作为分组。
+
 对比：
 
 ```json
@@ -214,7 +232,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 2. `section` 或 `text`：背景或问题。
 3. `compare`：旧方式 vs 新方式。
 4. `threeCards`：解决方案或能力。
-5. `data`：关键结果。
+5. `data` 或 `chart`：关键结果。
 6. `timeline` 或 `table`：计划。
 7. `ending`：总结和下一步。
 
@@ -317,7 +335,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 输出 6 页
 - 主题使用 boardroom
 - 每页必须有 id、layout、title
-- 优先使用 hero、compare、threeCards、data、table、ending
+- 优先使用 hero、compare、threeCards、data、chart、table、ending
 - 不要输出自由 HTML
 - 不要解释，直接输出 JSON
 
@@ -354,6 +372,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 每页是否有 `title`。
 - `threeCards` 是否不超过 3 张卡片。
 - `data` 是否不超过 3 个指标。
+- `chart` 是否包含标签和数字数据系列。
 - `timeline` 是否不超过 5 个条目。
 - 图片是否有 `alt`。
 - 是否没有输出自由 HTML。

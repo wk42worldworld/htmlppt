@@ -56,6 +56,33 @@ const imageDeck = ppt.normalizeDeck({
 assert.equal(imageDeck.slides[0].image.fit, "contain");
 assert.equal(ppt.validateDeck(imageDeck).ok, true);
 
+const chartDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Chart deck",
+  slides: [
+    {
+      layout: "chart",
+      title: "Quarterly growth",
+      chart: {
+        kind: "line",
+        labels: ["Q1", "Q2", "Q3", "Q4"],
+        series: [
+          { name: "Revenue", values: [12, 20, 31, 42] },
+          { name: "Cost", values: [8, 11, 18, 24] }
+        ],
+        unit: "k"
+      }
+    }
+  ]
+});
+assert.equal(chartDeck.slides[0].chart.kind, "line");
+assert.equal(chartDeck.slides[0].chart.series.length, 2);
+assert.equal(ppt.validateDeck(chartDeck).ok, true);
+const chartHtml = ppt.exportStandalone(chartDeck);
+assert.match(chartHtml, /ppt-layout-chart/);
+assert.match(chartHtml, /ppt-chart/);
+assert.match(chartHtml, /Quarterly growth/);
+
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);

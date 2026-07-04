@@ -10,7 +10,7 @@ This tutorial is for people who do not want to write code. The goal is to create
 4. Edit deck information and theme
 5. Edit slide content
 6. Manage slide order
-7. Add images, data, tables, and code
+7. Add images, data, charts, tables, and code
 8. Draft with AI JSON
 9. Repair issues with validation reports
 10. Present the deck
@@ -21,8 +21,8 @@ This tutorial is for people who do not want to write code. The goal is to create
 
 PPT.html Studio separates a deck into three layers:
 
-- Content: titles, subtitles, body text, lists, images, metrics, tables, and code.
-- Layout: stable slide templates such as cover, comparison, cards, data, and tables.
+- Content: titles, subtitles, body text, lists, images, metrics, charts, tables, and code.
+- Layout: stable slide templates such as cover, comparison, cards, data, charts, and tables.
 - Playback: the app renders structured content into browser-ready HTML slides.
 
 You do not need to write HTML. You also do not need to manually drag dozens of text boxes like in a traditional slide editor. Edit content, choose layouts, validate the deck, and save one `.ppt.html` file.
@@ -97,6 +97,7 @@ Different layouts reveal different fields:
 - `compare` shows left and right titles and text.
 - `threeCards` shows card content.
 - `data` shows metrics.
+- `chart` shows chart kind, labels, series, and unit.
 - `table` shows columns and rows.
 - `code` shows a code field.
 
@@ -106,6 +107,7 @@ Editing tips:
 - Keep titles short.
 - Use 3 to 6 list items.
 - Use 1 to 3 metrics on data slides.
+- Use 2 to 8 labels on chart slides.
 - Split overloaded slides into multiple slides.
 
 ## 6. Manage Slide Order
@@ -120,7 +122,7 @@ The left slide rail supports:
 
 Delete is disabled when only one slide remains, so the deck cannot become empty.
 
-## 7. Add Images, Data, Tables, and Code
+## 7. Add Images, Data, Charts, Tables, and Code
 
 Images:
 
@@ -139,6 +141,25 @@ In the `data` layout, write one metric per line:
 2 | Key risks | Resources and release window
 1 | Decision | Whether to expand the pilot
 ```
+
+Chart slides:
+
+Switch the layout to `chart`, then choose `bar`, `line`, or `donut`.
+
+Labels use `|` separators:
+
+```text
+Q1 | Q2 | Q3 | Q4
+```
+
+Each series uses one line:
+
+```text
+Revenue | 12 | 20 | 31 | 42
+Cost | 8 | 11 | 18 | 24
+```
+
+For donut charts, the first series is used as the segments.
 
 Tables:
 

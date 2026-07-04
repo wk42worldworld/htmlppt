@@ -5,6 +5,7 @@
   var BASE_WIDTH = 1280;
   var BASE_HEIGHT = 720;
   var THEMES = ["paper", "launch", "studio", "boardroom"];
+  var CHART_KINDS = ["bar", "line", "donut"];
 
   var LAYOUTS = [
     ["hero", "封面"],
@@ -19,6 +20,7 @@
     ["quote", "引用"],
     ["timeline", "时间线"],
     ["data", "数据"],
+    ["chart", "图表"],
     ["table", "表格"],
     ["code", "代码"],
     ["ending", "结束"]
@@ -89,6 +91,27 @@
     ".ppt-metric strong{display:block;color:var(--ppt-accent);font-size:58px;line-height:1;font-weight:900}",
     ".ppt-metric span{display:block;margin-top:14px;color:var(--ppt-strong);font-size:25px;font-weight:760}",
     ".ppt-metric p{margin-top:12px;color:var(--ppt-muted);font-size:20px;line-height:1.35}",
+    ".ppt-layout-chart{display:grid;grid-template-rows:auto minmax(0,1fr);gap:24px}",
+    ".ppt-layout-chart .ppt-content-stack{max-width:980px}",
+    ".ppt-chart-wrap{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:24px;align-items:stretch;min-height:386px}",
+    ".ppt-chart{width:100%;height:100%;min-height:360px;border:1px solid var(--ppt-line);border-radius:8px;background:var(--ppt-surface);overflow:visible}",
+    ".ppt-chart-grid{stroke:var(--ppt-line);stroke-width:1;opacity:.55}",
+    ".ppt-chart-axis{stroke:var(--ppt-line);stroke-width:2}",
+    ".ppt-chart-label{fill:var(--ppt-muted);font-size:17px;font-weight:760}",
+    ".ppt-chart-value{fill:var(--ppt-strong);font-size:22px;font-weight:840}",
+    ".ppt-chart-series-0{--ppt-chart-color:var(--ppt-accent);fill:var(--ppt-chart-color);stroke:var(--ppt-chart-color)}",
+    ".ppt-chart-series-1{--ppt-chart-color:var(--ppt-accent-2);fill:var(--ppt-chart-color);stroke:var(--ppt-chart-color)}",
+    ".ppt-chart-series-2{--ppt-chart-color:#8f7cf6;fill:var(--ppt-chart-color);stroke:var(--ppt-chart-color)}",
+    ".ppt-chart-series-3{--ppt-chart-color:#35a05b;fill:var(--ppt-chart-color);stroke:var(--ppt-chart-color)}",
+    ".ppt-chart-line{fill:none;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}",
+    ".ppt-chart-point{stroke:var(--ppt-surface);stroke-width:4}",
+    ".ppt-chart-ring{fill:none;stroke-width:44}",
+    ".ppt-chart-legend{display:flex;flex-direction:column;gap:12px;align-self:center}",
+    ".ppt-chart-legend-item{display:grid;grid-template-columns:14px 1fr;gap:10px;align-items:center;min-height:36px}",
+    ".ppt-chart-swatch{width:14px;height:14px;border-radius:4px;background:var(--ppt-chart-color)}",
+    ".ppt-chart-legend-item strong{display:block;color:var(--ppt-strong);font-size:20px;line-height:1.2}",
+    ".ppt-chart-legend-item small{display:block;margin-top:3px;color:var(--ppt-muted);font-size:16px}",
+    ".ppt-chart-empty{display:grid;place-items:center;min-height:360px;border:1px dashed var(--ppt-line);border-radius:8px;color:var(--ppt-muted);font-size:24px;background:var(--ppt-surface)}",
     ".ppt-table{width:100%;margin-top:28px;border-collapse:collapse;overflow:hidden;border-radius:8px;background:var(--ppt-surface);font-size:24px}",
     ".ppt-table th,.ppt-table td{padding:18px 20px;border:1px solid var(--ppt-line);text-align:left;vertical-align:top}",
     ".ppt-table th{color:var(--ppt-strong);font-weight:820;background:rgba(0,0,0,.035)}",
@@ -127,6 +150,42 @@
     image.caption = safeText(image.caption);
     image.fit = image.fit === "contain" ? "contain" : "cover";
     return image;
+  }
+
+  function normalizeChart(rawChart) {
+    var chart = rawChart && typeof rawChart === "object" ? clone(rawChart) : {};
+    chart.kind = CHART_KINDS.indexOf(chart.kind) !== -1 ? chart.kind : "bar";
+    chart.labels = asArray(chart.labels).map(function (label) {
+      return safeText(label).trim();
+    }).filter(Boolean).slice(0, 8);
+    chart.series = asArray(chart.series).map(function (series, index) {
+      var item = series && typeof series === "object" ? series : {};
+      var values = asArray(item.values).map(function (value) {
+        var number = Number(value);
+        return isFinite(number) ? number : 0;
+      }).slice(0, 8);
+      return {
+        name: safeText(item.name || "系列 " + (index + 1)),
+        values: values
+      };
+    }).filter(function (series) {
+      return series.values.length;
+    }).slice(0, 4);
+    chart.unit = safeText(chart.unit);
+
+    var longest = chart.series.reduce(function (max, series) {
+      return Math.max(max, series.values.length);
+    }, chart.labels.length);
+    while (chart.labels.length < longest) {
+      chart.labels.push("Item " + (chart.labels.length + 1));
+    }
+    chart.labels = chart.labels.slice(0, longest);
+    chart.series.forEach(function (series) {
+      series.values = series.values.slice(0, chart.labels.length);
+      while (series.values.length < chart.labels.length) series.values.push(0);
+    });
+
+    return chart;
   }
 
   function uid(prefix) {
@@ -181,6 +240,233 @@
     appendText(stack, "p", "ppt-body", slide.body);
     if (includeList && asArray(slide.items).length) stack.appendChild(createList(slide.items));
     return stack;
+  }
+
+  function svgEl(tag, attrs) {
+    var node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.keys(attrs || {}).forEach(function (key) {
+      if (attrs[key] != null) node.setAttribute(key, attrs[key]);
+    });
+    return node;
+  }
+
+  function chartSeriesClass(index) {
+    return "ppt-chart-series-" + (index % 4);
+  }
+
+  function chartMax(chart) {
+    var max = 0;
+    chart.series.forEach(function (series) {
+      series.values.forEach(function (value) {
+        max = Math.max(max, Number(value) || 0);
+      });
+    });
+    return max > 0 ? max * 1.15 : 1;
+  }
+
+  function shortLabel(value, maxLength) {
+    var text = safeText(value);
+    return text.length > maxLength ? text.slice(0, Math.max(1, maxLength - 3)) + "..." : text;
+  }
+
+  function appendChartAxes(svg, width, height, pad) {
+    var plotHeight = height - pad.top - pad.bottom;
+    for (var i = 0; i <= 4; i += 1) {
+      var y = pad.top + (plotHeight / 4) * i;
+      svg.appendChild(svgEl("line", {
+        class: "ppt-chart-grid",
+        x1: pad.left,
+        y1: y,
+        x2: width - pad.right,
+        y2: y
+      }));
+    }
+    svg.appendChild(svgEl("line", {
+      class: "ppt-chart-axis",
+      x1: pad.left,
+      y1: height - pad.bottom,
+      x2: width - pad.right,
+      y2: height - pad.bottom
+    }));
+    svg.appendChild(svgEl("line", {
+      class: "ppt-chart-axis",
+      x1: pad.left,
+      y1: pad.top,
+      x2: pad.left,
+      y2: height - pad.bottom
+    }));
+  }
+
+  function createBarChart(chart) {
+    var width = 820;
+    var height = 360;
+    var pad = { left: 56, right: 26, top: 26, bottom: 66 };
+    var svg = svgEl("svg", { class: "ppt-chart", viewBox: "0 0 " + width + " " + height, role: "img" });
+    appendChartAxes(svg, width, height, pad);
+
+    var labels = chart.labels;
+    var plotWidth = width - pad.left - pad.right;
+    var plotHeight = height - pad.top - pad.bottom;
+    var max = chartMax(chart);
+    var groupWidth = labels.length ? plotWidth / labels.length : plotWidth;
+    var seriesCount = Math.max(1, chart.series.length);
+    var barWidth = Math.max(8, Math.min(38, (groupWidth - 18) / seriesCount - 4));
+
+    labels.forEach(function (label, labelIndex) {
+      var center = pad.left + groupWidth * labelIndex + groupWidth / 2;
+      chart.series.forEach(function (series, seriesIndex) {
+        var value = Math.max(0, Number(series.values[labelIndex]) || 0);
+        var barHeight = value / max * plotHeight;
+        var x = center - (seriesCount * barWidth + (seriesCount - 1) * 6) / 2 + seriesIndex * (barWidth + 6);
+        var y = height - pad.bottom - barHeight;
+        svg.appendChild(svgEl("rect", {
+          class: chartSeriesClass(seriesIndex),
+          x: x,
+          y: y,
+          width: barWidth,
+          height: Math.max(1, barHeight),
+          rx: 5
+        }));
+      });
+      svg.appendChild(svgEl("text", {
+        class: "ppt-chart-label",
+        x: center,
+        y: height - 28,
+        "text-anchor": "middle"
+      })).textContent = shortLabel(label, 11);
+    });
+
+    return svg;
+  }
+
+  function createLineChart(chart) {
+    var width = 820;
+    var height = 360;
+    var pad = { left: 56, right: 34, top: 30, bottom: 66 };
+    var svg = svgEl("svg", { class: "ppt-chart", viewBox: "0 0 " + width + " " + height, role: "img" });
+    appendChartAxes(svg, width, height, pad);
+
+    var labels = chart.labels;
+    var plotWidth = width - pad.left - pad.right;
+    var plotHeight = height - pad.top - pad.bottom;
+    var max = chartMax(chart);
+
+    labels.forEach(function (label, labelIndex) {
+      var x = pad.left + (labels.length === 1 ? plotWidth / 2 : plotWidth * labelIndex / (labels.length - 1));
+      svg.appendChild(svgEl("text", {
+        class: "ppt-chart-label",
+        x: x,
+        y: height - 28,
+        "text-anchor": "middle"
+      })).textContent = shortLabel(label, 11);
+    });
+
+    chart.series.forEach(function (series, seriesIndex) {
+      var points = labels.map(function (label, labelIndex) {
+        var value = Math.max(0, Number(series.values[labelIndex]) || 0);
+        var x = pad.left + (labels.length === 1 ? plotWidth / 2 : plotWidth * labelIndex / (labels.length - 1));
+        var y = height - pad.bottom - value / max * plotHeight;
+        return { x: x, y: y };
+      });
+      svg.appendChild(svgEl("polyline", {
+        class: "ppt-chart-line " + chartSeriesClass(seriesIndex),
+        points: points.map(function (point) { return point.x + "," + point.y; }).join(" ")
+      }));
+      points.forEach(function (point) {
+        svg.appendChild(svgEl("circle", {
+          class: "ppt-chart-point " + chartSeriesClass(seriesIndex),
+          cx: point.x,
+          cy: point.y,
+          r: 7
+        }));
+      });
+    });
+
+    return svg;
+  }
+
+  function createDonutChart(chart) {
+    var width = 820;
+    var height = 360;
+    var cx = 360;
+    var cy = 180;
+    var r = 118;
+    var svg = svgEl("svg", { class: "ppt-chart", viewBox: "0 0 " + width + " " + height, role: "img" });
+    var values = chart.series[0] ? chart.series[0].values : [];
+    var total = values.reduce(function (sum, value) {
+      return sum + Math.max(0, Number(value) || 0);
+    }, 0);
+    if (!total) return svg;
+
+    var circumference = 2 * Math.PI * r;
+    var offset = 0;
+    values.forEach(function (value, index) {
+      var size = Math.max(0, Number(value) || 0) / total * circumference;
+      var circle = svgEl("circle", {
+        class: "ppt-chart-ring " + chartSeriesClass(index),
+        cx: cx,
+        cy: cy,
+        r: r,
+        transform: "rotate(-90 " + cx + " " + cy + ")",
+        "stroke-dasharray": size + " " + Math.max(0, circumference - size),
+        "stroke-dashoffset": -offset
+      });
+      svg.appendChild(circle);
+      offset += size;
+    });
+    svg.appendChild(svgEl("text", {
+      class: "ppt-chart-value",
+      x: cx,
+      y: cy - 6,
+      "text-anchor": "middle"
+    })).textContent = String(total);
+    svg.appendChild(svgEl("text", {
+      class: "ppt-chart-label",
+      x: cx,
+      y: cy + 28,
+      "text-anchor": "middle"
+    })).textContent = chart.unit || "Total";
+    return svg;
+  }
+
+  function createChartLegend(chart) {
+    var legend = el("div", "ppt-chart-legend");
+    if (chart.kind === "donut") {
+      var values = chart.series[0] ? chart.series[0].values : [];
+      chart.labels.forEach(function (label, index) {
+        appendLegendItem(legend, index, label, values[index], chart.unit);
+      });
+      return legend;
+    }
+
+    chart.series.forEach(function (series, index) {
+      appendLegendItem(legend, index, series.name || "系列 " + (index + 1), null, chart.unit);
+    });
+    return legend;
+  }
+
+  function appendLegendItem(legend, index, title, value, unit) {
+    var item = el("div", "ppt-chart-legend-item");
+    item.appendChild(el("span", "ppt-chart-swatch " + chartSeriesClass(index)));
+    var body = el("div", "");
+    appendText(body, "strong", "", title);
+    if (value != null) appendText(body, "small", "", value + (unit ? " " + unit : ""));
+    legend.appendChild(item);
+    item.appendChild(body);
+  }
+
+  function createChart(rawChart) {
+    var chart = normalizeChart(rawChart);
+    if (!chart.labels.length || !chart.series.length) {
+      return el("div", "ppt-chart-empty", "添加图表标签和数据后预览");
+    }
+
+    var wrap = el("div", "ppt-chart-wrap ppt-chart-kind-" + chart.kind);
+    if (chart.kind === "line") wrap.appendChild(createLineChart(chart));
+    else if (chart.kind === "donut") wrap.appendChild(createDonutChart(chart));
+    else wrap.appendChild(createBarChart(chart));
+    wrap.appendChild(createChartLegend(chart));
+    return wrap;
   }
 
   function createDemoDeck() {
@@ -420,6 +706,7 @@
     slide.items = asArray(slide.items);
     slide.cards = asArray(slide.cards);
     slide.metrics = asArray(slide.metrics);
+    slide.chart = normalizeChart(slide.chart);
     slide.left = slide.left && typeof slide.left === "object" ? slide.left : { title: "Before", text: "" };
     slide.right = slide.right && typeof slide.right === "object" ? slide.right : { title: "After", text: "" };
     slide.table = slide.table && typeof slide.table === "object" ? slide.table : { columns: [], rows: [] };
@@ -556,6 +843,34 @@
       }
       if (metrics.length > 3) {
         issues.push(issue("tip", path + ".metrics", "数据页最多显示前 3 个指标。", "挑选最重要的 3 个。"));
+      }
+    }
+
+    if (layout === "chart") {
+      var rawChart = slide.chart || {};
+      var chartLabels = asArray(rawChart.labels);
+      var chartSeries = asArray(rawChart.series);
+      if (rawChart.kind && CHART_KINDS.indexOf(rawChart.kind) === -1) {
+        issues.push(issue("warning", path + ".chart.kind", "图表类型不支持 \"" + rawChart.kind + "\"。", "使用 bar、line 或 donut。"));
+      }
+      if (!chartLabels.length) {
+        issues.push(issue("warning", path + ".chart.labels", "图表缺少标签。", "提供 chart.labels，例如 [\"Q1\",\"Q2\",\"Q3\"]。"));
+      }
+      if (!chartSeries.length) {
+        issues.push(issue("warning", path + ".chart.series", "图表缺少数据系列。", "提供 chart.series，例如 [{\"name\":\"收入\",\"values\":[12,20,31]}]。"));
+      }
+      var hasNumber = false;
+      chartSeries.forEach(function (series, seriesIndex) {
+        var values = asArray(series && series.values);
+        if (chartLabels.length && values.length && values.length !== chartLabels.length) {
+          issues.push(issue("tip", path + ".chart.series[" + seriesIndex + "].values", "图表数据数量和标签数量不一致。", "让 values 的数量与 chart.labels 保持一致。"));
+        }
+        values.forEach(function (value) {
+          if (isFinite(Number(value))) hasNumber = true;
+        });
+      });
+      if (chartSeries.length && !hasNumber) {
+        issues.push(issue("warning", path + ".chart.series", "图表没有可用数字。", "把 values 写成数字数组，例如 [12,20,31]。"));
       }
     }
 
@@ -738,6 +1053,12 @@
       return article;
     }
 
+    if (slide.layout === "chart") {
+      article.appendChild(createContentStack(slide, false));
+      article.appendChild(createChart(slide.chart));
+      return article;
+    }
+
     if (slide.layout === "table") {
       article.appendChild(createContentStack(slide, false));
       var table = el("table", "ppt-table");
@@ -812,7 +1133,21 @@
       "function media(m){m=m||{};var b=e('figure','ppt-media');b.setAttribute('data-fit',m.fit==='contain'?'contain':'cover');if(m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));a(b,'figcaption','ppt-caption',m.caption);return b}" +
       "function list(items){var u=e('ul','ppt-list');arr(items).slice(0,6).forEach(function(it){var x=typeof it==='string'?it:(it.text||it.title||'');if(x)u.appendChild(e('li','',x))});return u}" +
       "function stack(s,li){var x=e('div','ppt-content-stack');a(x,'div','ppt-kicker',s.kicker);a(x,'h1','ppt-title',s.title);a(x,'p','ppt-subtitle',s.subtitle);a(x,'p','ppt-body',s.body);if(li&&arr(s.items).length)x.appendChild(list(s.items));return x}" +
-      "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
+      "function se(t,o){var n=document.createElementNS('http://www.w3.org/2000/svg',t);Object.keys(o||{}).forEach(function(k){if(o[k]!=null)n.setAttribute(k,o[k])});return n}" +
+      "function num(v){var n=Number(v);return isFinite(n)?n:0}" +
+      "function ck(k){return k==='line'||k==='donut'?k:'bar'}" +
+      "function norm(ch){ch=ch||{};var labs=arr(ch.labels).map(function(x){return String(x||'').trim()}).filter(Boolean).slice(0,8),ser=arr(ch.series).map(function(s,j){s=s||{};return{name:s.name||('系列 '+(j+1)),values:arr(s.values).map(num).slice(0,8)}}).filter(function(s){return s.values.length}).slice(0,4),long=labs.length;ser.forEach(function(s){long=Math.max(long,s.values.length)});while(labs.length<long)labs.push('Item '+(labs.length+1));ser.forEach(function(s){s.values=s.values.slice(0,labs.length);while(s.values.length<labs.length)s.values.push(0)});return{kind:ck(ch.kind),labels:labs,series:ser,unit:ch.unit||''}}" +
+      "function cc(j){return 'ppt-chart-series-'+(j%4)}" +
+      "function cm(c){var m=0;c.series.forEach(function(s){s.values.forEach(function(v){m=Math.max(m,num(v))})});return m>0?m*1.15:1}" +
+      "function sh(x,m){x=String(x||'');return x.length>m?x.slice(0,Math.max(1,m-3))+'...':x}" +
+      "function ax(s,w,h,p){var ph=h-p.top-p.bottom;for(var j=0;j<=4;j++){var y=p.top+(ph/4)*j;s.appendChild(se('line',{class:'ppt-chart-grid',x1:p.left,y1:y,x2:w-p.right,y2:y}))}s.appendChild(se('line',{class:'ppt-chart-axis',x1:p.left,y1:h-p.bottom,x2:w-p.right,y2:h-p.bottom}));s.appendChild(se('line',{class:'ppt-chart-axis',x1:p.left,y1:p.top,x2:p.left,y2:h-p.bottom}))}" +
+      "function barChart(c){var w=820,h=360,p={left:56,right:26,top:26,bottom:66},s=se('svg',{class:'ppt-chart',viewBox:'0 0 '+w+' '+h,role:'img'});ax(s,w,h,p);var labs=c.labels,pw=w-p.left-p.right,ph=h-p.top-p.bottom,m=cm(c),gw=labs.length?pw/labs.length:pw,sc=Math.max(1,c.series.length),bw=Math.max(8,Math.min(38,(gw-18)/sc-4));labs.forEach(function(l,li){var cen=p.left+gw*li+gw/2;c.series.forEach(function(sr,si){var v=Math.max(0,num(sr.values[li])),bh=v/m*ph,x=cen-(sc*bw+(sc-1)*6)/2+si*(bw+6),y=h-p.bottom-bh;s.appendChild(se('rect',{class:cc(si),x:x,y:y,width:bw,height:Math.max(1,bh),rx:5}))});var tx=se('text',{class:'ppt-chart-label',x:cen,y:h-28,'text-anchor':'middle'});tx.textContent=sh(l,11);s.appendChild(tx)});return s}" +
+      "function lineChart(c){var w=820,h=360,p={left:56,right:34,top:30,bottom:66},s=se('svg',{class:'ppt-chart',viewBox:'0 0 '+w+' '+h,role:'img'});ax(s,w,h,p);var labs=c.labels,pw=w-p.left-p.right,ph=h-p.top-p.bottom,m=cm(c);labs.forEach(function(l,li){var x=p.left+(labs.length===1?pw/2:pw*li/(labs.length-1)),tx=se('text',{class:'ppt-chart-label',x:x,y:h-28,'text-anchor':'middle'});tx.textContent=sh(l,11);s.appendChild(tx)});c.series.forEach(function(sr,si){var pts=labs.map(function(l,li){var v=Math.max(0,num(sr.values[li])),x=p.left+(labs.length===1?pw/2:pw*li/(labs.length-1)),y=h-p.bottom-v/m*ph;return{x:x,y:y}});s.appendChild(se('polyline',{class:'ppt-chart-line '+cc(si),points:pts.map(function(p){return p.x+','+p.y}).join(' ')}));pts.forEach(function(p){s.appendChild(se('circle',{class:'ppt-chart-point '+cc(si),cx:p.x,cy:p.y,r:7}))})});return s}" +
+      "function donutChart(c){var w=820,h=360,cx=360,cy=180,r=118,s=se('svg',{class:'ppt-chart',viewBox:'0 0 '+w+' '+h,role:'img'}),vals=c.series[0]?c.series[0].values:[],tot=vals.reduce(function(z,v){return z+Math.max(0,num(v))},0);if(!tot)return s;var cir=2*Math.PI*r,off=0;vals.forEach(function(v,j){var sz=Math.max(0,num(v))/tot*cir;s.appendChild(se('circle',{class:'ppt-chart-ring '+cc(j),cx:cx,cy:cy,r:r,transform:'rotate(-90 '+cx+' '+cy+')','stroke-dasharray':sz+' '+Math.max(0,cir-sz),'stroke-dashoffset':-off}));off+=sz});var tv=se('text',{class:'ppt-chart-value',x:cx,y:cy-6,'text-anchor':'middle'});tv.textContent=String(tot);s.appendChild(tv);var tu=se('text',{class:'ppt-chart-label',x:cx,y:cy+28,'text-anchor':'middle'});tu.textContent=c.unit||'Total';s.appendChild(tu);return s}" +
+      "function li(l,j,t,v,u){var it=e('div','ppt-chart-legend-item'),sw=e('span','ppt-chart-swatch '+cc(j)),b=e('div','');it.appendChild(sw);a(b,'strong','',t);if(v!=null)a(b,'small','',v+(u?' '+u:''));it.appendChild(b);l.appendChild(it)}" +
+      "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
+      "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
+      "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
       "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
       "function fit(){var sc=Math.min(window.innerWidth/w,(window.innerHeight-72)/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
       "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}" +

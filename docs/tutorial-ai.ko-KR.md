@@ -116,6 +116,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 | `quote` | 인용, 주장 | `quote`, `author` |
 | `timeline` | 과정, 로드맵 | `items` |
 | `data` | 핵심 지표 | `metrics` |
+| `chart` | 추세, 그룹 값, 구성비 | `chart.kind`, `chart.labels`, `chart.series` |
 | `table` | 계획표, 비교표 | `table.columns`, `table.rows` |
 | `code` | 코드 표시 | `code` |
 | `ending` | 마무리 | `title`, `subtitle` |
@@ -128,6 +129,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 - 세 가지 장점이나 기능이면 `threeCards`.
 - 시간 순서라면 `timeline`.
 - 숫자를 강조하려면 `data`.
+- 추세, 그룹 값, 구성비라면 `chart`.
 - 계획이나 상태를 보여주려면 `table`.
 
 ## 5. 자주 쓰는 필드 형식
@@ -173,6 +175,22 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 ]
 ```
 
+차트:
+
+```json
+"chart": {
+  "kind": "bar",
+  "labels": ["Q1", "Q2", "Q3", "Q4"],
+  "series": [
+    { "name": "매출", "values": [12, 20, 31, 42] },
+    { "name": "비용", "values": [8, 11, 18, 24] }
+  ],
+  "unit": "만원"
+}
+```
+
+`bar` 는 비교, `line` 은 추세, `donut` 은 구성비에 적합합니다. 도넛 차트는 첫 번째 시리즈를 조각으로 사용합니다.
+
 비교:
 
 ```json
@@ -214,7 +232,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 2. `section` 또는 `text`: 배경이나 문제.
 3. `compare`: 기존 방식과 새로운 방식.
 4. `threeCards`: 해결책이나 기능.
-5. `data`: 핵심 결과.
+5. `data` 또는 `chart`: 핵심 결과.
 6. `timeline` 또는 `table`: 계획.
 7. `ending`: 요약과 다음 행동.
 
@@ -317,7 +335,7 @@ PPT.html Studio용 완전한 deck JSON을 생성해 주세요.
 - 6장 생성
 - theme은 boardroom
 - 모든 슬라이드에는 id, layout, title 포함
-- hero, compare, threeCards, data, table, ending 우선 사용
+- hero, compare, threeCards, data, chart, table, ending 우선 사용
 - 자유 형식 HTML 출력 금지
 - 설명하지 말고 JSON만 출력
 
@@ -354,6 +372,7 @@ deck JSON을 수정해 주세요:
 - 모든 슬라이드에 `title` 이 있는가?
 - `threeCards` 는 3개 이하인가?
 - `data` 는 지표 3개 이하인가?
+- `chart` 에 라벨과 숫자 시리즈 값이 있는가?
 - `timeline` 은 항목 5개 이하인가?
 - 이미지에 `alt` 텍스트가 있는가?
 - 자유 형식 HTML을 출력하지 않았는가?

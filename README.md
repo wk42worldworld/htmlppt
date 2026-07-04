@@ -69,7 +69,7 @@ npm start
 
 1. Open PPT.html Studio.
 2. Click `Templates` and choose Product Pitch, Lesson, Project Update, or the demo deck.
-3. Edit the title, subtitle, metrics, table rows, or slide order in the visual editor.
+3. Edit the title, subtitle, metrics, charts, table rows, or slide order in the visual editor.
 4. Click `AI JSON` to paste a deck from an AI model. Fenced `json` code blocks are accepted.
 5. Click `Check` and copy the validation report back to AI if anything needs repair.
 6. Click `Present` to preview the deck.
@@ -103,6 +103,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Start from built-in templates for product pitches, lessons, project updates, or the demo deck.
 - Open, save, and save as `.ppt.html` files in the desktop app.
 - Import local images into image slides as embedded data URIs.
+- Create bar, line, and donut charts from structured labels and series.
 - Run `Check` to get a human-readable and AI-readable validation report.
 
 ## Release Builds

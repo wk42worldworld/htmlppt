@@ -43,7 +43,7 @@
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
-      "cardsInput", "metricsInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
+      "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
       "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "toast"
@@ -241,6 +241,10 @@
     bindSlideInput(els.rightTextInput, function (slide, value) { slide.right.text = value; });
     bindSlideInput(els.cardsInput, function (slide, value) { slide.cards = parseRows(value); });
     bindSlideInput(els.metricsInput, function (slide, value) { slide.metrics = parseMetrics(value); });
+    bindSlideInput(els.chartKindInput, function (slide, value) { ensureChart(slide).kind = value; });
+    bindSlideInput(els.chartLabelsInput, function (slide, value) { ensureChart(slide).labels = splitCells(value); });
+    bindSlideInput(els.chartSeriesInput, function (slide, value) { ensureChart(slide).series = parseChartSeries(value); });
+    bindSlideInput(els.chartUnitInput, function (slide, value) { ensureChart(slide).unit = value; });
     bindSlideInput(els.tableColumnsInput, function (slide, value) { slide.table.columns = splitCells(value); });
     bindSlideInput(els.tableRowsInput, function (slide, value) { slide.table.rows = parseTableRows(value); });
     bindSlideInput(els.quoteInput, function (slide, value) { slide.quote = value; });
@@ -525,6 +529,10 @@
     els.rightTextInput.value = slide.right.text || "";
     els.cardsInput.value = stringifyRows(slide.cards);
     els.metricsInput.value = stringifyMetrics(slide.metrics);
+    els.chartKindInput.value = slide.chart.kind || "bar";
+    els.chartLabelsInput.value = slide.chart.labels.join(" | ");
+    els.chartSeriesInput.value = stringifyChartSeries(slide.chart.series);
+    els.chartUnitInput.value = slide.chart.unit || "";
     els.tableColumnsInput.value = slide.table.columns.join(" | ");
     els.tableRowsInput.value = stringifyTableRows(slide.table.rows);
     els.quoteInput.value = slide.quote || "";
@@ -827,6 +835,37 @@
       return [metric.value, metric.label, metric.detail].filter(function (value) {
         return value != null && value !== "";
       }).join(" | ");
+    }).join("\n");
+  }
+
+  function ensureChart(slide) {
+    if (!slide.chart || typeof slide.chart !== "object") {
+      slide.chart = { kind: "bar", labels: [], series: [], unit: "" };
+    }
+    if (!Array.isArray(slide.chart.labels)) slide.chart.labels = [];
+    if (!Array.isArray(slide.chart.series)) slide.chart.series = [];
+    return slide.chart;
+  }
+
+  function parseChartSeries(text) {
+    return String(text || "").split(/\n+/).map(function (line) {
+      var cells = splitCells(line);
+      if (!cells.length) return null;
+      return {
+        name: cells[0] || "",
+        values: cells.slice(1).map(function (value) {
+          var number = Number(value);
+          return isFinite(number) ? number : 0;
+        })
+      };
+    }).filter(function (series) {
+      return series && series.values.length;
+    });
+  }
+
+  function stringifyChartSeries(seriesList) {
+    return (seriesList || []).map(function (series) {
+      return [series.name || ""].concat(series.values || []).join(" | ");
     }).join("\n");
   }
 
