@@ -275,7 +275,7 @@
         <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft,imageFull,imageBackground">
           <h2 data-i18n="panel.image">图片</h2>
           <div class="inline-tools">
-            <button type="button" id="imageFileBtn" data-i18n="action.pickImage">选择本地图片</button>
+            <button type="button" id="imageFileBtn" data-i18n="action.pickImage" data-i18n-title="action.pickImage">选择本地图片</button>
           </div>
           <label>
             <span data-i18n="field.fit">适配</span>
@@ -301,7 +301,7 @@
         <section class="panel-section field-group" data-layouts="video">
           <h2 data-i18n="panel.video">视频</h2>
           <div class="inline-tools">
-            <button type="button" id="videoFileBtn" data-i18n="action.pickVideo">选择本地视频</button>
+            <button type="button" id="videoFileBtn" data-i18n="action.pickVideo" data-i18n-title="action.pickVideo">选择本地视频</button>
           </div>
           <label>
             <span data-i18n="field.fit">适配</span>
@@ -327,7 +327,7 @@
         <section class="panel-section field-group" data-layouts="audio">
           <h2 data-i18n="panel.audio">音频</h2>
           <div class="inline-tools">
-            <button type="button" id="audioFileBtn" data-i18n="action.pickAudio">选择本地音频</button>
+            <button type="button" id="audioFileBtn" data-i18n="action.pickAudio" data-i18n-title="action.pickAudio">选择本地音频</button>
           </div>
           <label>
             <span data-i18n="field.audioSrc">音频 URL 或 Data URI</span>
@@ -453,10 +453,10 @@
   <div class="presenter" id="presenter" hidden>
     <div class="presenter-stage" id="presenterStage"></div>
     <div class="presenter-controls">
-      <button type="button" id="presentPrevBtn" data-i18n="present.prev">上一页</button>
+      <button type="button" id="presentPrevBtn" data-i18n="present.prev" data-i18n-title="present.prev">上一页</button>
       <span id="presentCounter">1 / 1</span>
-      <button type="button" id="presentNextBtn" data-i18n="present.next">下一页</button>
-      <button type="button" id="presentExitBtn" data-i18n="present.exit">退出</button>
+      <button type="button" id="presentNextBtn" data-i18n="present.next" data-i18n-title="present.next">下一页</button>
+      <button type="button" id="presentExitBtn" data-i18n="present.exit" data-i18n-title="present.exit">退出</button>
     </div>
   </div>
 
@@ -464,12 +464,12 @@
     <form method="dialog">
       <header>
         <strong data-i18n="dialog.aiJson">AI JSON</strong>
-        <button type="submit" data-i18n="dialog.close">关闭</button>
+        <button type="submit" data-i18n="dialog.close" data-i18n-title="dialog.close">关闭</button>
       </header>
       <textarea id="jsonTextarea" spellcheck="false"></textarea>
       <footer>
-        <button type="button" id="copyJsonBtn" data-i18n="dialog.copyJson">复制当前 JSON</button>
-        <button type="button" id="loadJsonBtn" class="primary" data-i18n="dialog.loadJson">从文本载入</button>
+        <button type="button" id="copyJsonBtn" data-i18n="dialog.copyJson" data-i18n-title="dialog.copyJson">复制当前 JSON</button>
+        <button type="button" id="loadJsonBtn" class="primary" data-i18n="dialog.loadJson" data-i18n-title="dialog.loadJson">从文本载入</button>
       </footer>
     </form>
   </dialog>
@@ -478,28 +478,28 @@
     <form method="dialog">
       <header>
         <strong data-i18n="dialog.templates">选择模板</strong>
-        <button type="submit" data-i18n="dialog.close">关闭</button>
+        <button type="submit" data-i18n="dialog.close" data-i18n-title="dialog.close">关闭</button>
       </header>
       <div class="template-grid">
-        <button type="button" class="template-card" data-template="ai-camera">
+        <button type="button" class="template-card" data-template="ai-camera" data-i18n-title="template.aiCamera.name">
           <strong data-i18n="template.aiCamera.name">AI 导演相机</strong>
           <span data-i18n="template.aiCamera.desc">产品发布 demo，适合展示一个新想法。</span>
         </button>
-        <button type="button" class="template-card" data-template="product-pitch">
+        <button type="button" class="template-card" data-template="product-pitch" data-i18n-title="template.productPitch.name">
           <strong data-i18n="template.productPitch.name">产品发布</strong>
           <span data-i18n="template.productPitch.desc">问题、方案、价值和下一步。</span>
         </button>
-        <button type="button" class="template-card" data-template="lesson">
+        <button type="button" class="template-card" data-template="lesson" data-i18n-title="template.lesson.name">
           <strong data-i18n="template.lesson.name">课程课件</strong>
           <span data-i18n="template.lesson.desc">学习目标、概念、练习和课后任务。</span>
         </button>
-        <button type="button" class="template-card" data-template="project-update">
+        <button type="button" class="template-card" data-template="project-update" data-i18n-title="template.projectUpdate.name">
           <strong data-i18n="template.projectUpdate.name">项目汇报</strong>
           <span data-i18n="template.projectUpdate.desc">状态、风险、决策和里程碑。</span>
         </button>
       </div>
       <footer>
-        <button type="submit" data-i18n="dialog.cancel">取消</button>
+        <button type="submit" data-i18n="dialog.cancel" data-i18n-title="dialog.cancel">取消</button>
       </footer>
     </form>
   </dialog>
@@ -508,14 +508,14 @@
     <form method="dialog">
       <header>
         <strong data-i18n="dialog.validation">质量检查</strong>
-        <button type="submit" data-i18n="dialog.close">关闭</button>
+        <button type="submit" data-i18n="dialog.close" data-i18n-title="dialog.close">关闭</button>
       </header>
       <div class="validation-body">
         <p id="validationSummary"></p>
         <textarea id="validationReport" readonly spellcheck="false"></textarea>
       </div>
       <footer>
-        <button type="button" id="copyValidationBtn" data-i18n="dialog.copyReport">复制报告</button>
+        <button type="button" id="copyValidationBtn" data-i18n="dialog.copyReport" data-i18n-title="dialog.copyReport">复制报告</button>
       </footer>
     </form>
   </dialog>

@@ -30,6 +30,9 @@
   var pendingLiveCanvas = false;
   var pendingLiveSlideList = false;
   var persistTimer = 0;
+  var tooltipEl = null;
+  var tooltipTarget = null;
+  var tooltipTimer = 0;
 
   var els = {};
   var I18N = {
@@ -183,6 +186,7 @@
       "canvas.reset": "重置",
       "canvas.resetTitle": "重置这个元素的位置和尺寸",
       "canvas.resize": "拖拽调整尺寸",
+      "tooltip.slideThumb": "第 {number} 页：{title} · {layout}",
       "toast.languageChanged": "语言已切换",
       "toast.imageAdded": "图片已加入当前页面",
       "toast.videoAdded": "视频已加入当前页面",
@@ -409,6 +413,7 @@
     "canvas.reset": "Reset",
     "canvas.resetTitle": "Reset this element position and size",
     "canvas.resize": "Drag to resize",
+    "tooltip.slideThumb": "Slide {number}: {title} · {layout}",
     "toast.languageChanged": "Language changed",
     "toast.imageAdded": "Image added to this slide",
     "toast.videoAdded": "Video added to this slide",
@@ -600,6 +605,7 @@
     "canvas.reset": "リセット",
     "canvas.resetTitle": "この要素の位置とサイズをリセット",
     "canvas.resize": "ドラッグしてサイズ変更",
+    "tooltip.slideThumb": "{number} 枚目: {title} · {layout}",
     "toast.languageChanged": "言語を変更しました",
     "toast.imageAdded": "画像を追加しました",
     "toast.videoAdded": "動画を追加しました",
@@ -749,6 +755,7 @@
     "canvas.reset": "초기화",
     "canvas.resetTitle": "이 요소의 위치와 크기를 초기화",
     "canvas.resize": "드래그하여 크기 조절",
+    "tooltip.slideThumb": "{number}번 슬라이드: {title} · {layout}",
     "toast.languageChanged": "언어가 변경되었습니다",
     "toast.imageAdded": "이미지가 추가되었습니다",
     "toast.videoAdded": "비디오가 추가되었습니다",
@@ -920,6 +927,7 @@
   function init() {
     cacheElements();
     bindEvents();
+    bindTooltipEvents();
     configureRuntime();
     applyLanguage({ skipRender: true });
     renderAll();
@@ -985,8 +993,7 @@
     });
     document.querySelectorAll("[data-i18n-title]").forEach(function (node) {
       var value = t(node.getAttribute("data-i18n-title"));
-      node.setAttribute("title", value);
-      node.setAttribute("aria-label", value);
+      setTooltip(node, value);
     });
     document.querySelectorAll("[data-i18n-placeholder]").forEach(function (node) {
       node.setAttribute("placeholder", t(node.getAttribute("data-i18n-placeholder")));
@@ -996,7 +1003,136 @@
     });
 
     populateLayoutSelect();
+    refreshTooltips();
     if (!settings.skipRender) renderAll();
+  }
+
+  function setTooltip(node, value) {
+    var text = normalizeTooltipText(value);
+    if (!node || !text) return;
+    node.setAttribute("title", text);
+    node.setAttribute("aria-label", text);
+    node.setAttribute("data-tooltip", text);
+  }
+
+  function normalizeTooltipText(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function tooltipTextFromNode(node) {
+    if (!node) return "";
+    return normalizeTooltipText(
+      node.getAttribute("data-tooltip") ||
+      node.getAttribute("title") ||
+      node.getAttribute("aria-label") ||
+      node.textContent
+    );
+  }
+
+  function refreshTooltips() {
+    document.querySelectorAll("[data-i18n-title]").forEach(function (node) {
+      setTooltip(node, t(node.getAttribute("data-i18n-title")));
+    });
+
+    document.querySelectorAll("button, [role='button']").forEach(function (node) {
+      if (node.hasAttribute("data-tooltip")) return;
+      var text = tooltipTextFromNode(node);
+      if (text) setTooltip(node, text);
+    });
+
+    document.querySelectorAll("select").forEach(function (node) {
+      if (node.hasAttribute("data-tooltip")) return;
+      var label = node.closest("label");
+      var text = tooltipTextFromNode(label) || tooltipTextFromNode(node);
+      if (text) setTooltip(node, text);
+    });
+  }
+
+  function bindTooltipEvents() {
+    document.addEventListener("pointerover", function (event) {
+      var target = tooltipTargetFromEvent(event);
+      if (target) scheduleTooltip(target);
+    });
+    document.addEventListener("pointerout", function (event) {
+      if (tooltipTarget && (!event.relatedTarget || !tooltipTarget.contains(event.relatedTarget))) hideTooltip();
+    });
+    document.addEventListener("focusin", function (event) {
+      var target = tooltipTargetFromEvent(event);
+      if (target) showTooltip(target);
+    });
+    document.addEventListener("focusout", function () {
+      hideTooltip();
+    });
+    document.addEventListener("pointermove", function () {
+      if (tooltipTarget && tooltipEl && !tooltipEl.hidden) positionTooltip(tooltipTarget);
+    });
+    window.addEventListener("scroll", hideTooltip, true);
+    window.addEventListener("resize", hideTooltip);
+    window.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") hideTooltip();
+    });
+  }
+
+  function tooltipTargetFromEvent(event) {
+    var node = event.target && event.target.closest && event.target.closest("[data-tooltip], [title]");
+    if (!node || node.closest(".app-tooltip")) return null;
+    return tooltipTextFromNode(node) ? node : null;
+  }
+
+  function ensureTooltipEl() {
+    if (tooltipEl) return tooltipEl;
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = "app-tooltip";
+    tooltipEl.hidden = true;
+    document.body.appendChild(tooltipEl);
+    return tooltipEl;
+  }
+
+  function scheduleTooltip(target) {
+    window.clearTimeout(tooltipTimer);
+    tooltipTarget = target;
+    tooltipTimer = window.setTimeout(function () {
+      showTooltip(target);
+    }, 120);
+  }
+
+  function showTooltip(target) {
+    var text = tooltipTextFromNode(target);
+    if (!target || !text) return;
+    var tip = ensureTooltipEl();
+    tooltipTarget = target;
+    tip.textContent = text;
+    tip.hidden = false;
+    tip.classList.remove("above");
+    positionTooltip(target);
+  }
+
+  function hideTooltip() {
+    window.clearTimeout(tooltipTimer);
+    tooltipTimer = 0;
+    tooltipTarget = null;
+    if (tooltipEl) tooltipEl.hidden = true;
+  }
+
+  function positionTooltip(target) {
+    var tip = ensureTooltipEl();
+    if (!target || tip.hidden) return;
+    var rect = target.getBoundingClientRect();
+    var tipRect = tip.getBoundingClientRect();
+    var gap = 8;
+    var left = rect.left + rect.width / 2 - tipRect.width / 2;
+    var top = rect.bottom + gap;
+
+    left = clamp(left, 8, Math.max(8, window.innerWidth - tipRect.width - 8));
+    if (top + tipRect.height + 8 > window.innerHeight) {
+      top = rect.top - tipRect.height - gap;
+      tip.classList.add("above");
+    } else {
+      tip.classList.remove("above");
+    }
+    top = clamp(top, 8, Math.max(8, window.innerHeight - tipRect.height - 8));
+    tip.style.left = Math.round(left) + "px";
+    tip.style.top = Math.round(top) + "px";
   }
 
   function configureRuntime() {
@@ -1792,6 +1928,7 @@
     syncInspector();
     updateButtons();
     updateFileStatus();
+    refreshTooltips();
   }
 
   function renderSlideList() {
@@ -1804,6 +1941,11 @@
       button.draggable = true;
       button.querySelector("strong").textContent = slide.title || t("slide.untitled");
       button.querySelector("small").textContent = layoutLabel(slide.layout);
+      setTooltip(button, formatText(t("tooltip.slideThumb"), {
+        number: index + 1,
+        title: slide.title || t("slide.untitled"),
+        layout: layoutLabel(slide.layout)
+      }));
       button.addEventListener("click", function () {
         selectSlide(index);
       });
@@ -2094,7 +2236,7 @@
     var reset = document.createElement("button");
     reset.type = "button";
     reset.className = "canvas-reset-button";
-    reset.title = t("canvas.resetTitle");
+    setTooltip(reset, t("canvas.resetTitle"));
     reset.textContent = t("canvas.reset");
     reset.addEventListener("pointerdown", function (event) {
       event.stopPropagation();
@@ -2110,7 +2252,7 @@
       var control = document.createElement("span");
       control.className = "canvas-resize-handle canvas-resize-" + handle;
       control.setAttribute("data-canvas-handle", handle);
-      control.setAttribute("title", t("canvas.resize"));
+      setTooltip(control, t("canvas.resize"));
       control.addEventListener("pointerdown", handleCanvasResizePointerDown);
       box.appendChild(control);
     });
@@ -2828,13 +2970,13 @@
   }
 
   function updateButtons() {
-    els.undoBtn.disabled = !history.length;
-    els.redoBtn.disabled = !future.length;
-    els.downloadDeckBtn.disabled = saving;
-    els.saveAsDeckBtn.disabled = saving;
-    els.moveSlideUpBtn.disabled = currentIndex <= 0;
-    els.moveSlideDownBtn.disabled = currentIndex >= deck.slides.length - 1;
-    els.deleteSlideBtn.disabled = deck.slides.length <= 1;
+    setButtonUnavailable(els.undoBtn, !history.length);
+    setButtonUnavailable(els.redoBtn, !future.length);
+    setButtonUnavailable(els.downloadDeckBtn, saving);
+    setButtonUnavailable(els.saveAsDeckBtn, saving);
+    setButtonUnavailable(els.moveSlideUpBtn, currentIndex <= 0);
+    setButtonUnavailable(els.moveSlideDownBtn, currentIndex >= deck.slides.length - 1);
+    setButtonUnavailable(els.deleteSlideBtn, deck.slides.length <= 1);
   }
 
   function createNewDeck() {
@@ -2937,8 +3079,15 @@
   }
 
   function setSaveButtonsDisabled(disabled) {
-    els.downloadDeckBtn.disabled = disabled;
-    els.saveAsDeckBtn.disabled = disabled;
+    setButtonUnavailable(els.downloadDeckBtn, disabled);
+    setButtonUnavailable(els.saveAsDeckBtn, disabled);
+  }
+
+  function setButtonUnavailable(button, unavailable) {
+    if (!button) return;
+    button.disabled = false;
+    button.classList.toggle("is-disabled", Boolean(unavailable));
+    button.setAttribute("aria-disabled", unavailable ? "true" : "false");
   }
 
   function packageDeckAssets(sourceDeck) {
