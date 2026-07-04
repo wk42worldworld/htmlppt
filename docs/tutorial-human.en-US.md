@@ -110,6 +110,15 @@ Editing tips:
 - Use 2 to 8 labels on chart slides.
 - Split overloaded slides into multiple slides.
 
+Direct canvas editing:
+
+- Double-click titles, subtitles, body text, list items, cards, metrics, table cells, chart legends, or code blocks on the canvas to edit text in place.
+- Press `Enter` to save single-line edits. For multi-line content, use line breaks and press `Ctrl+Enter` or `Cmd+Enter` to save.
+- Press `Esc` to cancel the current canvas edit.
+- Drag editable text or content blocks on the canvas for light position tweaks. The position is saved in the current slide's `canvas` data, so exported `.ppt.html` files keep the adjustment.
+- Use `Undo` if a drag lands in the wrong place.
+- Use dragging for small refinements. For major layout changes, switch layouts or split content into more slides so the deck stays friendly to both AI and human editing.
+
 ## 6. Manage Slide Order
 
 The left slide rail supports:
@@ -119,6 +128,7 @@ The left slide rail supports:
 - `Move Up` / `Move Down`: reorder slides.
 - `Delete`: remove the current slide.
 - Click a thumbnail: switch slides.
+- Drag a thumbnail: reorder slides directly.
 
 Delete is disabled when only one slide remains, so the deck cannot become empty.
 
@@ -131,6 +141,8 @@ Images:
 3. The image is embedded into the `.ppt.html` file as a Data URI.
 4. Use `Fit` to choose cropped fill or full containment.
 5. Add alt text and an optional caption.
+
+You can also drag an image file onto the center canvas. If the current slide is not an image layout, the app switches it to `imageRight` and embeds the image into the current `.ppt.html` file.
 
 Data slides:
 

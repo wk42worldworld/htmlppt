@@ -2,7 +2,7 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
-  var APP_VERSION_LABEL = "v0.2.2";
+  var APP_VERSION_LABEL = "v0.2.3";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var currentIndex = 0;
@@ -16,6 +16,8 @@
   var toastTimer = 0;
   var activeEditSnapshot = "";
   var activeEditPushed = false;
+  var activeCanvasEdit = null;
+  var activeCanvasDrag = null;
   var presenterUiTimer = 0;
   var presenterFullscreenActive = false;
 
@@ -159,6 +161,13 @@
         toast("检查报告已复制");
       });
     });
+
+    els.stageFrame.addEventListener("pointerdown", handleCanvasPointerDown);
+    els.stageFrame.addEventListener("dblclick", handleCanvasDblClick);
+    els.stageViewport.addEventListener("dragover", handleCanvasDragOver);
+    els.stageViewport.addEventListener("dragenter", handleCanvasDragEnter);
+    els.stageViewport.addEventListener("dragleave", handleCanvasDragLeave);
+    els.stageViewport.addEventListener("drop", handleCanvasDrop);
 
     els.templateDialog.querySelectorAll("[data-template]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -481,14 +490,36 @@
       button.type = "button";
       button.className = "slide-thumb" + (index === currentIndex ? " active" : "");
       button.innerHTML = "<span>" + (index + 1) + "</span><strong></strong><small></small>";
+      button.draggable = true;
       button.querySelector("strong").textContent = slide.title || "未命名页面";
       button.querySelector("small").textContent = layoutLabel(slide.layout);
-      button.addEventListener("pointerdown", function (event) {
-        event.preventDefault();
-        selectSlide(index);
-      });
       button.addEventListener("click", function () {
         selectSlide(index);
+      });
+      button.addEventListener("dragstart", function (event) {
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("application/x-htmlppt-slide-index", String(index));
+        event.dataTransfer.setData("text/plain", String(index));
+        button.classList.add("dragging");
+      });
+      button.addEventListener("dragend", function () {
+        button.classList.remove("dragging");
+      });
+      button.addEventListener("dragover", function (event) {
+        if (!event.dataTransfer.types || !Array.prototype.includes.call(event.dataTransfer.types, "application/x-htmlppt-slide-index")) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        button.classList.add("drag-over");
+      });
+      button.addEventListener("dragleave", function () {
+        button.classList.remove("drag-over");
+      });
+      button.addEventListener("drop", function (event) {
+        var sourceIndex = event.dataTransfer.getData("application/x-htmlppt-slide-index");
+        if (sourceIndex === "") return;
+        event.preventDefault();
+        button.classList.remove("drag-over");
+        moveSlideByDrag(Number(sourceIndex), index);
       });
       els.slideList.appendChild(button);
     });
@@ -503,9 +534,432 @@
   function renderCanvas() {
     els.stageFrame.innerHTML = "";
     els.stageFrame.appendChild(PPTHtml.renderSlide(currentSlide(), deck, { index: currentIndex }));
+    enhanceCanvasEditing();
     els.currentSlideLabel.textContent = "第 " + (currentIndex + 1) + " 页";
     els.currentSlideTitle.textContent = currentSlide().title || "未命名页面";
     fitFrame(els.stageFrame, els.stageViewport);
+  }
+
+  function enhanceCanvasEditing() {
+    var slide = currentSlide();
+    bindCanvasText(".ppt-kicker", "kicker", { singleLine: true });
+    bindCanvasText(".ppt-title", "title", { singleLine: true });
+    bindCanvasText(".ppt-subtitle", "subtitle");
+    bindCanvasText(".ppt-body", "body");
+    bindCanvasText(".ppt-caption", "image.caption", { singleLine: true });
+
+    if (slide.layout === "quote") {
+      bindCanvasText(".ppt-quote", "quote");
+      bindCanvasText(".ppt-author", "author", { singleLine: true });
+    }
+
+    bindCanvasListItems();
+    bindCanvasCompare();
+    bindCanvasCards();
+    bindCanvasTimeline();
+    bindCanvasMetrics();
+    bindCanvasTable();
+    bindCanvasChartLegend();
+    bindCanvasText(".ppt-code", "code", { multiline: true, preserveWhitespace: true });
+    applyCanvasOffsets();
+  }
+
+  function bindCanvasText(selector, path, options) {
+    var node = els.stageFrame.querySelector(selector);
+    if (!node) return;
+    registerCanvasEdit(node, path, options);
+  }
+
+  function bindCanvasListItems() {
+    els.stageFrame.querySelectorAll(".ppt-list li").forEach(function (node, index) {
+      registerCanvasEdit(node, "items." + index + ".text");
+    });
+  }
+
+  function bindCanvasCompare() {
+    ["left", "right"].forEach(function (side, index) {
+      var card = els.stageFrame.querySelectorAll(".ppt-compare-card")[index];
+      if (!card) return;
+      registerCanvasEdit(card.querySelector("h2"), side + ".title", { singleLine: true });
+      registerCanvasEdit(card.querySelector("p"), side + ".text");
+    });
+  }
+
+  function bindCanvasCards() {
+    els.stageFrame.querySelectorAll(".ppt-card").forEach(function (card, index) {
+      registerCanvasEdit(card.querySelector("h2"), "cards." + index + ".title", { singleLine: true });
+      registerCanvasEdit(card.querySelector("p"), "cards." + index + ".text");
+    });
+  }
+
+  function bindCanvasTimeline() {
+    els.stageFrame.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+      registerCanvasEdit(item.querySelector("h2"), "items." + index + ".title", { singleLine: true });
+      registerCanvasEdit(item.querySelector("p"), "items." + index + ".text");
+    });
+  }
+
+  function bindCanvasMetrics() {
+    els.stageFrame.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+      registerCanvasEdit(metric.querySelector("strong"), "metrics." + index + ".value", { singleLine: true });
+      registerCanvasEdit(metric.querySelector("span"), "metrics." + index + ".label", { singleLine: true });
+      registerCanvasEdit(metric.querySelector("p"), "metrics." + index + ".detail");
+    });
+  }
+
+  function bindCanvasTable() {
+    els.stageFrame.querySelectorAll(".ppt-table th").forEach(function (cell, index) {
+      registerCanvasEdit(cell, "table.columns." + index, { singleLine: true });
+    });
+    els.stageFrame.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+      row.querySelectorAll("td").forEach(function (cell, cellIndex) {
+        registerCanvasEdit(cell, "table.rows." + rowIndex + "." + cellIndex, { singleLine: true });
+      });
+    });
+  }
+
+  function bindCanvasChartLegend() {
+    var slide = currentSlide();
+    els.stageFrame.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (node, index) {
+      var path = slide.chart.kind === "donut" ? "chart.labels." + index : "chart.series." + index + ".name";
+      registerCanvasEdit(node, path, { singleLine: true });
+    });
+    if (slide.chart.kind !== "donut") return;
+    els.stageFrame.querySelectorAll(".ppt-chart-legend-item small").forEach(function (node, index) {
+      registerCanvasEdit(node, "chart.series.0.values." + index, { singleLine: true, numberValue: true });
+    });
+  }
+
+  function applyCanvasOffsets() {
+    els.stageFrame.querySelectorAll("[data-canvas-edit]").forEach(function (node) {
+      setCanvasOffsetStyle(node, getCanvasOffset(node.getAttribute("data-canvas-edit")));
+    });
+  }
+
+  function registerCanvasEdit(node, path, options) {
+    if (!node) return;
+    node.setAttribute("data-canvas-edit", path);
+    node.setAttribute("tabindex", "0");
+    node.dataset.canvasOptions = JSON.stringify(options || {});
+  }
+
+  function handleCanvasPointerDown(event) {
+    if (presenting || activeCanvasEdit || event.button !== 0) return;
+    var target = event.target.closest("[data-canvas-edit]");
+    if (!target || !els.stageFrame.contains(target)) return;
+    activeCanvasDrag = {
+      node: target,
+      path: target.getAttribute("data-canvas-edit"),
+      before: JSON.stringify(deck),
+      startX: event.clientX,
+      startY: event.clientY,
+      origin: getCanvasOffset(target.getAttribute("data-canvas-edit")),
+      scale: currentFrameScale(),
+      moved: false
+    };
+    window.addEventListener("pointermove", handleCanvasPointerMove);
+    window.addEventListener("pointerup", handleCanvasPointerEnd);
+    window.addEventListener("pointercancel", handleCanvasPointerEnd);
+  }
+
+  function handleCanvasPointerMove(event) {
+    if (!activeCanvasDrag) return;
+    var drag = activeCanvasDrag;
+    var dx = (event.clientX - drag.startX) / drag.scale;
+    var dy = (event.clientY - drag.startY) / drag.scale;
+    if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+    if (!drag.moved) {
+      drag.moved = true;
+      drag.node.classList.add("is-canvas-dragging");
+    }
+    event.preventDefault();
+    setCanvasOffsetStyle(drag.node, {
+      x: clamp(drag.origin.x + dx, -420, 420),
+      y: clamp(drag.origin.y + dy, -240, 240)
+    });
+  }
+
+  function handleCanvasPointerEnd(event) {
+    if (!activeCanvasDrag) return;
+    var drag = activeCanvasDrag;
+    activeCanvasDrag = null;
+    window.removeEventListener("pointermove", handleCanvasPointerMove);
+    window.removeEventListener("pointerup", handleCanvasPointerEnd);
+    window.removeEventListener("pointercancel", handleCanvasPointerEnd);
+    drag.node.classList.remove("is-canvas-dragging");
+    if (!drag.moved) return;
+    event.preventDefault();
+
+    var offset = parseCanvasOffsetStyle(drag.node);
+    if (sameOffset(drag.origin, offset)) return;
+    history.push(drag.before);
+    if (history.length > 80) history.shift();
+    future = [];
+    setCanvasOffset(drag.path, offset);
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+  }
+
+  function currentFrameScale() {
+    var transform = window.getComputedStyle(els.stageFrame).transform;
+    if (!transform || transform === "none") return 1;
+    try {
+      var matrix = new DOMMatrixReadOnly(transform);
+      return matrix.a || 1;
+    } catch (error) {
+      var match = transform.match(/matrix\(([^,]+)/);
+      return match ? Number(match[1]) || 1 : 1;
+    }
+  }
+
+  function getCanvasOffset(path) {
+    var canvas = currentSlide().canvas || {};
+    var offset = canvas[path] || {};
+    return {
+      x: Number(offset.x) || 0,
+      y: Number(offset.y) || 0
+    };
+  }
+
+  function setCanvasOffset(path, offset) {
+    var slide = currentSlide();
+    slide.canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
+    if (Math.abs(offset.x) < 0.5 && Math.abs(offset.y) < 0.5) {
+      delete slide.canvas[path];
+    } else {
+      slide.canvas[path] = {
+        x: Math.round(offset.x),
+        y: Math.round(offset.y)
+      };
+    }
+    if (!Object.keys(slide.canvas).length) delete slide.canvas;
+  }
+
+  function setCanvasOffsetStyle(node, offset) {
+    var x = Number(offset && offset.x) || 0;
+    var y = Number(offset && offset.y) || 0;
+    node.dataset.canvasX = String(x);
+    node.dataset.canvasY = String(y);
+    if (!x && !y) {
+      node.style.transform = "";
+      node.style.position = "";
+      node.style.zIndex = "";
+      return;
+    }
+    node.style.position = "relative";
+    node.style.zIndex = "5";
+    node.style.transform = "translate(" + x + "px, " + y + "px)";
+  }
+
+  function parseCanvasOffsetStyle(node) {
+    return {
+      x: Number(node.dataset.canvasX) || 0,
+      y: Number(node.dataset.canvasY) || 0
+    };
+  }
+
+  function sameOffset(left, right) {
+    return Math.round(left.x) === Math.round(right.x) && Math.round(left.y) === Math.round(right.y);
+  }
+
+  function handleCanvasDblClick(event) {
+    if (presenting) return;
+    var target = event.target.closest("[data-canvas-edit]");
+    if (!target || !els.stageFrame.contains(target)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    startCanvasEdit(target);
+  }
+
+  function startCanvasEdit(node) {
+    if (activeCanvasEdit) finishCanvasEdit(true);
+    var options = parseCanvasOptions(node);
+    activeCanvasEdit = {
+      node: node,
+      path: node.getAttribute("data-canvas-edit"),
+      options: options,
+      before: JSON.stringify(deck),
+      originalText: node.innerText
+    };
+    node.classList.add("is-canvas-editing");
+    node.contentEditable = "true";
+    node.spellcheck = false;
+    node.addEventListener("keydown", handleCanvasEditKeydown);
+    node.addEventListener("blur", handleCanvasEditBlur);
+    node.focus();
+    selectEditableContents(node);
+  }
+
+  function parseCanvasOptions(node) {
+    try {
+      return JSON.parse(node.dataset.canvasOptions || "{}");
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function selectEditableContents(node) {
+    var selection = window.getSelection();
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  function handleCanvasEditKeydown(event) {
+    if (!activeCanvasEdit) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      finishCanvasEdit(false);
+      return;
+    }
+    if (event.key === "Enter" && (activeCanvasEdit.options.singleLine || event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      finishCanvasEdit(true);
+    }
+  }
+
+  function handleCanvasEditBlur() {
+    if (activeCanvasEdit) finishCanvasEdit(true);
+  }
+
+  function finishCanvasEdit(shouldCommit) {
+    if (!activeCanvasEdit) return;
+    var edit = activeCanvasEdit;
+    activeCanvasEdit = null;
+    edit.node.removeEventListener("keydown", handleCanvasEditKeydown);
+    edit.node.removeEventListener("blur", handleCanvasEditBlur);
+    edit.node.contentEditable = "false";
+    edit.node.classList.remove("is-canvas-editing");
+
+    if (!shouldCommit) {
+      edit.node.innerText = edit.originalText;
+      return;
+    }
+
+    var value = canvasTextValue(edit.node, edit.options);
+    if (edit.options.numberValue) {
+      value = numberFromText(value);
+    }
+
+    var beforeValue = getPath(currentSlide(), edit.path);
+    if (String(beforeValue == null ? "" : beforeValue) === String(value == null ? "" : value)) return;
+
+    history.push(edit.before);
+    if (history.length > 80) history.shift();
+    future = [];
+    setPath(currentSlide(), edit.path, value);
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+  }
+
+  function canvasTextValue(node, options) {
+    var text = node.innerText == null ? node.textContent : node.innerText;
+    text = String(text || "").replace(/\u00a0/g, " ");
+    if (options.singleLine) return text.replace(/\s+/g, " ").trim();
+    if (options.preserveWhitespace) return text.replace(/\n$/, "");
+    return text.replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  function numberFromText(text) {
+    var number = Number(String(text || "").replace(/[^0-9.+-]/g, ""));
+    return isFinite(number) ? number : 0;
+  }
+
+  function pathParts(path) {
+    return String(path || "").split(".").filter(Boolean).map(function (part) {
+      return /^\d+$/.test(part) ? Number(part) : part;
+    });
+  }
+
+  function getPath(root, path) {
+    return pathParts(path).reduce(function (value, part) {
+      return value == null ? undefined : value[part];
+    }, root);
+  }
+
+  function setPath(root, path, value) {
+    var parts = pathParts(path);
+    var target = root;
+    for (var index = 0; index < parts.length - 1; index += 1) {
+      var part = parts[index];
+      var nextPart = parts[index + 1];
+      if (target[part] == null || typeof target[part] !== "object") {
+        target[part] = typeof nextPart === "number" ? [] : {};
+      }
+      target = target[part];
+    }
+    target[parts[parts.length - 1]] = value;
+  }
+
+  function handleCanvasDragEnter(event) {
+    if (hasImageFile(event.dataTransfer)) els.stageViewport.classList.add("is-drop-target");
+  }
+
+  function handleCanvasDragOver(event) {
+    if (!hasImageFile(event.dataTransfer)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "copy";
+    els.stageViewport.classList.add("is-drop-target");
+  }
+
+  function handleCanvasDragLeave(event) {
+    if (!els.stageViewport.contains(event.relatedTarget)) {
+      els.stageViewport.classList.remove("is-drop-target");
+    }
+  }
+
+  function handleCanvasDrop(event) {
+    if (!hasImageFile(event.dataTransfer)) return;
+    event.preventDefault();
+    els.stageViewport.classList.remove("is-drop-target");
+    var file = Array.prototype.find.call(event.dataTransfer.files || [], function (item) {
+      return item.type && item.type.indexOf("image/") === 0;
+    });
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      commit(function () {
+        var slide = currentSlide();
+        if (["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"].indexOf(slide.layout) === -1) {
+          slide.layout = "imageRight";
+        }
+        slide.image.src = reader.result;
+        if (!slide.image.alt) slide.image.alt = file.name.replace(/\.[^.]+$/, "");
+      });
+      toast("图片已拖入当前页面");
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function hasImageFile(dataTransfer) {
+    if (!dataTransfer || !dataTransfer.types) return false;
+    if (Array.prototype.some.call(dataTransfer.items || [], function (item) {
+      return item.kind === "file" && item.type.indexOf("image/") === 0;
+    })) return true;
+    return Array.prototype.some.call(dataTransfer.files || [], function (file) {
+      return file.type && file.type.indexOf("image/") === 0;
+    });
+  }
+
+  function moveSlideByDrag(fromIndex, toIndex) {
+    if (!isFinite(fromIndex) || fromIndex === toIndex) return;
+    if (fromIndex < 0 || fromIndex >= deck.slides.length || toIndex < 0 || toIndex >= deck.slides.length) return;
+    commit(function () {
+      var moved = deck.slides.splice(fromIndex, 1)[0];
+      deck.slides.splice(toIndex, 0, moved);
+      if (currentIndex === fromIndex) {
+        currentIndex = toIndex;
+      } else if (fromIndex < currentIndex && toIndex >= currentIndex) {
+        currentIndex -= 1;
+      } else if (fromIndex > currentIndex && toIndex <= currentIndex) {
+        currentIndex += 1;
+      }
+    });
   }
 
   function syncInspector() {

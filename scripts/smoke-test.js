@@ -83,6 +83,25 @@ assert.match(chartHtml, /ppt-layout-chart/);
 assert.match(chartHtml, /ppt-chart/);
 assert.match(chartHtml, /Quarterly growth/);
 
+const canvasDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Canvas deck",
+  slides: [
+    {
+      layout: "hero",
+      title: "Moved title",
+      canvas: {
+        title: { x: 24, y: 36 }
+      }
+    }
+  ]
+});
+assert.equal(canvasDeck.slides[0].canvas.title.x, 24);
+const canvasHtml = ppt.exportStandalone(canvasDeck);
+assert.match(canvasHtml, /"canvas"/);
+assert.match(canvasHtml, /data-ppt-path/);
+assert.match(canvasHtml, /24/);
+
 const html = ppt.exportStandalone(ppt.createTemplateDeck("product-pitch"));
 assert.match(html, /id="ppt-html-data"/);
 assert.match(html, /data-format="ppt\.html"/);

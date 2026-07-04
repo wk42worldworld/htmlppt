@@ -469,6 +469,82 @@
     return wrap;
   }
 
+  function tagPath(node, path) {
+    if (node) node.setAttribute("data-ppt-path", path);
+  }
+
+  function tagCanvasPaths(article, slide) {
+    tagPath(article.querySelector(".ppt-kicker"), "kicker");
+    tagPath(article.querySelector(".ppt-title"), "title");
+    tagPath(article.querySelector(".ppt-subtitle"), "subtitle");
+    tagPath(article.querySelector(".ppt-body"), "body");
+    tagPath(article.querySelector(".ppt-caption"), "image.caption");
+
+    if (slide.layout === "quote") {
+      tagPath(article.querySelector(".ppt-quote"), "quote");
+      tagPath(article.querySelector(".ppt-author"), "author");
+    }
+
+    article.querySelectorAll(".ppt-list li").forEach(function (node, index) {
+      tagPath(node, "items." + index + ".text");
+    });
+    ["left", "right"].forEach(function (side, index) {
+      var card = article.querySelectorAll(".ppt-compare-card")[index];
+      if (!card) return;
+      tagPath(card.querySelector("h2"), side + ".title");
+      tagPath(card.querySelector("p"), side + ".text");
+    });
+    article.querySelectorAll(".ppt-card").forEach(function (card, index) {
+      tagPath(card.querySelector("h2"), "cards." + index + ".title");
+      tagPath(card.querySelector("p"), "cards." + index + ".text");
+    });
+    article.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+      tagPath(item.querySelector("h2"), "items." + index + ".title");
+      tagPath(item.querySelector("p"), "items." + index + ".text");
+    });
+    article.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+      tagPath(metric.querySelector("strong"), "metrics." + index + ".value");
+      tagPath(metric.querySelector("span"), "metrics." + index + ".label");
+      tagPath(metric.querySelector("p"), "metrics." + index + ".detail");
+    });
+    article.querySelectorAll(".ppt-table th").forEach(function (cell, index) {
+      tagPath(cell, "table.columns." + index);
+    });
+    article.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+      row.querySelectorAll("td").forEach(function (cell, cellIndex) {
+        tagPath(cell, "table.rows." + rowIndex + "." + cellIndex);
+      });
+    });
+    article.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (node, index) {
+      tagPath(node, slide.chart.kind === "donut" ? "chart.labels." + index : "chart.series." + index + ".name");
+    });
+    if (slide.chart.kind === "donut") {
+      article.querySelectorAll(".ppt-chart-legend-item small").forEach(function (node, index) {
+        tagPath(node, "chart.series.0.values." + index);
+      });
+    }
+    tagPath(article.querySelector(".ppt-code"), "code");
+  }
+
+  function applyCanvasOffsets(article, slide) {
+    var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
+    tagCanvasPaths(article, slide);
+    article.querySelectorAll("[data-ppt-path]").forEach(function (node) {
+      var offset = canvas[node.getAttribute("data-ppt-path")] || {};
+      var x = Number(offset.x) || 0;
+      var y = Number(offset.y) || 0;
+      if (!x && !y) return;
+      node.style.position = "relative";
+      node.style.zIndex = "5";
+      node.style.transform = "translate(" + x + "px, " + y + "px)";
+    });
+  }
+
+  function finalizeSlide(article, slide) {
+    applyCanvasOffsets(article, slide);
+    return article;
+  }
+
   function createDemoDeck() {
     return createTemplateDeck("ai-camera");
   }
@@ -716,6 +792,7 @@
     slide.author = safeText(slide.author);
     slide.code = safeText(slide.code);
     slide.notes = safeText(slide.notes);
+    slide.canvas = slide.canvas && typeof slide.canvas === "object" && !Array.isArray(slide.canvas) ? slide.canvas : {};
     return slide;
   }
 
@@ -950,13 +1027,13 @@
         heroImage.classList.add("ppt-hero-image");
         article.appendChild(heroImage);
       }
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "section") {
       article.appendChild(el("div", "ppt-section-number", String(index + 1).padStart(2, "0")));
       article.appendChild(createContentStack(slide, false));
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "imageRight" || slide.layout === "imageLeft") {
@@ -969,7 +1046,7 @@
         article.appendChild(content);
         article.appendChild(media);
       }
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "imageFull") {
@@ -982,7 +1059,7 @@
         appendText(imageOverlay, "p", "ppt-subtitle", slide.subtitle);
         article.appendChild(imageOverlay);
       }
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "imageBackground") {
@@ -990,7 +1067,7 @@
       backgroundMedia.classList.add("ppt-background-media");
       article.appendChild(backgroundMedia);
       article.appendChild(createContentStack(slide, true));
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "compare") {
@@ -1003,7 +1080,7 @@
         grid.appendChild(card);
       });
       article.appendChild(grid);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "threeCards") {
@@ -1016,14 +1093,14 @@
         cardGrid.appendChild(card);
       });
       article.appendChild(cardGrid);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "quote") {
       article.appendChild(el("div", "ppt-quote-mark", "“"));
       appendText(article, "p", "ppt-quote", slide.quote || slide.title);
       appendText(article, "p", "ppt-author", slide.author || slide.subtitle);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "timeline") {
@@ -1036,7 +1113,7 @@
         timeline.appendChild(row);
       });
       article.appendChild(timeline);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "data") {
@@ -1050,13 +1127,13 @@
         metrics.appendChild(box);
       });
       article.appendChild(metrics);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "chart") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(createChart(slide.chart));
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "table") {
@@ -1079,24 +1156,24 @@
       });
       table.appendChild(tbody);
       article.appendChild(table);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "code") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(el("pre", "ppt-code", slide.code || "const deck = await createPptHtml();"));
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     if (slide.layout === "ending") {
       article.appendChild(el("div", "ppt-ending-line"));
       appendText(article, "h1", "ppt-title", slide.title);
       appendText(article, "p", "ppt-subtitle", slide.subtitle);
-      return article;
+      return finalizeSlide(article, slide);
     }
 
     article.appendChild(createContentStack(slide, true));
-    return article;
+    return finalizeSlide(article, slide);
   }
 
   function parseFileText(text) {
@@ -1147,12 +1224,13 @@
       "function li(l,j,t,v,u){var it=e('div','ppt-chart-legend-item'),sw=e('span','ppt-chart-swatch '+cc(j)),b=e('div','');it.appendChild(sw);a(b,'strong','',t);if(v!=null)a(b,'small','',v+(u?' '+u:''));it.appendChild(b);l.appendChild(it)}" +
       "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
       "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
+      "function tp(n,p){if(n)n.setAttribute('data-ppt-path',p)}function off(n,s){tp(n.querySelector('.ppt-kicker'),'kicker');tp(n.querySelector('.ppt-title'),'title');tp(n.querySelector('.ppt-subtitle'),'subtitle');tp(n.querySelector('.ppt-body'),'body');tp(n.querySelector('.ppt-caption'),'image.caption');if(s.layout==='quote'){tp(n.querySelector('.ppt-quote'),'quote');tp(n.querySelector('.ppt-author'),'author')}n.querySelectorAll('.ppt-list li').forEach(function(x,j){tp(x,'items.'+j+'.text')});['left','right'].forEach(function(side,j){var c=n.querySelectorAll('.ppt-compare-card')[j];if(c){tp(c.querySelector('h2'),side+'.title');tp(c.querySelector('p'),side+'.text')}});n.querySelectorAll('.ppt-card').forEach(function(c,j){tp(c.querySelector('h2'),'cards.'+j+'.title');tp(c.querySelector('p'),'cards.'+j+'.text')});n.querySelectorAll('.ppt-time-item').forEach(function(c,j){tp(c.querySelector('h2'),'items.'+j+'.title');tp(c.querySelector('p'),'items.'+j+'.text')});n.querySelectorAll('.ppt-metric').forEach(function(c,j){tp(c.querySelector('strong'),'metrics.'+j+'.value');tp(c.querySelector('span'),'metrics.'+j+'.label');tp(c.querySelector('p'),'metrics.'+j+'.detail')});n.querySelectorAll('.ppt-table th').forEach(function(c,j){tp(c,'table.columns.'+j)});n.querySelectorAll('.ppt-table tbody tr').forEach(function(r,ri){r.querySelectorAll('td').forEach(function(c,ci){tp(c,'table.rows.'+ri+'.'+ci)})});n.querySelectorAll('.ppt-chart-legend-item strong').forEach(function(x,j){tp(x,s.chart&&s.chart.kind==='donut'?'chart.labels.'+j:'chart.series.'+j+'.name')});if(s.chart&&s.chart.kind==='donut')n.querySelectorAll('.ppt-chart-legend-item small').forEach(function(x,j){tp(x,'chart.series.0.values.'+j)});tp(n.querySelector('.ppt-code'),'code');var cv=s.canvas&&typeof s.canvas==='object'?s.canvas:{};n.querySelectorAll('[data-ppt-path]').forEach(function(x){var o=cv[x.getAttribute('data-ppt-path')]||{},dx=num(o.x),dy=num(o.y);if(!dx&&!dy)return;x.style.position='relative';x.style.zIndex='5';x.style.transform='translate('+dx+'px, '+dy+'px)'})}" +
       "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
       "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
       "function fit(){var sc=Math.min(window.innerWidth/w,window.innerHeight/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
       "function bg(){var sl=stage.querySelector('.ppt-slide');if(sl)root.style.background=getComputedStyle(sl).backgroundColor||''}" +
       "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}" +
-      "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';stage.appendChild(slide(arr(d.slides)[i]||{}));count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
+      "function show(n){i=Math.max(0,Math.min(arr(d.slides).length-1,n));stage.innerHTML='';var sd=arr(d.slides)[i]||{},sn=slide(sd);off(sn,sd);stage.appendChild(sn);count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
       "function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}" +
       "function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}" +
       "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;" +

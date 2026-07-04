@@ -27,6 +27,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 - 每页必须包含 `layout` 和 `title`。
 - 使用 `schema/ppt-html-v0.1.schema.json` 作为数据结构参考。
 - 不要生成 CSS、脚本、绝对定位文本框或 PPTX XML。
+- 可以保留人类编辑产生的 `canvas` 位置偏移；除非用户明确要求微调位置，不要主动生成大量 `canvas` 坐标。
 
 推荐输出方式：
 
@@ -215,6 +216,17 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
   ]
 }
 ```
+
+画布偏移：
+
+```json
+"canvas": {
+  "title": { "x": 24, "y": 36 },
+  "cards.0.title": { "x": -12, "y": 8 }
+}
+```
+
+`canvas` 用于保存人类在画布上拖动元素后的轻量位置微调。键名对应结构化字段路径，例如 `title`、`subtitle`、`cards.0.title`、`table.rows.1.2`。AI 修正文案时应尽量保留已有 `canvas`；只有用户要求“重置布局”或“恢复模板位置”时才删除它。
 
 ## 6. 推荐生成流程
 

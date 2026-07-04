@@ -27,6 +27,7 @@ Requirements:
 - Every slide must include `layout` and `title`.
 - Use `schema/ppt-html-v0.1.schema.json` as the structure reference.
 - Do not generate CSS, scripts, absolute-positioned text boxes, or PPTX XML.
+- Preserve human-created `canvas` position offsets when they already exist. Do not generate many `canvas` coordinates unless the user explicitly asks for position tweaking.
 
 Recommended output:
 
@@ -215,6 +216,17 @@ Table:
   ]
 }
 ```
+
+Canvas offsets:
+
+```json
+"canvas": {
+  "title": { "x": 24, "y": 36 },
+  "cards.0.title": { "x": -12, "y": 8 }
+}
+```
+
+`canvas` stores light position tweaks created when a human drags an element on the canvas. Keys are structured field paths such as `title`, `subtitle`, `cards.0.title`, or `table.rows.1.2`. When repairing copy, preserve existing `canvas` values. Remove them only when the user asks to reset the layout or restore template positions.
 
 ## 6. Recommended Generation Workflow
 

@@ -2,6 +2,10 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+## New in v0.2.3
+
+PPT.html Studio now has a first canvas-style editing layer. Double-click rendered text, cards, metrics, table cells, chart legends, and code blocks to edit them in place; drag editable slide elements for light visual adjustments that are saved as structured `canvas` offsets; drag images onto the stage; and drag slide thumbnails to reorder pages.
+
 ## New in v0.2.2
 
 PPT.html Studio now uses true full-window presentation scaling. The editor and exported `.ppt.html` player no longer reserve hidden margins for controls or cap presentation zoom, so 16:9 displays fill cleanly without the old black border.
@@ -75,7 +79,7 @@ npm start
 
 1. Open PPT.html Studio.
 2. Click `Templates` and choose Product Pitch, Lesson, Project Update, or the demo deck.
-3. Edit the title, subtitle, metrics, charts, table rows, or slide order in the visual editor.
+3. Edit the title, subtitle, metrics, charts, table rows, or slide order in the visual editor. You can also double-click text directly on the canvas and drag editable elements for light positioning tweaks.
 4. Click `AI JSON` to paste a deck from an AI model. Fenced `json` code blocks are accepted.
 5. Click `Check` and copy the validation report back to AI if anything needs repair.
 6. Click `Present` to preview the deck.
@@ -109,6 +113,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Start from built-in templates for product pitches, lessons, project updates, or the demo deck.
 - Open, save, and save as `.ppt.html` files in the desktop app.
 - Import local images into image slides as embedded data URIs.
+- Double-click canvas text to edit in place, drag editable slide elements for structured position offsets, and drag thumbnails to reorder pages.
 - Create bar, line, and donut charts from structured labels and series.
 - Run `Check` to get a human-readable and AI-readable validation report.
 

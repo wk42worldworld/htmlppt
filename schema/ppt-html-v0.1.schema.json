@@ -142,6 +142,24 @@
         }
       }
     },
+    "canvasOffset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        }
+      }
+    },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/canvasOffset"
+      }
+    },
     "slide": {
       "type": "object",
       "required": ["layout", "title"],
@@ -234,6 +252,9 @@
         },
         "notes": {
           "type": "string"
+        },
+        "canvas": {
+          "$ref": "#/$defs/canvas"
         }
       }
     }
