@@ -2,9 +2,28 @@
 
 const fs = require("node:fs/promises");
 const path = require("node:path");
-const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require("electron");
+const { app, BrowserWindow, Menu, dialog, ipcMain, nativeImage, shell } = require("electron");
 
 const isMac = process.platform === "darwin";
+const appName = "PPT.html Studio";
+
+function appIconPath() {
+  const iconFile = process.platform === "win32" ? "icon.ico" : "icon.png";
+  return path.join(__dirname, "..", "build", iconFile);
+}
+
+function configureAppIdentity() {
+  app.setName(appName);
+
+  if (process.platform === "win32") {
+    app.setAppUserModelId("world.wk42.htmlppt");
+  }
+
+  if (isMac && app.dock) {
+    const dockIcon = nativeImage.createFromPath(appIconPath());
+    if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
+  }
+}
 
 function createWindow() {
   const window = new BrowserWindow({
@@ -13,7 +32,8 @@ function createWindow() {
     minWidth: 960,
     minHeight: 680,
     backgroundColor: "#e9ecef",
-    title: "PPT.html Studio",
+    title: appName,
+    icon: appIconPath(),
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -202,6 +222,7 @@ function buildMenu() {
 }
 
 app.whenReady().then(() => {
+  configureAppIdentity();
   registerIpcHandlers();
   buildMenu();
   createWindow();
