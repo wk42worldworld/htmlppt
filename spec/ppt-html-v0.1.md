@@ -111,3 +111,13 @@ AI 应优先输出 deck JSON，而不是自由 HTML。最小可用格式：
 
 编辑器会把 deck JSON 导出为可播放的 `.ppt.html` 单文件。
 
+## 编辑器工作流
+
+PPT.html Studio v0.2 在不改变 v0.1 数据结构的前提下增加了产品工作流：
+
+- 模板：从产品发布、课程课件、项目汇报或 demo deck 生成初稿。
+- 文件：桌面端可以打开、保存、另存为 `.ppt.html`。
+- 图片：本地图片可以转成 `data:image/...` 写入 `image.src`。
+- 检查：编辑器会输出 PPT.html Validation Report，供人类阅读或交给 AI 修复。
+
+检查报告不是文件格式的一部分；它是编辑器围绕 v0.1 JSON 生成的诊断文本。

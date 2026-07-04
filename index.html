@@ -14,18 +14,22 @@
         <span class="brand-mark">P</span>
         <div>
           <strong>PPT.html Studio</strong>
-          <small>v0.1</small>
+          <small id="fileStatus">v0.2 · 草稿</small>
         </div>
       </div>
 
       <nav class="top-actions" aria-label="文件操作">
         <button type="button" id="newDeckBtn">新建</button>
+        <button type="button" id="templatesBtn">模板</button>
         <button type="button" id="openDeckBtn">打开</button>
-        <button type="button" id="downloadDeckBtn" class="primary">下载 PPT.html</button>
+        <button type="button" id="downloadDeckBtn" class="primary">保存 / 下载</button>
+        <button type="button" id="saveAsDeckBtn" hidden>另存为</button>
         <button type="button" id="jsonBtn">AI JSON</button>
+        <button type="button" id="validateBtn">检查</button>
         <button type="button" id="presentBtn">演示</button>
       </nav>
       <input id="fileInput" type="file" accept=".html,.json,application/json,text/html" hidden>
+      <input id="imageFileInput" type="file" accept="image/*" hidden>
     </header>
 
     <main class="main-layout">
@@ -103,6 +107,9 @@
 
         <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft">
           <h2>图片</h2>
+          <div class="inline-tools">
+            <button type="button" id="imageFileBtn">选择本地图片</button>
+          </div>
           <label>
             图片 URL 或 Data URI
             <input id="imageSrcInput" type="text">
@@ -220,6 +227,52 @@
       <footer>
         <button type="button" id="copyJsonBtn">复制当前 JSON</button>
         <button type="button" id="loadJsonBtn" class="primary">从文本载入</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="template-dialog" id="templateDialog">
+    <form method="dialog">
+      <header>
+        <strong>选择模板</strong>
+        <button type="submit">关闭</button>
+      </header>
+      <div class="template-grid">
+        <button type="button" class="template-card" data-template="ai-camera">
+          <strong>AI 导演相机</strong>
+          <span>产品发布 demo，适合展示一个新想法。</span>
+        </button>
+        <button type="button" class="template-card" data-template="product-pitch">
+          <strong>产品发布</strong>
+          <span>问题、方案、价值和下一步。</span>
+        </button>
+        <button type="button" class="template-card" data-template="lesson">
+          <strong>课程课件</strong>
+          <span>学习目标、概念、练习和课后任务。</span>
+        </button>
+        <button type="button" class="template-card" data-template="project-update">
+          <strong>项目汇报</strong>
+          <span>状态、风险、决策和里程碑。</span>
+        </button>
+      </div>
+      <footer>
+        <button type="submit">取消</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="validation-dialog" id="validationDialog">
+    <form method="dialog">
+      <header>
+        <strong>质量检查</strong>
+        <button type="submit">关闭</button>
+      </header>
+      <div class="validation-body">
+        <p id="validationSummary"></p>
+        <textarea id="validationReport" readonly spellcheck="false"></textarea>
+      </div>
+      <footer>
+        <button type="button" id="copyValidationBtn">复制报告</button>
       </footer>
     </form>
   </dialog>

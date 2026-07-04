@@ -54,6 +54,10 @@ button:disabled {
   opacity: .45;
 }
 
+button[hidden] {
+  display: none;
+}
+
 button.primary {
   border-color: var(--ui-accent);
   color: #fff;
@@ -328,6 +332,12 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(15, 139, 141, .14);
 }
 
+.inline-tools {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
 .presenter {
   position: fixed;
   inset: 0;
@@ -371,7 +381,9 @@ textarea:focus {
   font-size: 14px;
 }
 
-.json-dialog {
+.json-dialog,
+.template-dialog,
+.validation-dialog {
   width: min(860px, calc(100vw - 32px));
   height: min(700px, calc(100vh - 32px));
   padding: 0;
@@ -381,18 +393,32 @@ textarea:focus {
   box-shadow: var(--ui-shadow);
 }
 
-.json-dialog::backdrop {
+.template-dialog {
+  width: min(760px, calc(100vw - 32px));
+  height: auto;
+  max-height: min(640px, calc(100vh - 32px));
+}
+
+.json-dialog::backdrop,
+.template-dialog::backdrop,
+.validation-dialog::backdrop {
   background: rgba(16, 20, 24, .48);
 }
 
-.json-dialog form {
+.json-dialog form,
+.template-dialog form,
+.validation-dialog form {
   display: grid;
   grid-template-rows: 54px minmax(0, 1fr) 58px;
   height: 100%;
 }
 
 .json-dialog header,
-.json-dialog footer {
+.json-dialog footer,
+.template-dialog header,
+.template-dialog footer,
+.validation-dialog header,
+.validation-dialog footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -401,7 +427,9 @@ textarea:focus {
   border-bottom: 1px solid var(--ui-line);
 }
 
-.json-dialog footer {
+.json-dialog footer,
+.template-dialog footer,
+.validation-dialog footer {
   justify-content: flex-end;
   border-top: 1px solid var(--ui-line);
   border-bottom: 0;
@@ -412,6 +440,57 @@ textarea:focus {
   min-height: 0;
   border: 0;
   border-radius: 0;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 13px;
+}
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+  overflow: auto;
+}
+
+.template-card {
+  display: grid;
+  gap: 8px;
+  height: auto;
+  min-height: 128px;
+  padding: 16px;
+  text-align: left;
+  background: #fff;
+}
+
+.template-card strong {
+  color: var(--ui-strong);
+  font-size: 17px;
+}
+
+.template-card span {
+  color: var(--ui-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.validation-body {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+  padding: 14px;
+}
+
+.validation-body p {
+  margin: 0;
+  color: var(--ui-strong);
+  font-weight: 780;
+}
+
+.validation-body textarea {
+  height: 100%;
+  min-height: 0;
+  resize: none;
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 13px;
 }
@@ -475,6 +554,10 @@ textarea:focus {
 
   .top-actions {
     justify-content: flex-start;
+  }
+
+  .template-grid {
+    grid-template-columns: 1fr;
   }
 
   .main-layout {

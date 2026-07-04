@@ -11,8 +11,11 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 ## Core Features
 
 - Single-file `.ppt.html` playback and sharing
+- Open, save, and save as `.ppt.html` files in the desktop app
+- Starter templates for product pitches, lessons, and project updates
 - Visual editing for titles, text, images, comparisons, cards, data, tables, and code
 - AI JSON import
+- Validation reports that humans can read and AI can repair from
 - 12 starter layouts and 4 themes
 - GitHub Actions builds for Linux, macOS arm64, macOS x64, and Windows
 
@@ -24,4 +27,3 @@ npm run serve
 ```
 
 Open `http://localhost:5173`.
-

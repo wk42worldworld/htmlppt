@@ -37,6 +37,7 @@
 3. 填写标题、短正文、列表或数据。
 4. 输出完整 JSON，不要加 Markdown 代码块以外的解释。
 5. 用户把 JSON 粘贴到 `AI JSON` 面板导入。
+6. 用户点击 `检查` 后，如果返回检查报告，先修复 `ERROR`，再处理 `WARNING` 和 `TIP`。
 
 ## 常用 layout
 
@@ -71,3 +72,11 @@
 }
 ```
 
+## 检查报告修复规则
+
+当用户粘贴 PPT.html Validation Report 时：
+
+- 保持 `version` 为 `"0.1"`。
+- 不要改成自由 HTML。
+- 按报告里的路径修复，例如 `slides[2].layout` 或 `slides[4].metrics`。
+- 修复后输出完整 deck JSON。

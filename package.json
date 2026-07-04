@@ -1,6 +1,6 @@
 {
   "name": "htmlppt",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "PPT.html Studio: an AI-friendly, human-editable presentation format and editor.",
   "main": "electron/main.js",
   "homepage": "https://github.com/wk42worldworld/htmlppt#readme",
@@ -17,9 +17,10 @@
   "scripts": {
     "start": "electron .",
     "serve": "python3 -m http.server 5173",
-    "check": "node --check app.js && node --check renderer.js && node --check electron/main.js && node --check scripts/build-sample.js",
+    "check": "node --check app.js && node --check renderer.js && node --check electron/main.js && node --check electron/preload.js && node --check scripts/build-sample.js",
     "build:sample": "node scripts/build-sample.js",
-    "test": "npm run check && npm run build:sample",
+    "test": "npm run check && npm run smoke && npm run build:sample",
+    "smoke": "node scripts/smoke-test.js",
     "dist": "electron-builder"
   },
   "devDependencies": {

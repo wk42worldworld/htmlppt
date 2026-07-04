@@ -2,8 +2,12 @@
   "use strict";
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
+  var APP_VERSION_LABEL = "v0.2";
+  var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var currentIndex = 0;
+  var currentFilePath = "";
+  var dirty = false;
   var history = [];
   var future = [];
   var syncing = false;
@@ -21,6 +25,7 @@
     cacheElements();
     populateLayoutSelect();
     bindEvents();
+    configureRuntime();
     renderAll();
     window.addEventListener("resize", function () {
       fitFrame(els.stageFrame, els.stageViewport);
@@ -30,17 +35,36 @@
 
   function cacheElements() {
     [
-      "newDeckBtn", "openDeckBtn", "downloadDeckBtn", "jsonBtn", "presentBtn", "fileInput",
+      "newDeckBtn", "templatesBtn", "openDeckBtn", "downloadDeckBtn", "saveAsDeckBtn", "jsonBtn", "validateBtn", "presentBtn",
+      "fileInput", "imageFileInput", "fileStatus",
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "slideLayoutInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
-      "imageSrcInput", "imageAltInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
+      "imageFileBtn", "imageSrcInput", "imageAltInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "cardsInput", "metricsInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
-      "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn", "toast"
+      "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
+      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
+  }
+
+  function configureRuntime() {
+    if (desktop && desktop.isDesktop) {
+      els.downloadDeckBtn.textContent = "保存";
+      els.saveAsDeckBtn.hidden = false;
+      desktop.onMenuCommand(function (command) {
+        if (command === "new") createNewDeck();
+        if (command === "templates") els.templateDialog.showModal();
+        if (command === "open") openDeck();
+        if (command === "save") saveDeck(false);
+        if (command === "saveAs") saveDeck(true);
+        if (command === "validate") showValidationDialog();
+        if (command === "present") openPresenter(currentIndex);
+      });
+    }
+    updateFileStatus();
   }
 
   function populateLayoutSelect() {
@@ -54,16 +78,15 @@
 
   function bindEvents() {
     els.newDeckBtn.addEventListener("click", function () {
-      if (!confirm("新建会替换当前草稿。继续吗？")) return;
-      commit(function () {
-        deck = PPTHtml.createDemoDeck();
-        currentIndex = 0;
-      });
-      toast("已新建演示文稿");
+      createNewDeck();
+    });
+
+    els.templatesBtn.addEventListener("click", function () {
+      els.templateDialog.showModal();
     });
 
     els.openDeckBtn.addEventListener("click", function () {
-      els.fileInput.click();
+      openDeck();
     });
 
     els.fileInput.addEventListener("change", function (event) {
@@ -72,12 +95,7 @@
       var reader = new FileReader();
       reader.onload = function () {
         try {
-          var nextDeck = PPTHtml.parseFileText(reader.result);
-          commit(function () {
-            deck = nextDeck;
-            currentIndex = 0;
-          });
-          toast("已打开 " + file.name);
+          loadDeckText(reader.result, file.name, "");
         } catch (error) {
           alert("打开失败：" + error.message);
         }
@@ -87,9 +105,11 @@
     });
 
     els.downloadDeckBtn.addEventListener("click", function () {
-      var html = PPTHtml.exportStandalone(deck);
-      PPTHtml.download(filenameFromTitle(deck.title), html);
-      toast("已生成单文件 PPT.html");
+      saveDeck(false);
+    });
+
+    els.saveAsDeckBtn.addEventListener("click", function () {
+      saveDeck(true);
     });
 
     els.jsonBtn.addEventListener("click", function () {
@@ -116,11 +136,31 @@
           deck = parsed;
           currentIndex = 0;
         });
+        currentFilePath = "";
+        markDirty();
         els.jsonDialog.close();
-        toast("JSON 已载入");
+        toastWithValidation("JSON 已载入");
       } catch (error) {
         alert("载入失败：" + error.message);
       }
+    });
+
+    els.validateBtn.addEventListener("click", showValidationDialog);
+
+    els.copyValidationBtn.addEventListener("click", function () {
+      navigator.clipboard.writeText(els.validationReport.value).then(function () {
+        toast("检查报告已复制");
+      }).catch(function () {
+        els.validationReport.select();
+        document.execCommand("copy");
+        toast("检查报告已复制");
+      });
+    });
+
+    els.templateDialog.querySelectorAll("[data-template]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        createFromTemplate(button.getAttribute("data-template"));
+      });
     });
 
     els.addSlideBtn.addEventListener("click", function () {
@@ -203,12 +243,47 @@
     bindSlideInput(els.codeInput, function (slide, value) { slide.code = value; });
     bindSlideInput(els.notesInput, function (slide, value) { slide.notes = value; });
 
+    els.imageFileBtn.addEventListener("click", function () {
+      els.imageFileInput.click();
+    });
+
+    els.imageFileInput.addEventListener("change", function (event) {
+      var file = event.target.files && event.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        commit(function () {
+          var slide = currentSlide();
+          slide.image.src = reader.result;
+          if (!slide.image.alt) slide.image.alt = file.name.replace(/\.[^.]+$/, "");
+        });
+        toast("图片已加入当前页面");
+      };
+      reader.readAsDataURL(file);
+      event.target.value = "";
+    });
+
     els.presentBtn.addEventListener("click", function () { openPresenter(currentIndex); });
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
     els.presentExitBtn.addEventListener("click", closePresenter);
 
     document.addEventListener("keydown", function (event) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        saveDeck(event.shiftKey);
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "o") {
+        event.preventDefault();
+        openDeck();
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "n") {
+        event.preventDefault();
+        createNewDeck();
+        return;
+      }
       if (event.target && /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
@@ -237,6 +312,7 @@
       deck = PPTHtml.normalizeDeck(deck);
       activeEditSnapshot = "";
       activeEditPushed = false;
+      if (before !== JSON.stringify(deck)) markDirty();
       renderAll();
       persist();
     });
@@ -244,6 +320,7 @@
       if (syncing || input.tagName === "SELECT") return;
       pushLiveHistory();
       setter(input.value);
+      markDirty();
       renderCanvas();
       renderSlideList();
       updateButtons();
@@ -261,6 +338,7 @@
       deck = PPTHtml.normalizeDeck(deck);
       activeEditSnapshot = "";
       activeEditPushed = false;
+      if (before !== JSON.stringify(deck)) markDirty();
       renderAll();
       persist();
     });
@@ -268,6 +346,7 @@
       if (syncing || input.tagName === "SELECT") return;
       pushLiveHistory();
       setter(currentSlide(), input.value);
+      markDirty();
       renderCanvas();
       renderSlideList();
       updateButtons();
@@ -296,6 +375,7 @@
     mutator();
     deck = PPTHtml.normalizeDeck(deck);
     currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
+    markDirty();
     renderAll();
     persist();
   }
@@ -323,6 +403,7 @@
     renderCanvas();
     syncInspector();
     updateButtons();
+    updateFileStatus();
   }
 
   function renderSlideList() {
@@ -394,6 +475,111 @@
     els.moveSlideUpBtn.disabled = currentIndex <= 0;
     els.moveSlideDownBtn.disabled = currentIndex >= deck.slides.length - 1;
     els.deleteSlideBtn.disabled = deck.slides.length <= 1;
+  }
+
+  function createNewDeck() {
+    if (!confirmDiscard()) return;
+    replaceDeck(PPTHtml.createDemoDeck(), { filePath: "", dirty: true, keepHistory: false });
+    toast("已新建演示文稿");
+  }
+
+  function createFromTemplate(templateId) {
+    if (!confirmDiscard()) return;
+    replaceDeck(PPTHtml.createTemplateDeck(templateId), { filePath: "", dirty: true, keepHistory: false });
+    els.templateDialog.close();
+    toast("已从模板创建");
+  }
+
+  function openDeck() {
+    if (!confirmDiscard()) return;
+    if (desktop && desktop.isDesktop) {
+      desktop.openDeck().then(function (result) {
+        if (!result || result.canceled) return;
+        loadDeckText(result.content, basename(result.filePath), result.filePath);
+      }).catch(function (error) {
+        alert("打开失败：" + error.message);
+      });
+      return;
+    }
+    els.fileInput.click();
+  }
+
+  function loadDeckText(text, label, filePath) {
+    var nextDeck = PPTHtml.parseFileText(text);
+    replaceDeck(nextDeck, { filePath: filePath || "", dirty: false, keepHistory: false });
+    toastWithValidation("已打开 " + (label || "文稿"));
+  }
+
+  function replaceDeck(nextDeck, options) {
+    var settings = options || {};
+    deck = PPTHtml.normalizeDeck(nextDeck);
+    currentIndex = 0;
+    currentFilePath = settings.filePath || "";
+    dirty = Boolean(settings.dirty);
+    if (!settings.keepHistory) {
+      history = [];
+      future = [];
+    }
+    renderAll();
+    persist();
+  }
+
+  function saveDeck(forceDialog) {
+    var html = PPTHtml.exportStandalone(deck);
+    var name = filenameFromTitle(deck.title);
+    if (desktop && desktop.isDesktop) {
+      var action = forceDialog ? desktop.saveDeckAs : desktop.saveDeck;
+      action({ filePath: currentFilePath, defaultName: name, content: html }).then(function (result) {
+        if (!result || result.canceled) return;
+        currentFilePath = result.filePath || currentFilePath;
+        dirty = false;
+        updateFileStatus();
+        toast("已保存 " + basename(currentFilePath));
+      }).catch(function (error) {
+        alert("保存失败：" + error.message);
+      });
+      return;
+    }
+    PPTHtml.download(name, html);
+    dirty = false;
+    updateFileStatus();
+    toast("已生成单文件 PPT.html");
+  }
+
+  function confirmDiscard() {
+    if (!dirty) return true;
+    return confirm("当前文稿有未保存修改。继续会丢失这些修改。");
+  }
+
+  function markDirty() {
+    dirty = true;
+    updateFileStatus();
+  }
+
+  function updateFileStatus() {
+    if (!els.fileStatus) return;
+    var source = currentFilePath ? basename(currentFilePath) : (desktop && desktop.isDesktop ? "未命名" : "浏览器草稿");
+    els.fileStatus.textContent = APP_VERSION_LABEL + " · " + source + (dirty ? " · 未保存" : "");
+  }
+
+  function showValidationDialog() {
+    var result = PPTHtml.validateDeck(deck);
+    els.validationSummary.textContent = result.ok
+      ? "检查通过：" + deck.slides.length + " 页，可正常分享。"
+      : "需要修复：" + result.errors.length + " 个错误，" + result.warnings.length + " 个警告。";
+    els.validationReport.value = PPTHtml.formatValidationReport(deck, result);
+    els.validationDialog.showModal();
+  }
+
+  function toastWithValidation(prefix) {
+    var result = PPTHtml.validateDeck(deck);
+    if (result.errors.length) {
+      toast(prefix + " · 有 " + result.errors.length + " 个错误");
+    } else if (result.warnings.length) {
+      toast(prefix + " · 有 " + result.warnings.length + " 个建议");
+    } else {
+      toast(prefix + " · 检查通过");
+    }
   }
 
   function updateFieldVisibility() {
@@ -522,6 +708,10 @@
   function filenameFromTitle(title) {
     var safe = String(title || "deck").trim().replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, "-");
     return (safe || "deck") + ".ppt.html";
+  }
+
+  function basename(filePath) {
+    return String(filePath || "").split(/[\\/]/).pop() || "未命名";
   }
 
   function clamp(value, min, max) {

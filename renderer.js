@@ -4,6 +4,7 @@
   var FORMAT_VERSION = "0.1";
   var BASE_WIDTH = 1280;
   var BASE_HEIGHT = 720;
+  var THEMES = ["paper", "launch", "studio", "boardroom"];
 
   var LAYOUTS = [
     ["hero", "封面"],
@@ -156,7 +157,176 @@
   }
 
   function createDemoDeck() {
-    return {
+    return createTemplateDeck("ai-camera");
+  }
+
+  function createTemplateDeck(templateId) {
+    if (templateId === "product-pitch") {
+      return normalizeDeck({
+        version: FORMAT_VERSION,
+        title: "产品发布演示",
+        theme: "studio",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "slide-1",
+            layout: "hero",
+            kicker: "Product Pitch",
+            title: "把一句话产品讲清楚",
+            subtitle: "用问题、方案、价值和下一步构成一份可演示的发布稿"
+          },
+          {
+            id: "slide-2",
+            layout: "compare",
+            kicker: "Problem",
+            title: "用户现在为什么痛",
+            left: { title: "当前做法", text: "流程分散\n表达不统一\n协作成本高" },
+            right: { title: "新的机会", text: "结构化内容\n自动排版\nAI 和人类都能继续编辑" }
+          },
+          {
+            id: "slide-3",
+            layout: "threeCards",
+            kicker: "Solution",
+            title: "方案由三件事组成",
+            cards: [
+              { title: "结构化输入", text: "让内容先有清晰骨架。" },
+              { title: "确定性渲染", text: "用模板系统保证页面稳定。" },
+              { title: "可逆编辑", text: "AI 生成后，人类还能继续改。" }
+            ]
+          },
+          {
+            id: "slide-4",
+            layout: "data",
+            kicker: "Impact",
+            title: "用数字证明价值",
+            metrics: [
+              { value: "3x", label: "起稿速度", detail: "从空白到可演示初稿。" },
+              { value: "50%", label: "沟通减少", detail: "减少反复调整排版。" },
+              { value: "1 file", label: "交付形态", detail: "单个 .ppt.html 文件即可分享。" }
+            ]
+          },
+          {
+            id: "slide-5",
+            layout: "ending",
+            title: "下一步",
+            subtitle: "把这个演示换成你的产品、用户和数据"
+          }
+        ]
+      });
+    }
+
+    if (templateId === "lesson") {
+      return normalizeDeck({
+        version: FORMAT_VERSION,
+        title: "课程课件",
+        theme: "paper",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "slide-1",
+            layout: "hero",
+            kicker: "Lesson",
+            title: "本节课主题",
+            subtitle: "用一个清晰问题带学生进入内容"
+          },
+          {
+            id: "slide-2",
+            layout: "section",
+            kicker: "Goal",
+            title: "学习目标",
+            body: "本节课结束后，学生应该能够复述核心概念，并完成一个小练习。"
+          },
+          {
+            id: "slide-3",
+            layout: "text",
+            kicker: "Concept",
+            title: "核心概念",
+            body: "先给出定义，再给出一个贴近日常的例子。",
+            items: [
+              { title: "定义", text: "一句话解释概念。" },
+              { title: "例子", text: "展示它在真实场景中的样子。" },
+              { title: "误区", text: "指出最容易混淆的地方。" }
+            ]
+          },
+          {
+            id: "slide-4",
+            layout: "timeline",
+            kicker: "Practice",
+            title: "课堂练习流程",
+            items: [
+              { title: "3 min", text: "独立思考并写下答案。" },
+              { title: "5 min", text: "小组讨论，补充证据。" },
+              { title: "4 min", text: "全班分享，老师点评。" }
+            ]
+          },
+          {
+            id: "slide-5",
+            layout: "ending",
+            title: "课后任务",
+            subtitle: "用自己的例子重新讲一遍今天的概念"
+          }
+        ]
+      });
+    }
+
+    if (templateId === "project-update") {
+      return normalizeDeck({
+        version: FORMAT_VERSION,
+        title: "项目进展汇报",
+        theme: "boardroom",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "slide-1",
+            layout: "hero",
+            kicker: "Project Update",
+            title: "项目进展汇报",
+            subtitle: "状态、风险、决策和下一步"
+          },
+          {
+            id: "slide-2",
+            layout: "data",
+            kicker: "Snapshot",
+            title: "本周状态",
+            metrics: [
+              { value: "72%", label: "完成度", detail: "核心流程已打通。" },
+              { value: "2", label: "主要风险", detail: "资源与时间窗口。" },
+              { value: "1", label: "待决策", detail: "是否扩大试点范围。" }
+            ]
+          },
+          {
+            id: "slide-3",
+            layout: "table",
+            kicker: "Plan",
+            title: "里程碑",
+            table: {
+              columns: ["阶段", "时间", "状态"],
+              rows: [
+                ["需求确认", "第 1 周", "完成"],
+                ["原型验证", "第 2 周", "进行中"],
+                ["试点发布", "第 4 周", "待开始"]
+              ]
+            }
+          },
+          {
+            id: "slide-4",
+            layout: "compare",
+            kicker: "Risk",
+            title: "风险与应对",
+            left: { title: "风险", text: "关键资源冲突\n上线窗口收紧\n外部依赖变动" },
+            right: { title: "应对", text: "提前锁定负责人\n拆分最小发布范围\n准备替代方案" }
+          },
+          {
+            id: "slide-5",
+            layout: "ending",
+            title: "需要确认的决策",
+            subtitle: "本周是否进入下一阶段试点"
+          }
+        ]
+      });
+    }
+
+    return normalizeDeck({
       version: FORMAT_VERSION,
       title: "AI 导演相机发布会",
       theme: "launch",
@@ -208,7 +378,7 @@
           subtitle: "PPT.html demo · 可被 AI 生成，也可被人类继续编辑"
         }
       ]
-    };
+    });
   }
 
   function normalizeSlide(raw, index) {
@@ -244,6 +414,177 @@
     deck.slides = asArray(deck.slides).map(normalizeSlide);
     if (!deck.slides.length) deck.slides.push(normalizeSlide({ layout: "hero", title: deck.title }, 0));
     return deck;
+  }
+
+  function issue(level, path, message, fix) {
+    return { level: level, path: path, message: message, fix: fix || "" };
+  }
+
+  function validateDeck(rawDeck) {
+    var issues = [];
+    var deck = rawDeck && typeof rawDeck === "object" ? rawDeck : null;
+
+    if (!deck) {
+      issues.push(issue("error", "$", "Deck 必须是一个 JSON 对象。", "输出一个包含 version、title、slides 的对象。"));
+      return validationResult(issues);
+    }
+
+    if (deck.version !== FORMAT_VERSION) {
+      issues.push(issue("error", "version", "version 必须是 \"" + FORMAT_VERSION + "\"。", "把 version 改为 \"" + FORMAT_VERSION + "\"。"));
+    }
+
+    if (!safeText(deck.title).trim()) {
+      issues.push(issue("warning", "title", "文稿标题为空。", "给 deck.title 写一个清晰标题。"));
+    }
+
+    if (deck.theme && THEMES.indexOf(deck.theme) === -1) {
+      issues.push(issue("warning", "theme", "未知主题 \"" + deck.theme + "\"。", "使用 paper、launch、studio 或 boardroom。"));
+    }
+
+    if (deck.aspectRatio && deck.aspectRatio !== "16:9") {
+      issues.push(issue("warning", "aspectRatio", "当前编辑器只稳定支持 16:9。", "把 aspectRatio 改为 \"16:9\"。"));
+    }
+
+    if (!Array.isArray(deck.slides) || !deck.slides.length) {
+      issues.push(issue("error", "slides", "slides 必须是非空数组。", "至少生成 1 页幻灯片。"));
+      return validationResult(issues);
+    }
+
+    deck.slides.forEach(function (slide, index) {
+      validateSlide(slide, index, issues);
+    });
+
+    return validationResult(issues);
+  }
+
+  function validateSlide(slide, index, issues) {
+    var path = "slides[" + index + "]";
+    if (!slide || typeof slide !== "object") {
+      issues.push(issue("error", path, "幻灯片必须是对象。", "把这一页改为包含 layout 和 title 的对象。"));
+      return;
+    }
+
+    var layout = safeText(slide.layout || "text");
+    var layoutIds = LAYOUTS.map(function (item) { return item[0]; });
+    if (layoutIds.indexOf(layout) === -1) {
+      issues.push(issue("error", path + ".layout", "不支持的版式 \"" + layout + "\"。", "改用：" + layoutIds.join(", ") + "。"));
+    }
+
+    if (!safeText(slide.title).trim() && layout !== "quote") {
+      issues.push(issue("warning", path + ".title", "页面标题为空。", "给这一页增加能被缩略图和演讲者识别的标题。"));
+    }
+
+    if (safeText(slide.title).length > 44) {
+      issues.push(issue("warning", path + ".title", "标题偏长，可能在 16:9 画布中显得拥挤。", "压缩到 20-36 个汉字或等量英文以内。"));
+    }
+
+    if (safeText(slide.subtitle).length > 90) {
+      issues.push(issue("warning", path + ".subtitle", "副标题偏长，可能影响版面层级。", "拆成正文或列表。"));
+    }
+
+    if (layout === "imageRight" || layout === "imageLeft") {
+      if (!slide.image || !slide.image.src) {
+        issues.push(issue("warning", path + ".image.src", "图文版式缺少图片。", "提供 image.src，或改用 text 版式。"));
+      } else if (!slide.image.alt) {
+        issues.push(issue("tip", path + ".image.alt", "图片缺少替代文字。", "为 image.alt 写一句图片说明。"));
+      }
+    }
+
+    if (layout === "compare") {
+      if (!slide.left || !safeText(slide.left.text).trim()) {
+        issues.push(issue("warning", path + ".left.text", "对比页左侧内容为空。", "补充左侧观点或痛点。"));
+      }
+      if (!slide.right || !safeText(slide.right.text).trim()) {
+        issues.push(issue("warning", path + ".right.text", "对比页右侧内容为空。", "补充右侧方案或收益。"));
+      }
+    }
+
+    if (layout === "threeCards") {
+      var cards = asArray(slide.cards);
+      if (!cards.length) {
+        issues.push(issue("warning", path + ".cards", "三卡片页没有卡片内容。", "提供 2-3 个 {title,text} 卡片。"));
+      }
+      if (cards.length > 3) {
+        issues.push(issue("tip", path + ".cards", "三卡片页最多显示前 3 张卡片。", "删除多余卡片，或拆成多页。"));
+      }
+    }
+
+    if (layout === "timeline") {
+      var items = asArray(slide.items);
+      if (!items.length) {
+        issues.push(issue("warning", path + ".items", "时间线页没有条目。", "提供若干 {title,text} 条目。"));
+      }
+      if (items.length > 5) {
+        issues.push(issue("tip", path + ".items", "时间线页最多显示前 5 个条目。", "保留关键节点，其他拆页。"));
+      }
+    }
+
+    if (layout === "data") {
+      var metrics = asArray(slide.metrics);
+      if (!metrics.length) {
+        issues.push(issue("warning", path + ".metrics", "数据页没有指标。", "提供 1-3 个 {value,label,detail} 指标。"));
+      }
+      if (metrics.length > 3) {
+        issues.push(issue("tip", path + ".metrics", "数据页最多显示前 3 个指标。", "挑选最重要的 3 个。"));
+      }
+    }
+
+    if (layout === "table") {
+      var table = slide.table || {};
+      if (!asArray(table.columns).length) {
+        issues.push(issue("warning", path + ".table.columns", "表格页缺少表头。", "提供 table.columns。"));
+      }
+      if (!asArray(table.rows).length) {
+        issues.push(issue("warning", path + ".table.rows", "表格页缺少数据行。", "提供 table.rows。"));
+      }
+    }
+
+    if (layout === "code" && !safeText(slide.code).trim()) {
+      issues.push(issue("warning", path + ".code", "代码页没有代码内容。", "填写 code 字段，或换成 text 版式。"));
+    }
+  }
+
+  function validationResult(issues) {
+    var errors = issues.filter(function (item) { return item.level === "error"; });
+    var warnings = issues.filter(function (item) { return item.level === "warning"; });
+    var tips = issues.filter(function (item) { return item.level === "tip"; });
+    return {
+      ok: errors.length === 0,
+      errors: errors,
+      warnings: warnings,
+      tips: tips,
+      issues: issues
+    };
+  }
+
+  function formatValidationReport(rawDeck, result) {
+    var deck = rawDeck && typeof rawDeck === "object" ? rawDeck : {};
+    var validation = result || validateDeck(deck);
+    var lines = [
+      "PPT.html Validation Report",
+      "Deck: " + (deck.title || "(untitled)"),
+      "Format: " + (deck.version || "(missing)") + " / expected " + FORMAT_VERSION,
+      "Slides: " + (Array.isArray(deck.slides) ? deck.slides.length : 0),
+      "Status: " + (validation.ok ? "PASS" : "NEEDS FIXES"),
+      "Errors: " + validation.errors.length + " | Warnings: " + validation.warnings.length + " | Tips: " + validation.tips.length,
+      ""
+    ];
+
+    if (!validation.issues.length) {
+      lines.push("No issues found.");
+    } else {
+      validation.issues.forEach(function (item) {
+        lines.push("[" + item.level.toUpperCase() + "] " + item.path + " - " + item.message);
+        if (item.fix) lines.push("Fix: " + item.fix);
+        lines.push("");
+      });
+    }
+
+    lines.push("AI repair instruction:");
+    lines.push("- Keep version as \"" + FORMAT_VERSION + "\" and preserve the PPT.html deck structure.");
+    lines.push("- Fix ERROR items first, then WARNING items.");
+    lines.push("- Do not output free-form HTML unless explicitly asked; output corrected deck JSON.");
+    return lines.join("\n");
   }
 
   function renderSlide(rawSlide, rawDeck, options) {
@@ -389,12 +730,26 @@
   function parseFileText(text) {
     var trimmed = String(text || "").trim();
     if (!trimmed) throw new Error("文件内容为空");
-    if (trimmed[0] === "{") return normalizeDeck(JSON.parse(trimmed));
+    var jsonText = extractDeckJsonText(trimmed);
+    if (jsonText) return normalizeDeck(JSON.parse(jsonText));
 
     var parsed = new DOMParser().parseFromString(trimmed, "text/html");
     var dataNode = parsed.getElementById("ppt-html-data");
     if (!dataNode) throw new Error("没有找到 #ppt-html-data");
     return normalizeDeck(JSON.parse(dataNode.textContent));
+  }
+
+  function extractDeckJsonText(text) {
+    var trimmed = String(text || "").trim();
+    var fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+    if (fenced) return fenced[1].trim();
+    if (trimmed[0] === "{") return trimmed;
+    if (trimmed[0] === "<") return "";
+    if (trimmed.indexOf("\"slides\"") === -1) return "";
+    var start = trimmed.indexOf("{");
+    var end = trimmed.lastIndexOf("}");
+    if (start === -1 || end <= start) return "";
+    return trimmed.slice(start, end + 1);
   }
 
   function standaloneSource() {
@@ -460,11 +815,21 @@
     version: FORMAT_VERSION,
     baseWidth: BASE_WIDTH,
     baseHeight: BASE_HEIGHT,
+    themes: THEMES,
     layouts: LAYOUTS,
     slideCss: SLIDE_CSS,
+    deckTemplates: [
+      { id: "ai-camera", name: "AI 导演相机", description: "产品发布 demo，适合展示一个新想法。" },
+      { id: "product-pitch", name: "产品发布", description: "问题、方案、价值和下一步。" },
+      { id: "lesson", name: "课程课件", description: "学习目标、概念、练习和课后任务。" },
+      { id: "project-update", name: "项目汇报", description: "状态、风险、决策和里程碑。" }
+    ],
     createDemoDeck: createDemoDeck,
+    createTemplateDeck: createTemplateDeck,
     normalizeDeck: normalizeDeck,
     normalizeSlide: normalizeSlide,
+    validateDeck: validateDeck,
+    formatValidationReport: formatValidationReport,
     renderSlide: renderSlide,
     parseFileText: parseFileText,
     exportStandalone: exportStandalone,

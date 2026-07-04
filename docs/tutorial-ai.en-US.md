@@ -37,6 +37,7 @@ This guide is for AI models, agents, scripts, and developers. The goal is to gen
 3. Fill titles, concise copy, lists, or data.
 4. Output complete JSON. Do not add extra prose outside the code block.
 5. The user can paste the JSON into the `AI JSON` panel.
+6. After the user clicks `Check`, repair `ERROR` items first, then `WARNING` and `TIP` items.
 
 ## Common Layouts
 
@@ -71,3 +72,11 @@ This guide is for AI models, agents, scripts, and developers. The goal is to gen
 }
 ```
 
+## Repairing From a Validation Report
+
+When the user pastes a PPT.html Validation Report:
+
+- Keep `version` as `"0.1"`.
+- Do not convert the deck into free-form HTML.
+- Follow paths such as `slides[2].layout` or `slides[4].metrics`.
+- Return the full corrected deck JSON.

@@ -25,6 +25,10 @@ AI-friendly authoring guides:
 - [日本語 AI ガイド](docs/tutorial-ai.ja-JP.md)
 - [한국어 AI 가이드](docs/tutorial-ai.ko-KR.md)
 
+Product roadmap:
+
+- [中文路线图](docs/roadmap.zh-CN.md)
+
 ## Quick Start
 
 Run the browser editor:
@@ -68,6 +72,13 @@ A `.ppt.html` file is normal HTML with structured presentation data embedded ins
 ```
 
 AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT.html Studio.
+
+## Current Product Focus
+
+- Start from built-in templates for product pitches, lessons, project updates, or the demo deck.
+- Open, save, and save as `.ppt.html` files in the desktop app.
+- Import local images into image slides as embedded data URIs.
+- Run `Check` to get a human-readable and AI-readable validation report.
 
 ## Release Builds
 
