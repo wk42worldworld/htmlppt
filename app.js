@@ -25,6 +25,7 @@
   var selectedCanvasPath = "";
   var presenterUiTimer = 0;
   var presenterFullscreenActive = false;
+  var pendingMediaInsertType = "";
   var liveRenderFrame = 0;
   var pendingLiveCanvas = false;
   var pendingLiveSlideList = false;
@@ -1072,12 +1073,14 @@
     });
 
     els.jsonBtn.addEventListener("click", function () {
+      commitActiveCanvasEdit();
       els.jsonTextarea.value = JSON.stringify(deck, null, 2);
       els.jsonDialog.showModal();
       els.jsonTextarea.focus();
     });
 
     els.copyJsonBtn.addEventListener("click", function () {
+      commitActiveCanvasEdit();
       els.jsonTextarea.value = JSON.stringify(deck, null, 2);
       navigator.clipboard.writeText(els.jsonTextarea.value).then(function () {
         toast(t("toast.jsonCopied"));
@@ -1104,7 +1107,10 @@
       }
     });
 
-    els.validateBtn.addEventListener("click", showValidationDialog);
+    els.validateBtn.addEventListener("click", function () {
+      commitActiveCanvasEdit();
+      showValidationDialog();
+    });
 
     els.copyValidationBtn.addEventListener("click", function () {
       navigator.clipboard.writeText(els.validationReport.value).then(function () {
@@ -1234,7 +1240,10 @@
 
     els.imageFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        pendingMediaInsertType = "";
+        return;
+      }
       readImageFile(file);
       event.target.value = "";
     });
@@ -1245,7 +1254,10 @@
 
     els.videoFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        pendingMediaInsertType = "";
+        return;
+      }
       readVideoFile(file);
       event.target.value = "";
     });
@@ -1261,7 +1273,10 @@
 
     els.audioFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
-      if (!file) return;
+      if (!file) {
+        pendingMediaInsertType = "";
+        return;
+      }
       readAudioFile(file);
       event.target.value = "";
     });
@@ -1285,8 +1300,10 @@
   function readImageFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var createSlide = pendingMediaInsertType === "image";
+      pendingMediaInsertType = "";
       commit(function () {
-        var slide = currentSlide();
+        var slide = createSlide ? createComponentSlide() : currentSlide();
         if (["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"].indexOf(slide.layout) === -1) {
           slide.layout = "imageRight";
         }
@@ -1301,8 +1318,10 @@
   function readVideoFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var createSlide = pendingMediaInsertType === "video";
+      pendingMediaInsertType = "";
       commit(function () {
-        var slide = currentSlide();
+        var slide = createSlide ? createComponentSlide() : currentSlide();
         slide.layout = "video";
         slide.video.src = reader.result;
         if (!slide.video.caption) slide.video.caption = file.name.replace(/\.[^.]+$/, "");
@@ -1315,8 +1334,10 @@
   function readAudioFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var createSlide = pendingMediaInsertType === "audio";
+      pendingMediaInsertType = "";
       commit(function () {
-        var slide = currentSlide();
+        var slide = createSlide ? createComponentSlide() : currentSlide();
         slide.layout = "audio";
         slide.audio.src = reader.result;
         if (!slide.audio.caption) slide.audio.caption = file.name.replace(/\.[^.]+$/, "");
@@ -1326,15 +1347,18 @@
     reader.readAsDataURL(file);
   }
 
-  function openImagePicker() {
+  function openImagePicker(insertType) {
+    pendingMediaInsertType = insertType === "component" ? "image" : "";
     els.imageFileInput.click();
   }
 
-  function openVideoPicker() {
+  function openVideoPicker(insertType) {
+    pendingMediaInsertType = insertType === "component" ? "video" : "";
     els.videoFileInput.click();
   }
 
-  function openAudioPicker() {
+  function openAudioPicker(insertType) {
+    pendingMediaInsertType = insertType === "component" ? "audio" : "";
     els.audioFileInput.click();
   }
 
@@ -1354,20 +1378,51 @@
       return;
     }
     if (type === "image" && settings.source === "click") {
+      insertMediaPlaceholder("image");
       openImagePicker();
       return;
     }
     if (type === "video" && settings.source === "click") {
+      insertMediaPlaceholder("video");
       openVideoPicker();
       return;
     }
     if (type === "audio" && settings.source === "click") {
+      insertMediaPlaceholder("audio");
       openAudioPicker();
       return;
     }
 
     commit(function () {
-      applyComponentToSlide(currentSlide(), type);
+      var targetSlide = currentSlide();
+      if (shouldCreateComponentSlide(type)) {
+        targetSlide = createComponentSlide();
+      }
+      applyComponentToSlide(targetSlide, type);
+      selectedCanvasPath = "";
+    });
+    toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
+  }
+
+  function shouldCreateComponentSlide(type) {
+    return ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1;
+  }
+
+  function createComponentSlide() {
+    var slide = PPTHtml.normalizeSlide({
+      id: PPTHtml.uid("slide"),
+      layout: "text",
+      title: ""
+    }, currentIndex + 1);
+    deck.slides.splice(currentIndex + 1, 0, slide);
+    currentIndex += 1;
+    return slide;
+  }
+
+  function insertMediaPlaceholder(type) {
+    commit(function () {
+      var slide = createComponentSlide();
+      applyComponentToSlide(slide, type);
       selectedCanvasPath = "";
     });
     toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
@@ -1376,7 +1431,7 @@
   function applyComponentToSlide(slide, type) {
     if (type === "text") {
       slide.layout = "text";
-      if (!slide.title) slide.title = t("sample.textTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.textTitle");
       if (!slide.body) slide.body = t("sample.textBody");
       if (!slide.items || !slide.items.length) {
         slide.items = [
@@ -1388,14 +1443,14 @@
     }
     if (type === "image") {
       slide.layout = "imageRight";
-      if (!slide.title) slide.title = t("sample.imageTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.imageTitle");
       slide.image = slide.image || {};
       slide.image.caption = slide.image.caption || t("sample.imageCaption");
       return;
     }
     if (type === "video") {
       slide.layout = "video";
-      if (!slide.title) slide.title = t("sample.videoTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.videoTitle");
       slide.video = slide.video || {};
       slide.video.caption = slide.video.caption || t("sample.videoCaption");
       slide.video.fit = slide.video.fit || "cover";
@@ -1403,14 +1458,14 @@
     }
     if (type === "audio") {
       slide.layout = "audio";
-      if (!slide.title) slide.title = t("sample.audioTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.audioTitle");
       slide.audio = slide.audio || {};
       slide.audio.caption = slide.audio.caption || t("sample.audioCaption");
       return;
     }
     if (type === "chart") {
       slide.layout = "chart";
-      slide.title = slide.title || t("sample.chartTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.chartTitle");
       slide.chart = {
         kind: "bar",
         labels: [t("sample.q1"), t("sample.q2"), t("sample.q3"), t("sample.q4")],
@@ -1424,7 +1479,7 @@
     }
     if (type === "table") {
       slide.layout = "table";
-      slide.title = slide.title || t("sample.tableTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.tableTitle");
       slide.table = {
         columns: [t("sample.phase"), t("sample.owner"), t("sample.status")],
         rows: [
@@ -1436,7 +1491,7 @@
     }
     if (type === "cards") {
       slide.layout = "threeCards";
-      slide.title = slide.title || t("sample.cardsTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.cardsTitle");
       slide.cards = [
         { title: t("sample.card1Title"), text: t("sample.card1Text") },
         { title: t("sample.card2Title"), text: t("sample.card2Text") },
@@ -1446,7 +1501,7 @@
     }
     if (type === "metrics") {
       slide.layout = "data";
-      slide.title = slide.title || t("sample.metricsTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.metricsTitle");
       slide.metrics = [
         { value: "3x", label: t("sample.speed"), detail: t("sample.speedDetail") },
         { value: "42%", label: t("sample.growth"), detail: t("sample.growthDetail") },
@@ -1456,7 +1511,7 @@
     }
     if (type === "timeline") {
       slide.layout = "timeline";
-      slide.title = slide.title || t("sample.timelineTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.timelineTitle");
       slide.items = [
         { title: t("sample.step1"), text: t("sample.step1Text") },
         { title: t("sample.step2"), text: t("sample.step2Text") },
@@ -1466,31 +1521,38 @@
     }
     if (type === "quote") {
       slide.layout = "quote";
+      if (shouldUseSampleTitle(slide)) slide.title = t("insert.quote");
       slide.quote = slide.quote || t("sample.quoteText");
       slide.author = slide.author || t("sample.quoteAuthor");
       return;
     }
     if (type === "code") {
       slide.layout = "code";
-      slide.title = slide.title || t("sample.codeTitle");
+      if (shouldUseSampleTitle(slide)) slide.title = t("sample.codeTitle");
       slide.code = slide.code || "const deck = await createPptHtml();\nawait deck.present();";
     }
+  }
+
+  function shouldUseSampleTitle(slide) {
+    return !slide.title || slide.title === t("slide.untitled") || slide.title === "Untitled";
   }
 
   function addTextBoxToSlide(slide, point) {
     slide.textBoxes = Array.isArray(slide.textBoxes) ? slide.textBoxes : [];
     var index = slide.textBoxes.length;
+    var width = 380;
+    var height = 96;
     var x = point && isFinite(point.x) ? point.x - 190 : 730 + (index % 3) * 28;
     var y = point && isFinite(point.y) ? point.y - 48 : 430 + (index % 4) * 30;
-    x = clamp(x, 40, 1040);
-    y = clamp(y, 40, 620);
+    x = clamp(x, 40, PPTHtml.baseWidth - width - 40);
+    y = clamp(y, 40, PPTHtml.baseHeight - height - 40);
     slide.textBoxes.push({
       id: PPTHtml.uid("textbox"),
       text: t("sample.textBox"),
       x: Math.round(x),
       y: Math.round(y),
-      w: 380,
-      h: 96
+      w: width,
+      h: height
     });
     return "textBoxes." + index + ".text";
   }
@@ -1506,18 +1568,21 @@
 
     if (key === "F5") {
       event.preventDefault();
+      commitActiveCanvasEdit();
       openPresenter(event.shiftKey ? currentIndex : 0);
       return;
     }
 
     if (commandKey && key === "Enter") {
       event.preventDefault();
+      commitActiveCanvasEdit();
       openPresenter(currentIndex);
       return;
     }
 
     if (commandKey && lowerKey === "s") {
       event.preventDefault();
+      commitActiveCanvasEdit();
       saveDeck(event.shiftKey);
       return;
     }
@@ -1703,6 +1768,8 @@
     future.push(JSON.stringify(deck));
     deck = PPTHtml.normalizeDeck(JSON.parse(history.pop()));
     currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
+    selectedCanvasPath = "";
+    markDirty();
     renderAll();
     persist();
   }
@@ -1712,6 +1779,8 @@
     history.push(JSON.stringify(deck));
     deck = PPTHtml.normalizeDeck(JSON.parse(future.pop()));
     currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
+    selectedCanvasPath = "";
+    markDirty();
     renderAll();
     persist();
   }
@@ -1968,10 +2037,12 @@
     history.push(drag.before);
     if (history.length > 80) history.shift();
     future = [];
-    setCanvasOffset(drag.path, offset);
+    var foldedTextBox = foldTextBoxGeometry(drag.path, offset);
+    if (!foldedTextBox) setCanvasOffset(drag.path, offset);
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
-    renderCanvasControls();
+    if (foldedTextBox) renderCanvas();
+    else renderCanvasControls();
     updateButtons();
     updateFileStatus();
     schedulePersist();
@@ -2153,10 +2224,12 @@
     history.push(resize.before);
     if (history.length > 80) history.shift();
     future = [];
-    setCanvasOffset(resize.path, offset);
+    var foldedTextBox = foldTextBoxGeometry(resize.path, offset);
+    if (!foldedTextBox) setCanvasOffset(resize.path, offset);
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
-    renderCanvasControls();
+    if (foldedTextBox) renderCanvas();
+    else renderCanvasControls();
     updateButtons();
     updateFileStatus();
     schedulePersist();
@@ -2203,9 +2276,17 @@
     history.push(JSON.stringify(deck));
     if (history.length > 80) history.shift();
     future = [];
-    setCanvasOffset(selectedCanvasPath, next);
-    setCanvasOffsetStyle(node, next);
-    positionCanvasSelectionBox(node);
+    if (foldTextBoxGeometry(selectedCanvasPath, {
+      x: arrowDelta[0] * step,
+      y: arrowDelta[1] * step
+    })) {
+      applyTextBoxGeometryStyle(node, getTextBoxByPath(selectedCanvasPath));
+      positionCanvasSelectionBox(node);
+    } else {
+      setCanvasOffset(selectedCanvasPath, next);
+      setCanvasOffsetStyle(node, next);
+      positionCanvasSelectionBox(node);
+    }
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     updateButtons();
@@ -2319,6 +2400,55 @@
     if (!Object.keys(slide.canvas).length) delete slide.canvas;
   }
 
+  function textBoxIndexFromPath(path) {
+    var match = String(path || "").match(/^textBoxes\.(\d+)\.text$/);
+    return match ? Number(match[1]) : -1;
+  }
+
+  function getTextBoxByPath(path) {
+    var index = textBoxIndexFromPath(path);
+    var boxes = currentSlide().textBoxes;
+    return index >= 0 && Array.isArray(boxes) ? boxes[index] : null;
+  }
+
+  function foldTextBoxGeometry(path, offset) {
+    var box = getTextBoxByPath(path);
+    if (!box) return false;
+    var dx = Number(offset && offset.x) || 0;
+    var dy = Number(offset && offset.y) || 0;
+    var w = Math.max(0, Number(offset && offset.w) || 0);
+    var h = Math.max(0, Number(offset && offset.h) || 0);
+    var width = w || Number(box.w) || 380;
+    var height = h || Number(box.h) || 96;
+    box.x = Math.round(clamp((Number(box.x) || 0) + dx, 0, PPTHtml.baseWidth - 40));
+    box.y = Math.round(clamp((Number(box.y) || 0) + dy, 0, PPTHtml.baseHeight - 24));
+    if (w) box.w = Math.round(Math.max(44, width));
+    if (h) box.h = Math.round(Math.max(24, height));
+    clearCanvasOffset(path);
+    return true;
+  }
+
+  function clearCanvasOffset(path) {
+    var slide = currentSlide();
+    if (!slide.canvas || typeof slide.canvas !== "object") return;
+    delete slide.canvas[path];
+    if (!Object.keys(slide.canvas).length) delete slide.canvas;
+  }
+
+  function applyTextBoxGeometryStyle(node, box) {
+    if (!node || !box) return;
+    node.style.left = (Number(box.x) || 0) + "px";
+    node.style.top = (Number(box.y) || 0) + "px";
+    node.style.width = Math.max(44, Number(box.w) || 380) + "px";
+    node.style.maxWidth = "";
+    node.style.minHeight = Math.max(24, Number(box.h) || 96) + "px";
+    node.style.transform = "";
+    node.dataset.canvasX = "0";
+    node.dataset.canvasY = "0";
+    node.dataset.canvasW = "0";
+    node.dataset.canvasH = "0";
+  }
+
   function setCanvasOffsetStyle(node, offset) {
     var isTextBox = node.classList.contains("ppt-textbox");
     if (isTextBox && !node.dataset.canvasBaseWidth) {
@@ -2348,17 +2478,33 @@
     if (!x && !y) {
       node.style.transform = "";
       if (!w && !h) {
-        if (!isTextBox) node.style.position = "";
+        restoreCanvasOffsetPosition(node, isTextBox);
         node.style.zIndex = "";
       } else {
-        if (!isTextBox) node.style.position = "relative";
+        ensureCanvasOffsetPosition(node, isTextBox);
         node.style.zIndex = "5";
       }
       return;
     }
-    if (!isTextBox) node.style.position = "relative";
+    ensureCanvasOffsetPosition(node, isTextBox);
     node.style.zIndex = "5";
     node.style.transform = "translate(" + x + "px, " + y + "px)";
+  }
+
+  function ensureCanvasOffsetPosition(node, isTextBox) {
+    if (isTextBox) return;
+    if (node.dataset.canvasPositionWasStatic === "true" || window.getComputedStyle(node).position === "static") {
+      node.style.position = "relative";
+      node.dataset.canvasPositionWasStatic = "true";
+    }
+  }
+
+  function restoreCanvasOffsetPosition(node, isTextBox) {
+    if (isTextBox) return;
+    if (node.dataset.canvasPositionWasStatic === "true") {
+      node.style.position = "";
+      delete node.dataset.canvasPositionWasStatic;
+    }
   }
 
   function parseCanvasOffsetStyle(node) {
@@ -2454,6 +2600,10 @@
     if (activeCanvasEdit) finishCanvasEdit(true);
   }
 
+  function commitActiveCanvasEdit() {
+    if (activeCanvasEdit) finishCanvasEdit(true);
+  }
+
   function finishCanvasEdit(shouldCommit) {
     if (!activeCanvasEdit) return;
     var edit = activeCanvasEdit;
@@ -2465,6 +2615,7 @@
 
     if (!shouldCommit) {
       edit.node.innerText = edit.originalText;
+      renderCanvasControls();
       return;
     }
 
@@ -2474,7 +2625,10 @@
     }
 
     var beforeValue = getPath(currentSlide(), edit.path);
-    if (String(beforeValue == null ? "" : beforeValue) === String(value == null ? "" : value)) return;
+    if (String(beforeValue == null ? "" : beforeValue) === String(value == null ? "" : value)) {
+      renderCanvasControls();
+      return;
+    }
 
     history.push(edit.before);
     if (history.length > 80) history.shift();
@@ -2684,12 +2838,14 @@
   }
 
   function createNewDeck() {
+    commitActiveCanvasEdit();
     if (!confirmDiscard()) return;
     replaceDeck(PPTHtml.createDemoDeck(), { filePath: "", dirty: true, keepHistory: false });
     toast(t("toast.newDeck"));
   }
 
   function createFromTemplate(templateId) {
+    commitActiveCanvasEdit();
     if (!confirmDiscard()) return;
     replaceDeck(PPTHtml.createTemplateDeck(templateId), { filePath: "", dirty: true, keepHistory: false });
     els.templateDialog.close();
@@ -2697,6 +2853,7 @@
   }
 
   function openDeck() {
+    commitActiveCanvasEdit();
     if (!confirmDiscard()) return;
     if (desktop && desktop.isDesktop) {
       desktop.openDeck().then(function (result) {
@@ -2732,6 +2889,7 @@
 
   function saveDeck(forceDialog) {
     if (saving) return;
+    commitActiveCanvasEdit();
     saving = true;
     setSaveButtonsDisabled(true);
 
@@ -3018,6 +3176,7 @@
   }
 
   function openPresenter(index) {
+    commitActiveCanvasEdit();
     presenting = true;
     presentIndex = index || 0;
     els.presenter.hidden = false;

@@ -716,7 +716,7 @@ textarea:focus {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   html,
   body {
     height: auto;
@@ -1124,7 +1124,7 @@ textarea:focus {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   .app-shell {
     grid-template-rows: auto minmax(0, 1fr);
   }
@@ -1337,7 +1337,7 @@ button[hidden] {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   .topbar {
     grid-template-columns: 1fr auto;
   }
