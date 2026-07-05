@@ -977,6 +977,10 @@ textarea:focus {
   outline: 1px dashed rgba(100, 116, 139, .45);
 }
 
+.stage-frame .ppt-object .ppt-shape-text {
+  pointer-events: auto;
+}
+
 .object-data-grid-block {
   display: grid;
   gap: 7px;

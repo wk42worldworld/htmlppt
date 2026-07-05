@@ -5485,8 +5485,79 @@
       node.classList.toggle("is-canvas-locked", Boolean(object && object.locked));
       if (type === "image" || type === "video" || type === "audio") options.fileAction = type;
       registerCanvasEdit(node, path, options);
-      if (type === "table" && !(object && object.locked)) bindObjectTableCells(node, objectIndex);
+      if (!(object && object.locked)) bindObjectTextContent(node, objectIndex, type, object);
     });
+  }
+
+  function bindObjectTextContent(objectNode, objectIndex, type, object) {
+    if (type === "image" || type === "video" || type === "audio") {
+      registerCanvasEdit(objectNode.querySelector(".ppt-caption"), objectDataPath(objectIndex, "caption"), { singleLine: true, noDrag: true });
+      return;
+    }
+    if (type === "chart") {
+      var chart = object && object.data && typeof object.data === "object" ? object.data : {};
+      var donut = chart.kind === "donut";
+      objectNode.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (node, index) {
+        registerCanvasEdit(node, objectDataPath(objectIndex, donut ? "labels." + index : "series." + index + ".name"), { singleLine: true, noDrag: true });
+      });
+      if (donut) {
+        objectNode.querySelectorAll(".ppt-chart-legend-item small").forEach(function (node, index) {
+          registerCanvasEdit(node, objectDataPath(objectIndex, "series.0.values." + index), { singleLine: true, numberValue: true, noDrag: true });
+        });
+      }
+      return;
+    }
+    if (type === "table") {
+      bindObjectTableCells(objectNode, objectIndex);
+      return;
+    }
+    if (type === "cards") {
+      objectNode.querySelectorAll(".ppt-card").forEach(function (card, index) {
+        registerCanvasEdit(card.querySelector("h2"), objectDataPath(objectIndex, "cards." + index + ".title"), { singleLine: true, noDrag: true });
+        registerCanvasEdit(card.querySelector("p"), objectDataPath(objectIndex, "cards." + index + ".text"), { noDrag: true });
+      });
+      return;
+    }
+    if (type === "metrics") {
+      objectNode.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+        registerCanvasEdit(metric.querySelector("strong"), objectDataPath(objectIndex, "metrics." + index + ".value"), { singleLine: true, noDrag: true });
+        registerCanvasEdit(metric.querySelector("span"), objectDataPath(objectIndex, "metrics." + index + ".label"), { singleLine: true, noDrag: true });
+        registerCanvasEdit(metric.querySelector("p"), objectDataPath(objectIndex, "metrics." + index + ".detail"), { noDrag: true });
+      });
+      return;
+    }
+    if (type === "timeline") {
+      objectNode.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+        registerCanvasEdit(item.querySelector("h2"), objectDataPath(objectIndex, "items." + index + ".title"), { singleLine: true, noDrag: true });
+        registerCanvasEdit(item.querySelector("p"), objectDataPath(objectIndex, "items." + index + ".text"), { noDrag: true });
+      });
+      return;
+    }
+    if (type === "compare") {
+      ["left", "right"].forEach(function (side, index) {
+        var card = objectNode.querySelectorAll(".ppt-compare-card")[index];
+        if (!card) return;
+        registerCanvasEdit(card.querySelector("h2"), objectDataPath(objectIndex, side + ".title"), { singleLine: true, noDrag: true });
+        registerCanvasEdit(card.querySelector("p"), objectDataPath(objectIndex, side + ".text"), { noDrag: true });
+      });
+      return;
+    }
+    if (type === "quote") {
+      registerCanvasEdit(objectNode.querySelector(".ppt-quote"), objectDataPath(objectIndex, "quote"), { noDrag: true });
+      registerCanvasEdit(objectNode.querySelector(".ppt-author"), objectDataPath(objectIndex, "author"), { singleLine: true, noDrag: true });
+      return;
+    }
+    if (type === "code") {
+      registerCanvasEdit(objectNode.querySelector(".ppt-code"), objectDataPath(objectIndex, "code"), { multiline: true, preserveWhitespace: true, noDrag: true });
+      return;
+    }
+    if (type === "shape") {
+      registerCanvasEdit(objectNode.querySelector(".ppt-shape-text"), objectDataPath(objectIndex, "text"), { noDrag: true });
+    }
+  }
+
+  function objectDataPath(objectIndex, suffix) {
+    return "objects." + objectIndex + ".data." + suffix;
   }
 
   function bindObjectTableCells(objectNode, objectIndex) {
@@ -8324,7 +8395,7 @@
   }
 
   function selectedObjectInfo() {
-    var index = objectIndexFromPath(selectedCanvasPath);
+    var index = objectIndexFromAnyPath(selectedCanvasPath);
     var slide = currentSlide();
     if (index < 0 || !Array.isArray(slide.objects) || !slide.objects[index]) return null;
     return {

@@ -1093,11 +1093,11 @@
     if (article.querySelector(".ppt-audio .ppt-caption")) {
       tagPath(article.querySelector(".ppt-audio .ppt-caption"), "audio.caption");
     }
-    tagPath(article.querySelector(".ppt-chart-wrap"), "chart");
+    tagPath(nonObjectNodes(article, ".ppt-chart-wrap")[0], "chart");
     tagPath(nonObjectNodes(article, ".ppt-table")[0], "table");
-    tagPath(article.querySelector(".ppt-card-grid"), "cards");
-    tagPath(article.querySelector(".ppt-metric-grid"), "metrics");
-    tagPath(article.querySelector(".ppt-timeline"), "timeline");
+    tagPath(nonObjectNodes(article, ".ppt-card-grid")[0], "cards");
+    tagPath(nonObjectNodes(article, ".ppt-metric-grid")[0], "metrics");
+    tagPath(nonObjectNodes(article, ".ppt-timeline")[0], "timeline");
     article.querySelectorAll(".ppt-textbox").forEach(function (node, index) {
       tagPath(node, "textBoxes." + index + ".text");
     });
@@ -1105,41 +1105,33 @@
       var objectIndex = Number(node.getAttribute("data-object-index"));
       if (!isFinite(objectIndex)) objectIndex = index;
       tagPath(node, "objects." + objectIndex);
-      if (node.getAttribute("data-object-type") === "table") {
-        node.querySelectorAll(".ppt-table th").forEach(function (cell, columnIndex) {
-          tagPath(cell, "objects." + objectIndex + ".data.columns." + columnIndex);
-        });
-        node.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
-          row.querySelectorAll("td").forEach(function (cell, columnIndex) {
-            tagPath(cell, "objects." + objectIndex + ".data.rows." + rowIndex + "." + columnIndex);
-          });
-        });
-      }
+      tagObjectContentPaths(node, objectIndex, node.getAttribute("data-object-type"));
     });
 
     if (slide.layout === "quote") {
-      tagPath(article.querySelector(".ppt-quote"), "quote");
-      tagPath(article.querySelector(".ppt-author"), "author");
+      tagPath(nonObjectNodes(article, ".ppt-quote")[0], "quote");
+      tagPath(nonObjectNodes(article, ".ppt-author")[0], "author");
     }
 
-    article.querySelectorAll(".ppt-list li").forEach(function (node, index) {
+    nonObjectNodes(article, ".ppt-list li").forEach(function (node, index) {
       tagPath(node, "items." + index + ".text");
     });
+    var compareCards = nonObjectNodes(article, ".ppt-compare-card");
     ["left", "right"].forEach(function (side, index) {
-      var card = article.querySelectorAll(".ppt-compare-card")[index];
+      var card = compareCards[index];
       if (!card) return;
       tagPath(card.querySelector("h2"), side + ".title");
       tagPath(card.querySelector("p"), side + ".text");
     });
-    article.querySelectorAll(".ppt-card").forEach(function (card, index) {
+    nonObjectNodes(article, ".ppt-card").forEach(function (card, index) {
       tagPath(card.querySelector("h2"), "cards." + index + ".title");
       tagPath(card.querySelector("p"), "cards." + index + ".text");
     });
-    article.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+    nonObjectNodes(article, ".ppt-time-item").forEach(function (item, index) {
       tagPath(item.querySelector("h2"), "items." + index + ".title");
       tagPath(item.querySelector("p"), "items." + index + ".text");
     });
-    article.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+    nonObjectNodes(article, ".ppt-metric").forEach(function (metric, index) {
       tagPath(metric.querySelector("strong"), "metrics." + index + ".value");
       tagPath(metric.querySelector("span"), "metrics." + index + ".label");
       tagPath(metric.querySelector("p"), "metrics." + index + ".detail");
@@ -1152,15 +1144,89 @@
         tagPath(cell, "table.rows." + rowIndex + "." + cellIndex);
       });
     });
-    article.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (node, index) {
+    nonObjectNodes(article, ".ppt-chart-legend-item strong").forEach(function (node, index) {
       tagPath(node, slide.chart.kind === "donut" ? "chart.labels." + index : "chart.series." + index + ".name");
     });
     if (slide.chart.kind === "donut") {
-      article.querySelectorAll(".ppt-chart-legend-item small").forEach(function (node, index) {
+      nonObjectNodes(article, ".ppt-chart-legend-item small").forEach(function (node, index) {
         tagPath(node, "chart.series.0.values." + index);
       });
     }
-    tagPath(article.querySelector(".ppt-code"), "code");
+    tagPath(nonObjectNodes(article, ".ppt-code")[0], "code");
+  }
+
+  function tagObjectContentPaths(node, objectIndex, type) {
+    var prefix = "objects." + objectIndex + ".data.";
+    if (type === "image" || type === "video" || type === "audio") {
+      tagPath(node.querySelector(".ppt-caption"), prefix + "caption");
+      return;
+    }
+    if (type === "chart") {
+      var donut = node.classList.contains("ppt-object-chart") && node.querySelector(".ppt-chart-kind-donut");
+      node.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (legend, index) {
+        tagPath(legend, prefix + (donut ? "labels." + index : "series." + index + ".name"));
+      });
+      if (donut) {
+        node.querySelectorAll(".ppt-chart-legend-item small").forEach(function (legend, index) {
+          tagPath(legend, prefix + "series.0.values." + index);
+        });
+      }
+      return;
+    }
+    if (type === "table") {
+      node.querySelectorAll(".ppt-table th").forEach(function (cell, columnIndex) {
+        tagPath(cell, prefix + "columns." + columnIndex);
+      });
+      node.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+        row.querySelectorAll("td").forEach(function (cell, columnIndex) {
+          tagPath(cell, prefix + "rows." + rowIndex + "." + columnIndex);
+        });
+      });
+      return;
+    }
+    if (type === "cards") {
+      node.querySelectorAll(".ppt-card").forEach(function (card, index) {
+        tagPath(card.querySelector("h2"), prefix + "cards." + index + ".title");
+        tagPath(card.querySelector("p"), prefix + "cards." + index + ".text");
+      });
+      return;
+    }
+    if (type === "metrics") {
+      node.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+        tagPath(metric.querySelector("strong"), prefix + "metrics." + index + ".value");
+        tagPath(metric.querySelector("span"), prefix + "metrics." + index + ".label");
+        tagPath(metric.querySelector("p"), prefix + "metrics." + index + ".detail");
+      });
+      return;
+    }
+    if (type === "timeline") {
+      node.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+        tagPath(item.querySelector("h2"), prefix + "items." + index + ".title");
+        tagPath(item.querySelector("p"), prefix + "items." + index + ".text");
+      });
+      return;
+    }
+    if (type === "compare") {
+      ["left", "right"].forEach(function (side, index) {
+        var card = node.querySelectorAll(".ppt-compare-card")[index];
+        if (!card) return;
+        tagPath(card.querySelector("h2"), prefix + side + ".title");
+        tagPath(card.querySelector("p"), prefix + side + ".text");
+      });
+      return;
+    }
+    if (type === "quote") {
+      tagPath(node.querySelector(".ppt-quote"), prefix + "quote");
+      tagPath(node.querySelector(".ppt-author"), prefix + "author");
+      return;
+    }
+    if (type === "code") {
+      tagPath(node.querySelector(".ppt-code"), prefix + "code");
+      return;
+    }
+    if (type === "shape") {
+      tagPath(node.querySelector(".ppt-shape-text"), prefix + "text");
+    }
   }
 
   function normalizeStyleMap(value) {
