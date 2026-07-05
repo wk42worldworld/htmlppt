@@ -4293,7 +4293,8 @@
       number.textContent = String(index + 1);
       button.appendChild(number);
 
-      button.appendChild(createSlideThumbPreview(slide, index));
+      var preview = createSlideThumbPreview(slide, index);
+      button.appendChild(preview);
 
       var meta = document.createElement("div");
       meta.className = "slide-thumb-meta";
@@ -4348,6 +4349,7 @@
         moveSlideByDrag(Number(sourceIndex), index);
       });
       els.slideList.appendChild(button);
+      fitSlideThumbPreview(preview, preview.querySelector(".slide-thumb-frame"));
     });
   }
 
@@ -4364,7 +4366,9 @@
       transition: deck.transition,
       slides: [slide]
     };
-    var slideNode = PPTHtml.renderSlide(slide, thumbDeck, { index: 0 });
+    var slideNode = PPTHtml.renderSlide(slide, thumbDeck, { index: index, thumbnail: true });
+    slideNode.classList.add("is-slide-thumbnail");
+    slideNode.setAttribute("data-thumbnail", "true");
     slideNode.removeAttribute("data-ppt-path");
     prepareSlideThumbnailMedia(slideNode);
     frame.appendChild(slideNode);
@@ -4399,17 +4403,36 @@
       media.controls = false;
       media.muted = true;
       media.preload = "none";
+      media.removeAttribute("controls");
+      media.setAttribute("tabindex", "-1");
+      if (typeof media.pause === "function") media.pause();
+    });
+  }
+
+  function updateSlideListSelection() {
+    if (!els.slideList) return;
+    els.slideList.querySelectorAll(".slide-thumb").forEach(function (thumb) {
+      var index = Number(thumb.dataset.slideIndex);
+      var active = index === currentIndex;
+      thumb.classList.toggle("active", active);
+      thumb.setAttribute("aria-current", active ? "true" : "false");
     });
   }
 
   function selectSlide(index, options) {
-    if (index === currentIndex) {
+    var nextIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    if (nextIndex === currentIndex) {
       if (options && options.focusThumb) focusCurrentSlideThumb();
       return;
     }
     clearCanvasSelection();
-    currentIndex = index;
-    renderAll();
+    currentIndex = nextIndex;
+    updateSlideListSelection();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    refreshTooltips();
     if (options && options.focusThumb) focusCurrentSlideThumb();
   }
 

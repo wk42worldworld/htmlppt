@@ -99,6 +99,13 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   assert.match(indexHtml, pattern);
 });
 assert.match(appJs, /function createSlideThumbPreview/);
+assert.match(appJs, /function updateSlideListSelection/);
+{
+  const selectSlideSource = appJs.match(/function selectSlide[\s\S]*?\n  }\n\n  function focusCurrentSlideThumb/)[0];
+  assert.match(selectSlideSource, /updateSlideListSelection\(\)/);
+  assert.match(selectSlideSource, /renderCanvas\(\)/);
+  assert.doesNotMatch(selectSlideSource, /renderAll\(\)/);
+}
 assert.match(appJs, /replaceDeck\(PPTHtml\.createBlankDeck\(\)/);
 assert.match(appJs, /return PPTHtml\.normalizeDeck\(PPTHtml\.createBlankDeck\(\)\)/);
 assert.match(appJs, /function handleCanvasWheel/);
@@ -182,6 +189,8 @@ assert.match(electronMain, /canvasZoomIn/);
 assert.match(electronMain, /canvasZoomFit/);
 assert.doesNotMatch(electronMain, /role: "zoomIn"/);
 assert.match(stylesCss, /\.slide-thumb-preview/);
+assert.match(stylesCss, /Thumbnail stability pass/);
+assert.match(stylesCss, /\.slide-thumb-frame,[\s\S]*?\.slide-thumb-frame \*/);
 assert.match(stylesCss, /\.canvas-zoom-controls/);
 assert.match(stylesCss, /button\.icon-button\.labeled-action/);
 assert.match(stylesCss, /\.template-grid \{[\s\S]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
