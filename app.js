@@ -3230,6 +3230,7 @@
       startX: event.clientX,
       startY: event.clientY,
       origin: getCanvasOffset(target.getAttribute("data-canvas-edit")),
+      startBox: getNodeFrameBounds(target),
       scale: currentFrameScale(),
       pointerId: event.pointerId,
       frame: 0,
@@ -3291,7 +3292,12 @@
       return;
     }
     setCanvasOffsetStyle(drag.node, nextOffset);
-    positionCanvasSelectionBox(drag.node);
+    positionCanvasSelectionBoxFromBounds({
+      x: drag.startBox.x + nextOffset.x - drag.origin.x,
+      y: drag.startBox.y + nextOffset.y - drag.origin.y,
+      w: drag.startBox.w,
+      h: drag.startBox.h
+    });
   }
 
   function setObjectDragPreviewStyle(node, origin, nextOffset) {
@@ -3614,9 +3620,21 @@
       scale: currentFrameScale(),
       origin: getCanvasOffset(path),
       startBox: getNodeFrameBounds(node),
+      pointerId: event.pointerId,
+      frame: 0,
+      pendingDx: 0,
+      pendingDy: 0,
       moved: false
     };
     node.classList.add("is-canvas-dragging");
+    els.stageFrame.classList.add("is-canvas-moving");
+    if (node.setPointerCapture && event.pointerId != null) {
+      try {
+        node.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Pointer capture is best-effort; window listeners still keep the resize working.
+      }
+    }
     window.addEventListener("pointermove", handleCanvasResizePointerMove);
     window.addEventListener("pointerup", handleCanvasResizePointerEnd);
     window.addEventListener("pointercancel", handleCanvasResizePointerEnd);
@@ -3630,7 +3648,18 @@
     if (!resize.moved && Math.hypot(dx, dy) < 3) return;
     resize.moved = true;
     event.preventDefault();
+    resize.pendingDx = dx;
+    resize.pendingDy = dy;
+    if (!resize.frame) {
+      resize.frame = window.requestAnimationFrame(function () {
+        resize.frame = 0;
+        applyCanvasResizePreview(resize);
+      });
+    }
+  }
 
+  function applyCanvasResizePreview(resize) {
+    if (!resize || !resize.node) return;
     var next = {
       x: resize.origin.x,
       y: resize.origin.y,
@@ -3640,6 +3669,8 @@
     var handle = resize.handle;
     var minW = 44;
     var minH = 24;
+    var dx = resize.pendingDx;
+    var dy = resize.pendingDy;
 
     if (handle.indexOf("e") !== -1) next.w = Math.max(minW, resize.startBox.w + dx);
     if (handle.indexOf("s") !== -1) next.h = Math.max(minH, resize.startBox.h + dy);
@@ -3654,22 +3685,66 @@
 
     if (getObjectByPath(resize.path)) {
       next = clampObjectGeometry(next);
+      setObjectResizePreviewStyle(resize.node, resize.origin, resize.startBox, next);
+      positionCanvasSelectionBoxFromBounds(next);
+      return;
     } else {
       next.x = clamp(next.x, -420, 420);
       next.y = clamp(next.y, -240, 240);
     }
     setCanvasOffsetStyle(resize.node, next);
-    positionCanvasSelectionBox(resize.node);
+    positionCanvasSelectionBoxFromBounds({
+      x: resize.startBox.x + next.x - resize.origin.x,
+      y: resize.startBox.y + next.y - resize.origin.y,
+      w: next.w || resize.startBox.w,
+      h: next.h || resize.startBox.h
+    });
+  }
+
+  function setObjectResizePreviewStyle(node, origin, startBox, nextOffset) {
+    var baseW = Math.max(1, Number(origin.w) || Number(startBox.w) || 1);
+    var baseH = Math.max(1, Number(origin.h) || Number(startBox.h) || 1);
+    var dx = Math.round((Number(nextOffset.x) || 0) - (Number(origin.x) || 0));
+    var dy = Math.round((Number(nextOffset.y) || 0) - (Number(origin.y) || 0));
+    var sx = Math.max(0.01, (Number(nextOffset.w) || baseW) / baseW);
+    var sy = Math.max(0.01, (Number(nextOffset.h) || baseH) / baseH);
+    node.dataset.canvasX = String(nextOffset.x);
+    node.dataset.canvasY = String(nextOffset.y);
+    node.dataset.canvasW = String(nextOffset.w);
+    node.dataset.canvasH = String(nextOffset.h);
+    node.style.willChange = "transform";
+    node.style.transformOrigin = "0 0";
+    node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0) scale(" + sx + ", " + sy + ")";
+  }
+
+  function flushCanvasResizePreview(resize) {
+    if (!resize || !resize.moved) return;
+    if (resize.frame) {
+      window.cancelAnimationFrame(resize.frame);
+      resize.frame = 0;
+    }
+    applyCanvasResizePreview(resize);
   }
 
   function handleCanvasResizePointerEnd(event) {
     if (!activeCanvasResize) return;
     var resize = activeCanvasResize;
+    flushCanvasResizePreview(resize);
     activeCanvasResize = null;
     window.removeEventListener("pointermove", handleCanvasResizePointerMove);
     window.removeEventListener("pointerup", handleCanvasResizePointerEnd);
     window.removeEventListener("pointercancel", handleCanvasResizePointerEnd);
     resize.node.classList.remove("is-canvas-dragging");
+    els.stageFrame.classList.remove("is-canvas-moving");
+    resize.node.style.willChange = "";
+    resize.node.style.transformOrigin = "";
+    if (resize.node.releasePointerCapture && resize.pointerId != null) {
+      try {
+        resize.node.releasePointerCapture(resize.pointerId);
+      } catch (error) {
+        // The pointer may already be released by the browser.
+      }
+    }
     if (!resize.moved) return;
     event.preventDefault();
 
@@ -3679,7 +3754,10 @@
     if (history.length > 80) history.shift();
     future = [];
     var foldedTextBox = foldTextBoxGeometry(resize.path, offset);
-    if (!foldedTextBox) setCanvasOffset(resize.path, offset);
+    if (!foldedTextBox) {
+      setCanvasOffset(resize.path, offset);
+      setCanvasOffsetStyle(resize.node, getCanvasOffset(resize.path));
+    }
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     if (foldedTextBox) renderCanvas();
