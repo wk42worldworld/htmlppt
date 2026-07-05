@@ -288,6 +288,12 @@
         "zIndex": {
           "type": "number"
         },
+        "locked": {
+          "type": "boolean"
+        },
+        "hidden": {
+          "type": "boolean"
+        },
         "data": {
           "type": "object",
           "additionalProperties": true

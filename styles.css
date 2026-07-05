@@ -890,6 +890,88 @@ textarea:focus {
   font-weight: 740;
 }
 
+.object-layer-list {
+  display: grid;
+  gap: 6px;
+  max-height: 174px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+
+.object-layer-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 30px 30px;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px;
+  border: 1px solid var(--ui-line);
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.object-layer-row:hover {
+  border-color: rgba(37, 99, 235, .32);
+  background: #f8fbff;
+}
+
+.object-layer-row.is-selected {
+  border-color: rgba(37, 99, 235, .58);
+  background: rgba(37, 99, 235, .08);
+}
+
+.object-layer-row.is-hidden-object {
+  opacity: .62;
+}
+
+.object-layer-meta {
+  display: grid;
+  min-width: 0;
+}
+
+.object-layer-meta strong,
+.object-layer-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.object-layer-meta strong {
+  color: var(--ui-strong);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.object-layer-meta span,
+.object-layer-empty {
+  color: var(--ui-muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.object-layer-empty {
+  padding: 8px 2px;
+}
+
+.object-layer-action {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 7px;
+}
+
+.object-layer-action svg {
+  width: 15px;
+  height: 15px;
+}
+
+.stage-frame .ppt-object.is-canvas-locked {
+  outline: 1px dashed rgba(100, 116, 139, .45);
+}
+
 .object-panel .object-align-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 0;

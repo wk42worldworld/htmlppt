@@ -212,6 +212,8 @@ AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，
     "h": 300,
     "rotation": 0,
     "zIndex": 9,
+    "locked": false,
+    "hidden": false,
     "data": {
       "kind": "bar",
       "labels": ["Q1", "Q2"],
@@ -231,6 +233,8 @@ AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，
 - `w`、`h`：对象宽高。
 - `rotation`：旋转角度，单位为度。
 - `zIndex`：图层顺序，数值越大越靠前。
+- `locked`：可选布尔值。为 `true` 时编辑器应防止拖拽、缩放、删除和数据修改；播放和导出不受影响。
+- `hidden`：可选布尔值。为 `true` 时该对象不在画布、播放和导出的单文件中渲染，但仍保留在 `objects[]` 里，便于之后恢复显示。
 - `data`：对象内容数据。媒体对象使用 `src`/`poster`/`caption`；图表对象复用 `chart` 数据；表格对象复用 `table` 数据；形状对象使用下方 shape 数据。
 - `style`：对象内联样式覆盖。编辑器也兼容旧的 `styles["objects.0"]` 路径样式。
 

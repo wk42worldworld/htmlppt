@@ -168,6 +168,7 @@ const objectDeck = ppt.normalizeDeck({
         {
           id: "chart-object",
           type: "chart",
+          locked: true,
           x: 40,
           y: 80,
           w: 420,
@@ -178,6 +179,16 @@ const objectDeck = ppt.normalizeDeck({
             series: [{ name: "Revenue", values: [10, 18] }],
             unit: "k"
           }
+        },
+        {
+          id: "hidden-object",
+          type: "shape",
+          hidden: true,
+          x: 460,
+          y: 360,
+          w: 180,
+          h: 90,
+          data: { label: "Hidden shape" }
         },
         {
           id: "table-object",
@@ -220,38 +231,44 @@ const objectDeck = ppt.normalizeDeck({
 });
 
 const normalizedObjects = objectDeck.slides[0].objects;
-assert.equal(normalizedObjects.length, 4, "normalizeDeck should keep slide.objects");
-assert.equal(JSON.stringify(normalizedObjects.map((object) => object.type)), JSON.stringify(["chart", "table", "image", "shape"]));
+assert.equal(normalizedObjects.length, 5, "normalizeDeck should keep slide.objects");
+assert.equal(JSON.stringify(normalizedObjects.map((object) => object.type)), JSON.stringify(["chart", "shape", "table", "image", "shape"]));
+assert.equal(normalizedObjects[0].locked, true);
+assert.equal(normalizedObjects[1].hidden, true);
 assert.equal(normalizedObjects[0].data.series[0].values[1], 18);
-assert.equal(normalizedObjects[1].data.rows[0][1], "Ready");
-assert.equal(normalizedObjects[2].data.fit, "contain");
-assert.equal(normalizedObjects[3].data.label, "Callout shape");
+assert.equal(normalizedObjects[2].data.rows[0][1], "Ready");
+assert.equal(normalizedObjects[3].data.fit, "contain");
+assert.equal(normalizedObjects[4].data.label, "Callout shape");
 
 const slideNode = ppt.renderSlide(objectDeck.slides[0], objectDeck, { index: 0 });
 
 assert.equal(slideNode.querySelectorAll(".ppt-object").length, 4);
 assert.ok(slideNode.querySelector(".ppt-object-chart .ppt-chart-wrap"), "chart object should render a chart DOM subtree");
 assert.ok(slideNode.querySelector(".ppt-object-chart .ppt-chart"), "chart object should include svg chart output");
+assert.equal(slideNode.querySelector(".ppt-object-chart").getAttribute("data-object-locked"), "true");
 assert.ok(slideNode.querySelector(".ppt-object-table .ppt-table"), "table object should render a table DOM subtree");
 assert.equal(slideNode.querySelector(".ppt-object-table td").textContent, "Alpha");
+assert.equal(slideNode.querySelector(".ppt-object-table").getAttribute("data-object-index"), "2");
 assert.equal(
   slideNode.querySelector(".ppt-object-table th").getAttribute("data-ppt-path"),
-  "objects.1.data.columns.0",
+  "objects.2.data.columns.0",
   "object table header should use an object-scoped edit path"
 );
 assert.equal(
   slideNode.querySelector(".ppt-object-table td").getAttribute("data-ppt-path"),
-  "objects.1.data.rows.0.0",
+  "objects.2.data.rows.0.0",
   "object table cell should use an object-scoped edit path"
 );
 assert.ok(slideNode.querySelector(".ppt-object-image .ppt-media img"), "image object should render an img in media DOM");
 assert.equal(slideNode.querySelector(".ppt-object-image .ppt-caption").textContent, "Image object");
 assert.ok(slideNode.querySelector(".ppt-object-shape .ppt-shape"), "shape object should render a shape DOM subtree");
 assert.equal(slideNode.querySelector(".ppt-object-shape .ppt-shape-text").textContent, "Callout shape");
+assert.equal(slideNode.textContent.includes("Hidden shape"), false, "hidden objects should not render on slides");
 
 const standaloneHtml = ppt.exportStandalone(objectDeck);
 assert.match(standaloneHtml, /function obj\(o,j,s\)/);
 assert.match(standaloneHtml, /function objs\(n,s\)/);
+assert.match(standaloneHtml, /if\(o&&o\.hidden\)return/);
 assert.match(standaloneHtml, /objs\(sn,sd\)/);
 assert.match(standaloneHtml, /ppt-object ppt-object-/);
 assert.match(standaloneHtml, /ty==='image'/);

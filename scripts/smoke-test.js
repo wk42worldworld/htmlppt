@@ -83,6 +83,7 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectMediaEditor"/,
   /id="objectChartEditor"/,
   /id="objectTableEditor"/,
+  /id="objectLayerList"/,
   /id="copyRepairPromptBtn"/,
   /id="presentFitBtn"/,
   /id="presentShortcutsBtn"/,
@@ -108,7 +109,12 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="presentPrevBtn"[\s\S]*?#icon-chevron-left/,
   /id="presentFitBtn"[\s\S]*?#icon-fit-fill/,
   /id="presentShortcutsBtn"[\s\S]*?#icon-keyboard/,
-  /id="presentFullscreenBtn"[\s\S]*?#icon-fullscreen/
+  /id="presentFullscreenBtn"[\s\S]*?#icon-fullscreen/,
+  /id="objectLayerList"[\s\S]*data-i18n-group="object\.geometry"/,
+  /id="icon-eye"/,
+  /id="icon-eye-off"/,
+  /id="icon-lock"/,
+  /id="icon-unlock"/
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
 });
@@ -143,6 +149,11 @@ assert.match(appJs, /function selectableCanvasPathsInRect/);
 assert.match(appJs, /function resolveCanvasSnap/);
 assert.match(appJs, /snapDisabled = event\.altKey/);
 assert.match(appJs, /function renderCanvasSnapGuides/);
+assert.match(appJs, /function renderObjectLayerList/);
+assert.match(appJs, /function toggleObjectLocked/);
+assert.match(appJs, /function toggleObjectHidden/);
+assert.match(appJs, /function isLockedCanvasPath/);
+assert.match(appJs, /data-object-layer-action/);
 assert.match(appJs, /function textBoxPreset/);
 assert.match(appJs, /function fontFamilyStack/);
 assert.match(appJs, /function syncTypedObjectPanel/);
@@ -234,6 +245,8 @@ assert.match(appJs, /canvasZoomMode/);
     `schema missing font token ${token}`
   );
 });
+assert.equal(schema.$defs.slideObject.properties.locked.type, "boolean");
+assert.equal(schema.$defs.slideObject.properties.hidden.type, "boolean");
 const i18nKeys = Array.from(indexHtml.matchAll(/data-i18n(?:-[a-z]+)?="([^"]+)"/g)).map((match) => match[1]);
 Array.from(new Set(i18nKeys)).forEach((key) => {
   assert.match(appJs, new RegExp(`"${key.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}"`), `missing i18n key ${key}`);
@@ -254,6 +267,9 @@ assert.match(stylesCss, /\.stage-frame\.is-canvas-moving \[data-canvas-edit\]/);
 assert.match(stylesCss, /\.stage-frame \.canvas-marquee-box/);
 assert.match(stylesCss, /\.stage-frame \.canvas-snap-guide-x/);
 assert.match(stylesCss, /\.stage-frame \.canvas-snap-guide-y/);
+assert.match(stylesCss, /\.object-layer-list/);
+assert.match(stylesCss, /\.object-layer-row\.is-selected/);
+assert.match(stylesCss, /\.ppt-object\.is-canvas-locked/);
 assert.match(stylesCss, /contain: layout paint/);
 assert.match(stylesCss, /\.stage-frame \.ppt-object-table/);
 assert.match(stylesCss, /Layout stability pass/);
@@ -265,6 +281,7 @@ assert.match(code, /function tableObjectSize/);
 assert.match(code, /mode='fit'/);
 assert.match(code, /fitb=e\('button','','适合'\)/);
 assert.match(code, /k==='m'\|\|k==='M'/);
+assert.match(code, /if\(o&&o\.hidden\)return/);
 
 ppt.deckTemplates.forEach((template) => {
   const deck = ppt.createTemplateDeck(template.id);

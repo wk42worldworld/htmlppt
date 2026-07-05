@@ -1978,6 +1978,14 @@
     "panel.object": "对象",
     "object.noSelection": "选中画布对象后，可调整位置、尺寸、图层和数据。",
     "object.target": "{name} · ID {id}",
+    "object.layers": "对象列表",
+    "object.noObjects": "当前页还没有自由对象",
+    "object.lock": "锁定对象",
+    "object.unlock": "解锁对象",
+    "object.hide": "隐藏对象",
+    "object.show": "显示对象",
+    "object.locked": "已锁定",
+    "object.hidden": "已隐藏",
     "object.duplicate": "重复",
     "object.forward": "上移一层",
     "object.backward": "下移一层",
@@ -2012,6 +2020,11 @@
     "toast.objectCopied": "对象已复制",
     "toast.objectPasted": "对象已粘贴",
     "toast.layerChanged": "图层已调整",
+    "toast.objectLocked": "对象已锁定",
+    "toast.objectUnlocked": "对象已解锁",
+    "toast.objectHidden": "对象已隐藏",
+    "toast.objectShown": "对象已显示",
+    "toast.lockedSelection": "选区包含锁定对象",
     "toast.objectDataInvalid": "对象数据不是有效 JSON"
   });
 
@@ -2030,6 +2043,14 @@
     "panel.object": "Object",
     "object.noSelection": "Select a canvas object to edit position, size, layer, and data.",
     "object.target": "{name} · ID {id}",
+    "object.layers": "Object list",
+    "object.noObjects": "No freeform objects on this slide",
+    "object.lock": "Lock object",
+    "object.unlock": "Unlock object",
+    "object.hide": "Hide object",
+    "object.show": "Show object",
+    "object.locked": "Locked",
+    "object.hidden": "Hidden",
     "object.duplicate": "Duplicate",
     "object.forward": "Bring forward",
     "object.backward": "Send backward",
@@ -2064,6 +2085,11 @@
     "toast.objectCopied": "Object copied",
     "toast.objectPasted": "Object pasted",
     "toast.layerChanged": "Layer changed",
+    "toast.objectLocked": "Object locked",
+    "toast.objectUnlocked": "Object unlocked",
+    "toast.objectHidden": "Object hidden",
+    "toast.objectShown": "Object shown",
+    "toast.lockedSelection": "Selection includes a locked object",
     "toast.objectDataInvalid": "Object data is not valid JSON"
   });
 
@@ -2082,6 +2108,14 @@
     "panel.object": "オブジェクト",
     "object.noSelection": "キャンバス上のオブジェクトを選択すると、位置、サイズ、レイヤー、データを編集できます。",
     "object.target": "{name} · ID {id}",
+    "object.layers": "オブジェクト一覧",
+    "object.noObjects": "このスライドに自由配置オブジェクトはありません",
+    "object.lock": "ロック",
+    "object.unlock": "ロック解除",
+    "object.hide": "非表示",
+    "object.show": "表示",
+    "object.locked": "ロック中",
+    "object.hidden": "非表示",
     "object.duplicate": "複製",
     "object.forward": "前面へ",
     "object.backward": "背面へ",
@@ -2116,6 +2150,11 @@
     "toast.objectCopied": "コピーしました",
     "toast.objectPasted": "貼り付けました",
     "toast.layerChanged": "レイヤーを変更しました",
+    "toast.objectLocked": "オブジェクトをロックしました",
+    "toast.objectUnlocked": "ロックを解除しました",
+    "toast.objectHidden": "オブジェクトを非表示にしました",
+    "toast.objectShown": "オブジェクトを表示しました",
+    "toast.lockedSelection": "選択範囲にロック中のオブジェクトがあります",
     "toast.objectDataInvalid": "オブジェクトデータが有効な JSON ではありません"
   });
 
@@ -2134,6 +2173,14 @@
     "panel.object": "개체",
     "object.noSelection": "캔버스 개체를 선택하면 위치, 크기, 레이어, 데이터를 편집할 수 있습니다.",
     "object.target": "{name} · ID {id}",
+    "object.layers": "개체 목록",
+    "object.noObjects": "이 슬라이드에 자유 개체가 없습니다",
+    "object.lock": "개체 잠금",
+    "object.unlock": "잠금 해제",
+    "object.hide": "개체 숨기기",
+    "object.show": "개체 보이기",
+    "object.locked": "잠김",
+    "object.hidden": "숨김",
     "object.duplicate": "복제",
     "object.forward": "앞으로",
     "object.backward": "뒤로",
@@ -2168,6 +2215,11 @@
     "toast.objectCopied": "개체를 복사했습니다",
     "toast.objectPasted": "개체를 붙여넣었습니다",
     "toast.layerChanged": "레이어를 변경했습니다",
+    "toast.objectLocked": "개체를 잠갔습니다",
+    "toast.objectUnlocked": "잠금을 해제했습니다",
+    "toast.objectHidden": "개체를 숨겼습니다",
+    "toast.objectShown": "개체를 표시했습니다",
+    "toast.lockedSelection": "선택 항목에 잠긴 개체가 있습니다",
     "toast.objectDataInvalid": "개체 데이터가 올바른 JSON이 아닙니다"
   });
 
@@ -2429,7 +2481,7 @@
       "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "stylePanel", "styleTargetLabel", "styleFontFamilyInput", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
       "styleBackgroundInput", "styleBackgroundResetBtn", "styleBorderColorInput", "styleBorderColorResetBtn", "styleBorderWidthInput", "styleRadiusInput", "styleOpacityInput", "styleResetBtn",
-      "objectPanel", "objectTargetLabel", "objectXInput", "objectYInput", "objectWInput", "objectHInput", "objectRotationInput", "objectZInput",
+      "objectPanel", "objectTargetLabel", "objectLayerList", "objectXInput", "objectYInput", "objectWInput", "objectHInput", "objectRotationInput", "objectZInput",
       "objectDuplicateBtn", "objectDeleteBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
       "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
       "objectTableTools", "objectTableAddRowBtn", "objectTableDeleteRowBtn", "objectTableAddColumnBtn", "objectTableDeleteColumnBtn",
@@ -2881,6 +2933,10 @@
     bindObjectGeometryInput(els.objectHInput, "h", { min: 24, max: PPTHtml.baseHeight * 2 });
     bindObjectGeometryInput(els.objectRotationInput, "rotation", { min: -360, max: 360 });
     bindObjectGeometryInput(els.objectZInput, "zIndex", { min: 0, max: 999 });
+    if (els.objectLayerList) {
+      els.objectLayerList.addEventListener("click", handleObjectLayerListClick);
+      els.objectLayerList.addEventListener("keydown", handleObjectLayerListKeydown);
+    }
     els.objectDataInput.addEventListener("focus", captureEditStart);
     els.objectDataInput.addEventListener("change", commitObjectDataFromPanel);
     bindObjectDataInput(els.objectMediaSrcInput, function (object, value) { ensureObjectData(object).src = value; });
@@ -3251,6 +3307,7 @@
   function occupiedSlideBounds(slide, objectType) {
     var bounds = layoutOccupiedBounds(slide || {});
     (Array.isArray(slide && slide.objects) ? slide.objects : []).forEach(function (object) {
+      if (object && object.hidden) return;
       bounds.push({
         x: Number(object.x) || 0,
         y: Number(object.y) || 0,
@@ -4205,6 +4262,7 @@
 
   function updateSelectedStyleLive(prop, rawValue, options) {
     if (!selectedCanvasPath) return;
+    if (isLockedCanvasPath(selectedCanvasPath)) return;
     pushLiveHistory();
     setSelectedStyleProperty(prop, rawValue, options || {});
     markDirty();
@@ -4216,6 +4274,11 @@
 
   function updateSelectedStyleCommit(prop, rawValue, options) {
     if (!selectedCanvasPath) return;
+    if (isLockedCanvasPath(selectedCanvasPath)) {
+      toast(t("toast.lockedSelection"));
+      syncStylePanel();
+      return;
+    }
     var before = JSON.stringify(deck);
     setSelectedStyleProperty(prop, rawValue, options || {});
     if (!activeEditPushed && before !== JSON.stringify(deck)) pushLiveHistory(before);
@@ -4232,6 +4295,11 @@
 
   function commitStyleMutation(mutator) {
     if (!selectedCanvasPath) return;
+    if (isLockedCanvasPath(selectedCanvasPath)) {
+      toast(t("toast.lockedSelection"));
+      syncStylePanel();
+      return;
+    }
     var before = JSON.stringify(deck);
     var style = ensureStyleOverride(selectedCanvasPath);
     mutator(style);
@@ -4254,6 +4322,11 @@
 
   function resetSelectedStyle() {
     if (!selectedCanvasPath) return;
+    if (isLockedCanvasPath(selectedCanvasPath)) {
+      toast(t("toast.lockedSelection"));
+      syncStylePanel();
+      return;
+    }
     var slide = currentSlide();
     if (!slide.styles || !slide.styles[selectedCanvasPath]) return;
     var before = JSON.stringify(deck);
@@ -4970,15 +5043,22 @@
       compare: "insert.compare",
       shape: "canvas.shape"
     };
-    els.stageFrame.querySelectorAll(".ppt-object").forEach(function (node, index) {
-      var type = node.dataset.objectType || objectTypeFromPath("objects." + index);
+    els.stageFrame.querySelectorAll(".ppt-object").forEach(function (node, fallbackIndex) {
+      var objectIndex = Number(node.getAttribute("data-object-index"));
+      if (!isFinite(objectIndex)) objectIndex = fallbackIndex;
+      var path = "objects." + objectIndex;
+      var object = getObjectByPath(path);
+      var type = node.dataset.objectType || objectTypeFromPath(path);
       var options = {
         draggableOnly: true,
-        labelKey: labelKeys[type] || "canvas.object"
+        labelKey: labelKeys[type] || "canvas.object",
+        locked: Boolean(object && object.locked),
+        noDrag: Boolean(object && object.locked)
       };
+      node.classList.toggle("is-canvas-locked", Boolean(object && object.locked));
       if (type === "image" || type === "video" || type === "audio") options.fileAction = type;
-      registerCanvasEdit(node, "objects." + index, options);
-      if (type === "table") bindObjectTableCells(node, index);
+      registerCanvasEdit(node, path, options);
+      if (type === "table" && !(object && object.locked)) bindObjectTableCells(node, objectIndex);
     });
   }
 
@@ -5034,6 +5114,10 @@
     var targetOptions = parseCanvasOptions(target);
     selectCanvasTarget(target, { toggle: event.shiftKey });
     if (targetOptions.noDrag) return;
+    if (hasLockedCanvasSelection(currentCanvasSelectionPaths())) {
+      toast(t("toast.lockedSelection"));
+      return;
+    }
     if (!selectedCanvasPath) return;
     var dragPaths = currentCanvasSelectionPaths();
     var targetPath = target.getAttribute("data-canvas-edit");
@@ -5638,10 +5722,11 @@
     return null;
   }
 
-  function createCanvasDeleteButton() {
+  function createCanvasDeleteButton(disabled) {
     var remove = document.createElement("button");
     remove.type = "button";
     remove.className = "canvas-delete-button";
+    remove.disabled = Boolean(disabled);
     setTooltip(remove, t("canvas.deleteTitle"));
     remove.textContent = t("canvas.delete");
     remove.addEventListener("pointerdown", function (event) {
@@ -5699,7 +5784,7 @@
       resetSelectedCanvasOffset();
     });
     box.appendChild(reset);
-    box.appendChild(createCanvasDeleteButton());
+    box.appendChild(createCanvasDeleteButton(selectionOptions.locked));
 
     if (!selectionOptions.noDrag) {
       ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach(function (handle) {
@@ -5728,7 +5813,7 @@
     label.className = "canvas-selection-label";
     label.textContent = formatText(t("selection.multiple"), { count: paths.length });
     box.appendChild(label);
-    box.appendChild(createCanvasDeleteButton());
+    box.appendChild(createCanvasDeleteButton(hasLockedCanvasSelection(paths)));
 
     els.stageFrame.appendChild(box);
     positionCanvasSelectionBoxFromBounds(bounds, box);
@@ -5760,7 +5845,7 @@
   function syncStylePanel() {
     if (!els.stylePanel) return;
     var node = canvasNodeByPath(selectedCanvasPath);
-    var hasSelection = Boolean(node);
+    var hasSelection = Boolean(node && !isLockedCanvasPath(selectedCanvasPath));
     var previousSyncing = syncing;
     syncing = true;
 
@@ -5812,11 +5897,15 @@
     var info = selectedObjectInfo();
     var object = info && info.object;
     var hasObject = Boolean(object && !activeCanvasEdit);
+    var objectLocked = Boolean(object && object.locked);
+    var objectHidden = Boolean(object && object.hidden);
+    var canEditObject = hasObject && !objectLocked && !objectHidden;
     var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
-    var hasTableContext = Boolean(tableInfo && tableInfo.kind === "object" && !activeCanvasEdit);
+    var hasTableContext = Boolean(tableInfo && tableInfo.kind === "object" && !activeCanvasEdit && !objectLocked && !objectHidden);
+    renderObjectLayerList();
     els.objectPanel.classList.toggle("is-disabled", !hasObject && !hasTableContext);
     els.objectPanel.querySelectorAll("[data-object-control]").forEach(function (control) {
-      control.disabled = !hasObject;
+      control.disabled = !canEditObject;
     });
     if (els.objectTableTools) {
       var showTableTools = hasTableContext;
@@ -5841,11 +5930,12 @@
     }
 
     var node = canvasNodeByPath(selectedCanvasPath);
-    var paths = currentCanvasSelectionPaths();
+    var paths = objectHidden ? uniqueStrings(selectedCanvasPaths.concat(selectedCanvasPath)) : currentCanvasSelectionPaths();
+    var targetName = node ? canvasSelectionLabel(node, selectedCanvasPath) : objectLayerLabel(object, info.index);
     els.objectTargetLabel.textContent = paths.length > 1
       ? formatText(t("selection.multiple"), { count: paths.length })
       : formatText(t("object.target"), {
-        name: canvasSelectionLabel(node, selectedCanvasPath),
+        name: targetName,
         id: object.id || "-"
       });
     els.objectXInput.value = Math.round(Number(object.x) || 0);
@@ -5857,6 +5947,190 @@
     syncTypedObjectPanel(object);
     els.objectDataInput.value = JSON.stringify(object.data || {}, null, 2);
     updateObjectCommandControlState();
+  }
+
+  function renderObjectLayerList() {
+    if (!els.objectLayerList) return;
+    els.objectLayerList.innerHTML = "";
+    var slide = currentSlide();
+    var objects = Array.isArray(slide.objects) ? slide.objects : [];
+    if (!objects.length) {
+      var empty = document.createElement("div");
+      empty.className = "object-layer-empty";
+      empty.textContent = t("object.noObjects");
+      els.objectLayerList.appendChild(empty);
+      return;
+    }
+    objects.map(function (object, index) {
+      return { object: object, index: index, z: Number(object.zIndex) || 0 };
+    }).sort(function (a, b) {
+      if (a.z !== b.z) return b.z - a.z;
+      return b.index - a.index;
+    }).forEach(function (entry) {
+      els.objectLayerList.appendChild(createObjectLayerRow(entry.object, entry.index));
+    });
+  }
+
+  function createObjectLayerRow(object, index) {
+    var path = "objects." + index;
+    var row = document.createElement("div");
+    row.className = "object-layer-row";
+    row.classList.toggle("is-selected", selectedCanvasPath === path || selectedCanvasPaths.indexOf(path) !== -1);
+    row.classList.toggle("is-locked", Boolean(object.locked));
+    row.classList.toggle("is-hidden-object", Boolean(object.hidden));
+    row.setAttribute("data-object-layer-path", path);
+    row.setAttribute("role", "button");
+    row.setAttribute("tabindex", "0");
+    setTooltip(row, objectLayerLabel(object, index));
+
+    var meta = document.createElement("div");
+    meta.className = "object-layer-meta";
+
+    var title = document.createElement("strong");
+    title.textContent = objectLayerLabel(object, index);
+    meta.appendChild(title);
+
+    var detail = document.createElement("span");
+    var badges = [objectTypeLabel(object.type), "z " + (Number(object.zIndex) || 0)];
+    if (object.locked) badges.push(t("object.locked"));
+    if (object.hidden) badges.push(t("object.hidden"));
+    detail.textContent = badges.join(" · ");
+    meta.appendChild(detail);
+    row.appendChild(meta);
+
+    row.appendChild(createObjectLayerButton(path, object.hidden ? "show" : "hide", object.hidden ? "icon-eye-off" : "icon-eye", object.hidden ? t("object.show") : t("object.hide")));
+    row.appendChild(createObjectLayerButton(path, object.locked ? "unlock" : "lock", object.locked ? "icon-lock" : "icon-unlock", object.locked ? t("object.unlock") : t("object.lock")));
+    return row;
+  }
+
+  function createObjectLayerButton(path, action, iconId, label) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "object-layer-action";
+    button.setAttribute("data-object-layer-action", action);
+    button.setAttribute("data-object-layer-path", path);
+    setTooltip(button, label);
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", "#" + iconId);
+    svg.appendChild(use);
+    button.appendChild(svg);
+    var text = document.createElement("span");
+    text.className = "sr-only";
+    text.textContent = label;
+    button.appendChild(text);
+    return button;
+  }
+
+  function objectLayerLabel(object, index) {
+    var data = object && object.data && typeof object.data === "object" ? object.data : {};
+    var text = data.title || data.label || data.caption || data.alt || data.quote || data.code || object.id || "";
+    text = String(text || "").replace(/\s+/g, " ").trim();
+    return text ? objectTypeLabel(object.type) + " · " + truncateText(text, 24) : objectTypeLabel(object.type) + " " + (index + 1);
+  }
+
+  function objectTypeLabel(type) {
+    var keys = {
+      image: "canvas.image",
+      video: "canvas.video",
+      audio: "canvas.audio",
+      chart: "canvas.chart",
+      table: "canvas.table",
+      cards: "canvas.cards",
+      metrics: "canvas.metrics",
+      timeline: "canvas.timeline",
+      quote: "insert.quote",
+      code: "insert.code",
+      compare: "insert.compare",
+      shape: "canvas.shape"
+    };
+    return t(keys[type] || "canvas.object");
+  }
+
+  function truncateText(value, max) {
+    var text = String(value || "");
+    return text.length > max ? text.slice(0, Math.max(1, max - 1)) + "…" : text;
+  }
+
+  function handleObjectLayerListClick(event) {
+    var actionButton = event.target.closest("[data-object-layer-action]");
+    if (actionButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      var action = actionButton.getAttribute("data-object-layer-action");
+      var actionPath = actionButton.getAttribute("data-object-layer-path");
+      if (action === "lock" || action === "unlock") toggleObjectLocked(actionPath, action === "lock");
+      if (action === "hide" || action === "show") toggleObjectHidden(actionPath, action === "hide");
+      return;
+    }
+    var row = event.target.closest("[data-object-layer-path]");
+    if (!row) return;
+    event.preventDefault();
+    selectObjectFromLayerList(row.getAttribute("data-object-layer-path"));
+  }
+
+  function handleObjectLayerListKeydown(event) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    var row = event.target.closest("[data-object-layer-path]");
+    if (!row) return;
+    event.preventDefault();
+    selectObjectFromLayerList(row.getAttribute("data-object-layer-path"));
+  }
+
+  function selectObjectFromLayerList(path) {
+    var object = getObjectByPath(path);
+    if (!object || object.hidden) {
+      setCanvasSelection(object ? [path] : [], path);
+      syncObjectPanel();
+      return;
+    }
+    var node = canvasNodeByPath(path);
+    if (node) selectCanvasTarget(node);
+    else {
+      setCanvasSelection([path], path);
+      renderObjectLayerList();
+    }
+  }
+
+  function toggleObjectLocked(path, locked) {
+    var object = getObjectByPath(path);
+    if (!object) return false;
+    if (Boolean(object.locked) === Boolean(locked)) return false;
+    var before = JSON.stringify(deck);
+    object.locked = Boolean(locked);
+    if (!object.locked) delete object.locked;
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+    toast(t(locked ? "toast.objectLocked" : "toast.objectUnlocked"));
+    return true;
+  }
+
+  function toggleObjectHidden(path, hidden) {
+    var object = getObjectByPath(path);
+    if (!object) return false;
+    if (Boolean(object.hidden) === Boolean(hidden)) return false;
+    var before = JSON.stringify(deck);
+    object.hidden = Boolean(hidden);
+    if (!object.hidden) delete object.hidden;
+    if (object.hidden && selectedCanvasPath === path) clearCanvasSelection();
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+    toast(t(hidden ? "toast.objectHidden" : "toast.objectShown"));
+    return true;
   }
 
   function syncTypedObjectPanel(object) {
@@ -6244,6 +6518,10 @@
 
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
+      if (hasLockedCanvasSelection(selectedPaths)) {
+        toast(t("toast.lockedSelection"));
+        return true;
+      }
       deleteSelectedCanvasContent(selectedPaths);
       return true;
     }
@@ -6257,6 +6535,10 @@
     if (!arrowDelta) return false;
 
     event.preventDefault();
+    if (hasLockedCanvasSelection(selectedPaths)) {
+      toast(t("toast.lockedSelection"));
+      return true;
+    }
     var step = event.shiftKey ? 10 : 1;
     if (selectedPaths.length > 1) {
       nudgeSelectedCanvasTargets(selectedPaths, arrowDelta[0] * step, arrowDelta[1] * step);
@@ -6327,6 +6609,10 @@
     if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
     var targets = uniqueStrings((paths && paths.length ? paths : currentCanvasSelectionPaths()).filter(Boolean));
     if (!targets.length) return false;
+    if (hasLockedCanvasSelection(targets)) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
 
     var slide = currentSlide();
     var before = JSON.stringify(deck);
@@ -6622,8 +6908,24 @@
     return true;
   }
 
+  function isLockedCanvasPath(path) {
+    var objectIndex = objectIndexFromAnyPath(path);
+    var objects = currentSlide().objects;
+    return objectIndex >= 0 && Array.isArray(objects) && objects[objectIndex] && Boolean(objects[objectIndex].locked);
+  }
+
+  function hasLockedCanvasSelection(paths) {
+    return (paths || currentCanvasSelectionPaths()).some(isLockedCanvasPath);
+  }
+
+  function editableCanvasSelectionPaths(paths) {
+    return (paths || currentCanvasSelectionPaths()).filter(function (path) {
+      return !isLockedCanvasPath(path);
+    });
+  }
+
   function selectedGeometryInfos() {
-    return currentCanvasSelectionPaths().map(geometryInfoForPath).filter(Boolean);
+    return editableCanvasSelectionPaths().map(geometryInfoForPath).filter(Boolean);
   }
 
   function geometryInfoForPath(path) {
@@ -7031,6 +7333,11 @@
   function commitSelectedObjectMutation(mutator) {
     var info = selectedObjectInfo();
     if (!info) return false;
+    if (info.object && info.object.locked) {
+      toast(t("toast.lockedSelection"));
+      syncObjectPanel();
+      return false;
+    }
     var before = activeEditSnapshot || JSON.stringify(deck);
     mutator(info.object, info.index, info.slide);
     if (before === JSON.stringify(deck)) {
@@ -7335,6 +7642,10 @@
   }
 
   function moveSelectedObjectLayer(action) {
+    if (hasLockedCanvasSelection()) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
     var changed = commitSelectedObjectMutation(function (object, index, slide) {
       var objects = Array.isArray(slide.objects) ? slide.objects : [];
       var current = Number(object.zIndex) || 0;
@@ -7485,6 +7796,7 @@
     if (!els.canvasContextMenu) return;
     var hasSelection = Boolean(selectedCanvasPath);
     var hasObject = Boolean(selectedObjectInfo());
+    var hasLockedSelection = hasLockedCanvasSelection();
     var hasClipboardSource = hasCopyableCanvasSelection();
     var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
     var hasTable = Boolean(tableInfo);
@@ -7505,8 +7817,8 @@
       var enabled = true;
       if (action === "paste") enabled = Boolean(canvasClipboard);
       if (action === "copy" || action === "duplicate") enabled = hasClipboardSource;
-      if (action === "delete") enabled = hasSelection;
-      if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject;
+      if (action === "delete") enabled = hasSelection && !hasLockedSelection;
+      if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject && !hasLockedSelection;
       if (tableActions.indexOf(action) !== -1) enabled = hasTable;
       if (action === "tableClearCell") enabled = hasTable && isTableCellPath(selectedCanvasPath);
       button.disabled = !enabled;
@@ -7584,6 +7896,10 @@
   }
 
   function deleteSelectedObject() {
+    if (isLockedCanvasPath(selectedCanvasPath)) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
     var index = objectIndexFromPath(selectedCanvasPath);
     if (index < 0) return false;
     var slide = currentSlide();
@@ -7924,6 +8240,10 @@
     var options = parseCanvasOptions(node);
     if (options.draggableOnly) {
       selectCanvasTarget(node);
+      if (options.locked) {
+        toast(t("toast.lockedSelection"));
+        return;
+      }
       if (options.fileAction === "image") openImagePicker();
       else if (options.fileAction === "video") openVideoPicker();
       else if (options.fileAction === "audio") openAudioPicker();
