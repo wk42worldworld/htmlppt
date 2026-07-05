@@ -190,13 +190,14 @@ git diff -- examples/ai-camera.ppt.html
 - Codex Skill：统一生成、修复和维护规则。
 - 仓库级 `AGENTS.md`：说明多人协作、测试和常见坑。
 - 接入文档：说明其它 agent 怎么接进来。
+- `slide.objects[]` 对象级校验：重复 id、几何、媒体、图表、表格等问题会进入报告。
+- 图片/视频/音频、图表、表格对象已有 Typed Inspector，普通用户可以少编辑 JSON。
+- 质量检查弹窗可以一键复制 AI 修复 Prompt。
 
 ### P0 下一步
 
-- 对 `slide.objects[]` 做对象级校验：重复 id、越界、图表数据、表格行列、媒体资源。
-- 给图片/视频/音频、图表、表格做 Typed Inspector，减少普通用户编辑 JSON 的需求。
-- 增加“一键复制 AI 修复 Prompt”：当前 JSON + 校验报告 + 修复规则。
 - 支持导出 `deck.json` 和校验报告文件。
+- 增强对象级校验的自动修复建议和 JSON 报告字段。
 
 ### P1
 

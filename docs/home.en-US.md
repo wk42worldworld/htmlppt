@@ -4,6 +4,8 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 
 ## What Is New
 
+v0.2.14 strengthens the AI and human editing loop: canvas objects now receive object-level validation for duplicate ids, geometry, media, chart, table, card, metric, timeline, quote, code, and compare data; selected image/video/audio, chart, and table objects expose typed inspectors; the Quality Check dialog can copy a complete AI repair prompt; and the bundled `htmlppt` Codex skill plus deck CLI are now the documented handoff path for other agents.
+
 v0.2.10 polishes the first-run experience: a clearer HTML slide app icon, real favicons in both the editor and exported standalone `.ppt.html` files, a wider default desktop window, less cramped 1280px columns, a cleaner current-slide action bar, and earlier Electron app identity setup to reduce default Electron branding during launch.
 
 v0.2.9 adds the first element style inspector. Click titles, body text, text boxes, cards, table cells, metrics, chart legends, or media blocks on the canvas, then use the right panel to adjust font size, text color, alignment, bold, italic, background, border, radius, and opacity. The result is saved as structured `styles[path]` data, preserved in exported `.ppt.html` files, and still readable for AI edits.

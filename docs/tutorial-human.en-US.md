@@ -153,6 +153,14 @@ The main editor now includes an `Insert` component palette beside the canvas. Yo
 
 After inserting a component, continue editing it in the right panel, or double-click text, drag components, and resize them directly on the canvas.
 
+When a canvas object is selected, the `Object` panel shows position, size, and layer controls. Image, video, audio, chart, and table objects also show typed editors:
+
+- Media objects: edit media URL / Data URI, caption, alt text, poster, and fit mode.
+- Chart objects: edit chart type, labels, series, and unit.
+- Table objects: edit headers and rows, or use add/delete row and column buttons.
+
+The `Object data JSON (advanced)` field remains available for AI or power users. Normal users should prefer the typed fields above it.
+
 Images:
 
 1. Change the layout to `hero`, `imageRight`, `imageLeft`, `imageFull`, or `imageBackground`.
@@ -281,6 +289,8 @@ If the report contains `ERROR`:
 2. Paste the report back to the AI model.
 3. Ask it to repair the deck and return full deck JSON.
 4. Load the fixed JSON in the `AI JSON` panel.
+
+The faster path is `Copy AI Repair Prompt`. It includes the current deck JSON, validation report, and repair rules, so you can paste one complete prompt into an AI model.
 
 If the report only contains `WARNING` or `TIP`, the deck usually still plays, but it is worth improving.
 

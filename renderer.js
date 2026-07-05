@@ -7,6 +7,7 @@
   var THEMES = ["paper", "launch", "studio", "boardroom"];
   var CHART_KINDS = ["bar", "line", "donut"];
   var SHAPE_KINDS = ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"];
+  var OBJECT_TYPES = ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "compare", "shape"];
   var TRANSITIONS = ["none", "fade", "slide", "push", "zoom"];
   var STANDALONE_FAVICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" rx=\"15\" fill=\"#0b1117\"/><path d=\"M18 11h21l9 9v33H18z\" fill=\"#f4fbfa\"/><path d=\"M39 11l9 9h-9z\" fill=\"#20d6c7\"/><rect x=\"23\" y=\"24\" width=\"30\" height=\"18\" rx=\"3\" fill=\"#111a22\"/><rect x=\"26\" y=\"28\" width=\"12\" height=\"2\" rx=\"1\" fill=\"#ffb000\"/><rect x=\"26\" y=\"33\" width=\"14\" height=\"1.7\" rx=\".85\" fill=\"#8da4ad\"/><rect x=\"26\" y=\"37\" width=\"10\" height=\"1.7\" rx=\".85\" fill=\"#8da4ad\"/><path d=\"M43 29l8 4.5-8 4.5z\" fill=\"#20d6c7\"/><rect x=\"23\" y=\"46\" width=\"15\" height=\"2.2\" rx=\"1.1\" fill=\"#20d6c7\"/></svg>";
   var STANDALONE_FAVICON = "data:image/svg+xml," + encodeURIComponent(STANDALONE_FAVICON_SVG);
@@ -273,8 +274,7 @@
   function normalizeObject(rawObject, index) {
     var object = rawObject && typeof rawObject === "object" ? clone(rawObject) : {};
     var type = safeText(object.type || "shape");
-    var allowed = ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "compare", "shape"];
-    if (allowed.indexOf(type) === -1) {
+    if (OBJECT_TYPES.indexOf(type) === -1) {
       if (isShapeKindInput(type)) {
         object.data = object.data && typeof object.data === "object" ? object.data : {};
         if (!object.data.kind) object.data.kind = type;
@@ -2445,6 +2445,173 @@
     if (layout === "code" && !safeText(slide.code).trim()) {
       issues.push(issue("warning", path + ".code", "代码页没有代码内容。", "填写 code 字段，或换成 text 版式。"));
     }
+
+    validateSlideObjects(slide, index, issues);
+  }
+
+  function validateSlideObjects(slide, slideIndex, issues) {
+    var path = "slides[" + slideIndex + "]";
+    var objects = asArray(slide.objects);
+    var ids = {};
+
+    objects.forEach(function (object, objectIndex) {
+      var objectPath = path + ".objects[" + objectIndex + "]";
+      if (!object || typeof object !== "object" || Array.isArray(object)) {
+        issues.push(issue("error", objectPath, "对象必须是 JSON 对象。", "把对象改为包含 type、x、y、w、h 和 data 的对象。"));
+        return;
+      }
+
+      var type = safeText(object.type);
+      if (!type) {
+        issues.push(issue("error", objectPath + ".type", "对象缺少 type。", "设置为 " + OBJECT_TYPES.join(", ") + " 之一。"));
+      } else if (OBJECT_TYPES.indexOf(type) === -1) {
+        issues.push(issue("error", objectPath + ".type", "不支持的对象类型 \"" + type + "\"。", "改用：" + OBJECT_TYPES.join(", ") + "。"));
+      }
+
+      var id = safeText(object.id).trim();
+      if (!id) {
+        issues.push(issue("warning", objectPath + ".id", "对象缺少稳定 id。", "给对象写一个稳定 id，便于 AI 和人类后续精确编辑。"));
+      } else if (ids[id]) {
+        issues.push(issue("error", objectPath + ".id", "对象 id \"" + id + "\" 重复。", "每个 slide.objects[] 内的 id 必须唯一。"));
+      } else {
+        ids[id] = true;
+      }
+
+      validateObjectGeometry(object, objectPath, issues);
+      validateObjectData(type, object.data || {}, objectPath + ".data", issues);
+    });
+  }
+
+  function validateObjectGeometry(object, path, issues) {
+    ["x", "y", "w", "h"].forEach(function (prop) {
+      if (!isFinite(Number(object[prop]))) {
+        issues.push(issue("error", path + "." + prop, "对象几何字段 " + prop + " 必须是数字。", "给 " + prop + " 写入像素数字。"));
+      }
+    });
+
+    var x = Number(object.x);
+    var y = Number(object.y);
+    var w = Number(object.w);
+    var h = Number(object.h);
+    if (isFinite(w) && w <= 0) issues.push(issue("error", path + ".w", "对象宽度必须大于 0。", "把 w 改为 24 以上的数字。"));
+    if (isFinite(h) && h <= 0) issues.push(issue("error", path + ".h", "对象高度必须大于 0。", "把 h 改为 24 以上的数字。"));
+    if (isFinite(x) && isFinite(y) && isFinite(w) && isFinite(h)) {
+      if (x + w < 24 || y + h < 24 || x > BASE_WIDTH - 24 || y > BASE_HEIGHT - 24) {
+        issues.push(issue("warning", path, "对象几乎完全在画布外，用户可能看不到。", "把 x/y 调回 16:9 画布范围内。"));
+      } else if (x < -80 || y < -80 || x + w > BASE_WIDTH + 80 || y + h > BASE_HEIGHT + 80) {
+        issues.push(issue("tip", path, "对象部分超出画布。", "确认这是有意裁切，或调整 x/y/w/h。"));
+      }
+    }
+
+    if (object.zIndex != null && !isFinite(Number(object.zIndex))) {
+      issues.push(issue("warning", path + ".zIndex", "对象层级不是数字。", "把 zIndex 写成数字，或删除该字段让编辑器自动处理。"));
+    }
+  }
+
+  function validateObjectData(type, data, path, issues) {
+    var source = data && typeof data === "object" && !Array.isArray(data) ? data : {};
+    if (data && (typeof data !== "object" || Array.isArray(data))) {
+      issues.push(issue("error", path, "对象 data 必须是 JSON 对象。", "按对象类型提供结构化 data。"));
+      return;
+    }
+
+    if (type === "image") {
+      validateMediaObject("image", source, path, issues);
+    } else if (type === "video") {
+      validateMediaObject("video", source, path, issues);
+    } else if (type === "audio") {
+      validateMediaObject("audio", source, path, issues);
+    } else if (type === "chart") {
+      validateChartData(source, path, issues);
+    } else if (type === "table") {
+      validateTableData(source, path, issues);
+    } else if (type === "cards") {
+      var cards = asArray(source.cards);
+      if (!cards.length) issues.push(issue("warning", path + ".cards", "卡片对象没有卡片内容。", "提供 cards: [{title,text}]。"));
+      if (cards.length > 6) issues.push(issue("tip", path + ".cards", "卡片对象内容偏多，可能挤在一起。", "保留 2-4 个重点，或拆成多个对象/页面。"));
+    } else if (type === "metrics") {
+      var metrics = asArray(source.metrics);
+      if (!metrics.length) issues.push(issue("warning", path + ".metrics", "数据对象没有指标。", "提供 metrics: [{value,label,detail}]。"));
+      if (metrics.length > 6) issues.push(issue("tip", path + ".metrics", "指标数量偏多，可能影响可读性。", "保留关键指标。"));
+    } else if (type === "timeline") {
+      var items = asArray(source.items);
+      if (!items.length) issues.push(issue("warning", path + ".items", "时间线对象没有条目。", "提供 items: [{title,text}]。"));
+      if (items.length > 6) issues.push(issue("tip", path + ".items", "时间线条目偏多。", "保留关键节点或拆页。"));
+    } else if (type === "quote") {
+      if (!safeText(source.quote).trim()) issues.push(issue("warning", path + ".quote", "引用对象缺少引文。", "填写 quote 字段。"));
+    } else if (type === "code") {
+      if (!safeText(source.code).trim()) issues.push(issue("warning", path + ".code", "代码对象没有代码内容。", "填写 code 字段。"));
+    } else if (type === "compare") {
+      if (!source.left || !safeText(source.left.text).trim()) issues.push(issue("warning", path + ".left.text", "对比对象左侧内容为空。", "补充左侧观点。"));
+      if (!source.right || !safeText(source.right.text).trim()) issues.push(issue("warning", path + ".right.text", "对比对象右侧内容为空。", "补充右侧观点。"));
+    } else if (type === "shape") {
+      if (source.kind && SHAPE_KINDS.indexOf(source.kind) === -1) {
+        issues.push(issue("warning", path + ".kind", "形状类型不支持 \"" + source.kind + "\"。", "使用 " + SHAPE_KINDS.join(", ") + "。"));
+      }
+    }
+  }
+
+  function validateMediaObject(kind, data, path, issues) {
+    if (!safeText(data.src).trim()) {
+      issues.push(issue("warning", path + ".src", kind + " 对象缺少媒体来源。", "提供 src，或让用户在编辑器中选择本地文件。"));
+    } else if (looksLikeLocalAssetPath(data.src)) {
+      issues.push(issue("warning", path + ".src", "媒体来源看起来是本机路径，别人可能无法打开。", "保存前嵌入为 Data URI，或改为可访问 URL。"));
+    }
+    if ((kind === "image" || kind === "video") && data.fit && ["cover", "contain"].indexOf(data.fit) === -1) {
+      issues.push(issue("warning", path + ".fit", "媒体适配模式不支持 \"" + data.fit + "\"。", "使用 cover 或 contain。"));
+    }
+    if (kind === "image" && data.src && !data.alt) {
+      issues.push(issue("tip", path + ".alt", "图片对象缺少替代文字。", "为 alt 写一句图片说明。"));
+    }
+    if (kind === "video" && data.poster && looksLikeLocalAssetPath(data.poster)) {
+      issues.push(issue("warning", path + ".poster", "视频封面看起来是本机路径。", "保存前嵌入为 Data URI，或改为可访问 URL。"));
+    }
+  }
+
+  function looksLikeLocalAssetPath(value) {
+    var src = safeText(value).trim();
+    return Boolean(src && !/^data:/i.test(src) && (/^file:/i.test(src) || /^\/[^/]/.test(src) || /^[a-zA-Z]:[\\/]/.test(src)));
+  }
+
+  function validateChartData(chart, path, issues) {
+    var labels = asArray(chart.labels);
+    var seriesList = asArray(chart.series);
+    if (chart.kind && CHART_KINDS.indexOf(chart.kind) === -1) {
+      issues.push(issue("warning", path + ".kind", "图表类型不支持 \"" + chart.kind + "\"。", "使用 bar、line 或 donut。"));
+    }
+    if (!labels.length) issues.push(issue("warning", path + ".labels", "图表对象缺少标签。", "提供 labels，例如 [\"Q1\",\"Q2\",\"Q3\"]。"));
+    if (!seriesList.length) issues.push(issue("warning", path + ".series", "图表对象缺少数据系列。", "提供 series，例如 [{\"name\":\"收入\",\"values\":[12,20,31]}]。"));
+    var hasNumber = false;
+    seriesList.forEach(function (series, seriesIndex) {
+      var values = asArray(series && series.values);
+      if (!values.length) {
+        issues.push(issue("warning", path + ".series[" + seriesIndex + "].values", "图表系列缺少数值。", "给 values 写入数字数组。"));
+      }
+      if (labels.length && values.length && values.length !== labels.length) {
+        issues.push(issue("tip", path + ".series[" + seriesIndex + "].values", "图表系列数值数量和标签数量不一致。", "让 values 数量与 labels 保持一致。"));
+      }
+      values.forEach(function (value, valueIndex) {
+        if (isFinite(Number(value))) hasNumber = true;
+        else issues.push(issue("warning", path + ".series[" + seriesIndex + "].values[" + valueIndex + "]", "图表数值必须是数字。", "把该值改成数字。"));
+      });
+    });
+    if (seriesList.length && !hasNumber) issues.push(issue("warning", path + ".series", "图表对象没有可用数字。", "把 values 写成数字数组。"));
+  }
+
+  function validateTableData(table, path, issues) {
+    var columns = asArray(table.columns);
+    var rows = asArray(table.rows);
+    if (!columns.length) issues.push(issue("warning", path + ".columns", "表格对象缺少表头。", "提供 columns。"));
+    if (!rows.length) issues.push(issue("warning", path + ".rows", "表格对象缺少数据行。", "提供 rows。"));
+    rows.forEach(function (row, rowIndex) {
+      if (!Array.isArray(row)) {
+        issues.push(issue("error", path + ".rows[" + rowIndex + "]", "表格行必须是数组。", "把每行写成字符串数组。"));
+        return;
+      }
+      if (columns.length && row.length !== columns.length) {
+        issues.push(issue("tip", path + ".rows[" + rowIndex + "]", "表格行列数和表头数量不一致。", "让这一行的单元格数量与 columns 一致。"));
+      }
+    });
   }
 
   function validationResult(issues) {

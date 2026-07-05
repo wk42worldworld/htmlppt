@@ -77,7 +77,11 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /data-slide-action="delete"/,
   /data-context-action="tableInsertRowAbove"/,
   /data-context-action="tableInsertColumnRight"/,
-  /data-context-action="tableClearCell"/
+  /data-context-action="tableClearCell"/,
+  /id="objectMediaEditor"/,
+  /id="objectChartEditor"/,
+  /id="objectTableEditor"/,
+  /id="copyRepairPromptBtn"/
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
 });
@@ -124,6 +128,9 @@ assert.match(appJs, /function sameTableScope/);
 assert.match(appJs, /function previewCanvasSelectionBox/);
 assert.match(appJs, /function textBoxPreset/);
 assert.match(appJs, /function fontFamilyStack/);
+assert.match(appJs, /function syncTypedObjectPanel/);
+assert.match(appJs, /function bindObjectDataInput/);
+assert.match(appJs, /function buildRepairPrompt/);
 assert.match(appJs, /function tableObjectSize/);
 assert.match(appJs, /function findObjectPlacement/);
 assert.match(appJs, /function fitTableObjectToData/);
@@ -321,6 +328,28 @@ const audioHtml = ppt.exportStandalone(audioDeck);
 assert.match(audioHtml, /ppt-layout-audio/);
 assert.match(audioHtml, /ppt-audio/);
 assert.match(audioHtml, /Narration/);
+
+const objectValidationDeck = {
+  version: "0.1",
+  title: "Object validation deck",
+  slides: [
+    {
+      layout: "text",
+      title: "Object checks",
+      objects: [
+        { id: "dup", type: "chart", x: 40, y: 80, w: 420, h: 260, data: { kind: "scatter", labels: ["Q1"], series: [{ name: "Revenue", values: ["bad"] }] } },
+        { id: "dup", type: "table", x: 100, y: 120, w: 320, h: 180, data: { columns: ["A", "B"], rows: [["Only one"]] } },
+        { id: "local-media", type: "image", x: 1200, y: 20, w: 180, h: 120, data: { src: "/Users/example/image.png" } }
+      ]
+    }
+  ]
+};
+const objectValidation = ppt.validateDeck(objectValidationDeck);
+assert.equal(objectValidation.ok, false);
+assert.ok(objectValidation.errors.some((item) => item.path === "slides[0].objects[1].id"));
+assert.ok(objectValidation.warnings.some((item) => item.path === "slides[0].objects[0].data.kind"));
+assert.ok(objectValidation.warnings.some((item) => item.path === "slides[0].objects[2].data.src"));
+assert.ok(objectValidation.tips.some((item) => item.path === "slides[0].objects[1].data.rows[0]"));
 
 const externalAssetDeck = ppt.normalizeDeck({
   version: "0.1",

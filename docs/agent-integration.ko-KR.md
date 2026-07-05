@@ -80,6 +80,7 @@ P0:
 - `AGENTS.md` 와 연동 문서.
 - `slide.objects[]` 객체 단위 검증.
 - 이미지, 비디오, 오디오, 차트, 테이블용 Typed Inspector.
+- 품질 검사에서 AI 수정 Prompt 복사.
 
 P1:
 

@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.13";
+  var APP_VERSION_LABEL = "v0.2.14";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
@@ -169,6 +169,11 @@
       "dialog.copyJson": "复制当前 JSON",
       "dialog.loadJson": "从文本载入",
       "dialog.copyReport": "复制报告",
+      "dialog.copyRepairPrompt": "复制 AI 修复 Prompt",
+      "field.mediaSrc": "媒体 URL 或 Data URI",
+      "object.typedMedia": "媒体内容",
+      "object.typedChart": "图表内容",
+      "object.typedTable": "表格内容",
       "template.aiCamera.name": "AI 导演相机",
       "template.aiCamera.desc": "硬件发布 demo：问题、流程、数据和产品主张。",
       "template.productPitch.name": "产品发布",
@@ -236,6 +241,7 @@
       "toast.jsonCopied": "JSON 已复制",
       "toast.jsonLoaded": "JSON 已载入",
       "toast.reportCopied": "检查报告已复制",
+      "toast.repairPromptCopied": "AI 修复 Prompt 已复制",
       "toast.newDeck": "已新建演示文稿",
       "toast.templateCreated": "已从模板创建",
       "toast.opened": "已打开 {name}",
@@ -423,6 +429,8 @@
     "dialog.copyJson": "Copy JSON",
     "dialog.loadJson": "Load From Text",
     "dialog.copyReport": "Copy Report",
+    "dialog.copyRepairPrompt": "Copy AI Repair Prompt",
+    "field.mediaSrc": "Media URL or Data URI",
     "template.aiCamera.name": "AI Director Camera",
     "template.aiCamera.desc": "Hardware launch demo with problem, workflow, data, and positioning.",
     "template.productPitch.name": "Product Pitch",
@@ -490,6 +498,7 @@
     "toast.jsonCopied": "JSON copied",
     "toast.jsonLoaded": "JSON loaded",
     "toast.reportCopied": "Report copied",
+    "toast.repairPromptCopied": "AI repair prompt copied",
     "toast.newDeck": "New deck created",
     "toast.templateCreated": "Created from template",
     "toast.opened": "Opened {name}",
@@ -658,6 +667,8 @@
     "dialog.copyJson": "JSON をコピー",
     "dialog.loadJson": "テキストから読み込み",
     "dialog.copyReport": "レポートをコピー",
+    "dialog.copyRepairPrompt": "AI 修復 Prompt をコピー",
+    "field.mediaSrc": "メディア URL または Data URI",
     "template.aiCamera.name": "AI ディレクターカメラ",
     "template.aiCamera.desc": "ハードウェア発表 demo。課題、流れ、データ、製品メッセージを含みます。",
     "template.productPitch.name": "製品発表",
@@ -717,6 +728,7 @@
     "toast.jsonCopied": "JSON をコピーしました",
     "toast.jsonLoaded": "JSON を読み込みました",
     "toast.reportCopied": "レポートをコピーしました",
+    "toast.repairPromptCopied": "AI 修復 Prompt をコピーしました",
     "confirm.keepOneSlide": "少なくとも1枚のスライドが必要です。",
     "confirm.deleteSlide": "現在のスライドを削除しますか？",
     "confirm.discard": "未保存の変更があります。続行すると破棄されます。",
@@ -840,6 +852,8 @@
     "dialog.copyJson": "JSON 복사",
     "dialog.loadJson": "텍스트에서 불러오기",
     "dialog.copyReport": "보고서 복사",
+    "dialog.copyRepairPrompt": "AI 수정 Prompt 복사",
+    "field.mediaSrc": "미디어 URL 또는 Data URI",
     "template.aiCamera.name": "AI 디렉터 카메라",
     "template.aiCamera.desc": "하드웨어 출시 demo. 문제, 흐름, 데이터, 제품 메시지를 포함합니다.",
     "template.productPitch.name": "제품 출시",
@@ -899,6 +913,7 @@
     "toast.jsonCopied": "JSON 복사됨",
     "toast.jsonLoaded": "JSON 불러옴",
     "toast.reportCopied": "보고서 복사됨",
+    "toast.repairPromptCopied": "AI 수정 Prompt 복사됨",
     "confirm.keepOneSlide": "슬라이드는 최소 1장이 필요합니다.",
     "confirm.deleteSlide": "현재 슬라이드를 삭제할까요?",
     "confirm.discard": "저장하지 않은 변경 사항이 있습니다. 계속하면 버려집니다.",
@@ -1982,7 +1997,10 @@
     "field.objectH": "高",
     "field.rotation": "旋转",
     "field.layer": "层级",
-    "field.objectData": "对象数据",
+    "field.objectData": "对象数据 JSON（高级）",
+    "object.typedMedia": "媒体内容",
+    "object.typedChart": "图表内容",
+    "object.typedTable": "表格内容",
     "context.copy": "复制",
     "context.paste": "粘贴",
     "context.duplicate": "重复",
@@ -2031,7 +2049,10 @@
     "field.objectH": "H",
     "field.rotation": "Rotation",
     "field.layer": "Layer",
-    "field.objectData": "Object data",
+    "field.objectData": "Object data JSON (advanced)",
+    "object.typedMedia": "Media content",
+    "object.typedChart": "Chart content",
+    "object.typedTable": "Table content",
     "context.copy": "Copy",
     "context.paste": "Paste",
     "context.duplicate": "Duplicate",
@@ -2080,7 +2101,10 @@
     "field.objectH": "高さ",
     "field.rotation": "回転",
     "field.layer": "階層",
-    "field.objectData": "データ",
+    "field.objectData": "オブジェクトデータ JSON（詳細）",
+    "object.typedMedia": "メディア内容",
+    "object.typedChart": "グラフ内容",
+    "object.typedTable": "表の内容",
     "context.copy": "コピー",
     "context.paste": "貼り付け",
     "context.duplicate": "複製",
@@ -2129,7 +2153,10 @@
     "field.objectH": "높이",
     "field.rotation": "회전",
     "field.layer": "레이어",
-    "field.objectData": "개체 데이터",
+    "field.objectData": "개체 데이터 JSON (고급)",
+    "object.typedMedia": "미디어 내용",
+    "object.typedChart": "차트 내용",
+    "object.typedTable": "표 내용",
     "context.copy": "복사",
     "context.paste": "붙여넣기",
     "context.duplicate": "복제",
@@ -2339,6 +2366,9 @@
       "objectDuplicateBtn", "objectDeleteBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
       "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
       "objectTableTools", "objectTableAddRowBtn", "objectTableDeleteRowBtn", "objectTableAddColumnBtn", "objectTableDeleteColumnBtn",
+      "objectMediaEditor", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
+      "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartLabelsInput", "objectChartSeriesInput",
+      "objectTableEditor", "objectTableColumnsInput", "objectTableRowsInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
@@ -2346,7 +2376,7 @@
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
-      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "canvasContextMenu", "slideContextMenu", "toast"
+      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
@@ -2663,6 +2693,19 @@
       });
     });
 
+    els.copyRepairPromptBtn.addEventListener("click", function () {
+      commitActiveCanvasEdit();
+      var prompt = buildRepairPrompt();
+      navigator.clipboard.writeText(prompt).then(function () {
+        toast(t("toast.repairPromptCopied"));
+      }).catch(function () {
+        els.validationReport.value = prompt;
+        els.validationReport.select();
+        document.execCommand("copy");
+        toast(t("toast.repairPromptCopied"));
+      });
+    });
+
     els.stageFrame.addEventListener("pointerdown", handleCanvasPointerDown);
     els.stageFrame.addEventListener("dblclick", handleCanvasDblClick);
     els.stageFrame.addEventListener("contextmenu", handleCanvasContextMenu);
@@ -2771,6 +2814,17 @@
     bindObjectGeometryInput(els.objectZInput, "zIndex", { min: 0, max: 999 });
     els.objectDataInput.addEventListener("focus", captureEditStart);
     els.objectDataInput.addEventListener("change", commitObjectDataFromPanel);
+    bindObjectDataInput(els.objectMediaSrcInput, function (object, value) { ensureObjectData(object).src = value; });
+    bindObjectDataInput(els.objectMediaPosterInput, function (object, value) { ensureObjectData(object).poster = value; });
+    bindObjectDataInput(els.objectMediaCaptionInput, function (object, value) { ensureObjectData(object).caption = value; });
+    bindObjectDataInput(els.objectMediaAltInput, function (object, value) { ensureObjectData(object).alt = value; });
+    bindObjectDataInput(els.objectMediaFitInput, function (object, value) { ensureObjectData(object).fit = value; });
+    bindObjectDataInput(els.objectChartKindInput, function (object, value) { ensureObjectData(object).kind = value; });
+    bindObjectDataInput(els.objectChartUnitInput, function (object, value) { ensureObjectData(object).unit = value; });
+    bindObjectDataInput(els.objectChartLabelsInput, function (object, value) { ensureObjectData(object).labels = splitCells(value); });
+    bindObjectDataInput(els.objectChartSeriesInput, function (object, value) { ensureObjectData(object).series = parseChartSeries(value); });
+    bindObjectDataInput(els.objectTableColumnsInput, function (object, value) { ensureObjectData(object).columns = splitTableCells(value); }, { fitTable: true });
+    bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
     els.objectDuplicateBtn.addEventListener("click", duplicateSelectedCanvas);
     els.objectDeleteBtn.addEventListener("click", function () {
       if (deleteSelectedObject()) {
@@ -4015,6 +4069,24 @@
         object[prop] = prop === "zIndex" ? Math.round(value) : value;
       });
     });
+  }
+
+  function bindObjectDataInput(input, mutator, options) {
+    input.addEventListener("focus", captureEditStart);
+    input.addEventListener("change", function () {
+      if (syncing) return;
+      commitSelectedObjectMutation(function (object) {
+        mutator(object, input.value);
+        if ((options && options.fitTable) || object.type === "table") {
+          fitTableObjectToData(object, { growOnly: true });
+        }
+      });
+    });
+  }
+
+  function ensureObjectData(object) {
+    object.data = object.data && typeof object.data === "object" && !Array.isArray(object.data) ? object.data : {};
+    return object.data;
   }
 
   function normalizeObjectNumberInput(rawValue, options) {
@@ -5424,6 +5496,7 @@
       els.objectRotationInput.value = "";
       els.objectZInput.value = "";
       els.objectDataInput.value = "";
+      syncTypedObjectPanel(null);
       return;
     }
 
@@ -5441,8 +5514,43 @@
     els.objectHInput.value = Math.round(Number(object.h) || 0);
     els.objectRotationInput.value = Math.round(Number(object.rotation) || 0);
     els.objectZInput.value = Math.round(Number(object.zIndex) || 0);
+    syncTypedObjectPanel(object);
     els.objectDataInput.value = JSON.stringify(object.data || {}, null, 2);
     updateObjectCommandControlState();
+  }
+
+  function syncTypedObjectPanel(object) {
+    var type = object && object.type;
+    var data = object && object.data && typeof object.data === "object" ? object.data : {};
+    var mediaType = type === "image" || type === "video" || type === "audio";
+
+    if (els.objectMediaEditor) {
+      els.objectMediaEditor.hidden = !mediaType;
+      els.objectMediaSrcInput.value = mediaType ? data.src || "" : "";
+      els.objectMediaPosterInput.value = type === "video" ? data.poster || "" : "";
+      els.objectMediaCaptionInput.value = mediaType ? data.caption || "" : "";
+      els.objectMediaAltInput.value = type === "image" ? data.alt || "" : "";
+      els.objectMediaFitInput.value = data.fit === "contain" ? "contain" : "cover";
+      els.objectMediaPosterField.hidden = type !== "video";
+      els.objectMediaAltField.hidden = type !== "image";
+      els.objectMediaFitField.hidden = !(type === "image" || type === "video");
+    }
+
+    if (els.objectChartEditor) {
+      var isChart = type === "chart";
+      els.objectChartEditor.hidden = !isChart;
+      els.objectChartKindInput.value = isChart && data.kind === "line" ? "line" : isChart && data.kind === "donut" ? "donut" : "bar";
+      els.objectChartUnitInput.value = isChart ? data.unit || "" : "";
+      els.objectChartLabelsInput.value = isChart ? asTextCells(data.labels).join(" | ") : "";
+      els.objectChartSeriesInput.value = isChart ? stringifyChartSeries(data.series || []) : "";
+    }
+
+    if (els.objectTableEditor) {
+      var isTable = type === "table";
+      els.objectTableEditor.hidden = !isTable;
+      els.objectTableColumnsInput.value = isTable ? asTextCells(data.columns).join(" | ") : "";
+      els.objectTableRowsInput.value = isTable ? stringifyTableRows(data.rows || []) : "";
+    }
   }
 
   function tableContextLabel(info) {
@@ -7938,6 +8046,26 @@
     els.validationDialog.showModal();
   }
 
+  function buildRepairPrompt() {
+    var result = PPTHtml.validateDeck(deck);
+    var report = PPTHtml.formatValidationReport(deck, result);
+    return [
+      "请修复下面这份 PPT.html Studio deck。",
+      "",
+      "要求：",
+      "- 只输出完整 deck JSON，不输出 HTML/CSS/解释文字。",
+      "- 保持 version 为 \"0.1\"，aspectRatio 为 \"16:9\"。",
+      "- 先修复 ERROR，再修复 WARNING。",
+      "- 保留已有 id、canvas、styles、textBoxes、objects、media src 和 notes，除非它们本身就是错误来源。",
+      "- 不要写临时本地文件路径；不确定的媒体 src 留空。",
+      "",
+      report,
+      "",
+      "Current deck JSON:",
+      JSON.stringify(deck, null, 2)
+    ].join("\n");
+  }
+
   function toastWithValidation(prefix) {
     var result = PPTHtml.validateDeck(deck);
     if (result.errors.length) {
@@ -8336,6 +8464,10 @@
     return (rows || []).map(function (row) {
       return row.join(" | ");
     }).join("\n");
+  }
+
+  function asTextCells(values) {
+    return Array.isArray(values) ? values.map(function (value) { return String(value == null ? "" : value); }) : [];
   }
 
   function splitCells(line) {

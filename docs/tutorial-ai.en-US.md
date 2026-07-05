@@ -36,6 +36,14 @@ Recommended output:
 - Use a fenced ```json code block when showing JSON in chat; the editor can read it.
 - Do not add explanations after the JSON unless the user asks.
 
+Object-layer rules:
+
+- Components inserted on the canvas are stored in `slides[].objects[]`.
+- When editing an existing deck, find the target object by `id` and `type`, then edit only `data`, `x/y/w/h`, `style`, or the requested fields.
+- Do not rebuild the whole `objects` array unless necessary; doing so can lose human-adjusted geometry and layer order.
+- Object-level validation checks duplicate ids, bad geometry, local media paths, chart values, and table row/column mismatches.
+- Image, video, audio, chart, and table objects remain human-editable through typed inspectors, so keep their data structured and readable.
+
 ## 2. Deck Structure
 
 Minimal deck:

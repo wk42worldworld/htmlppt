@@ -31,8 +31,8 @@ git diff -- examples/ai-camera.ppt.html
 
 ## Current Product Gaps To Prioritize
 
-1. Object-level validation for `slide.objects[]`: duplicate ids, geometry bounds, chart/table/media data, and external asset warnings.
-2. Typed object inspectors for image/video/audio, chart, and table content so normal users do not edit JSON textareas.
-3. AI patch review: accept field-level or object-level changes instead of replacing the whole deck.
-4. PDF/PNG export based on the standalone renderer.
-5. Optional local MCP/service mode exposing `create_deck`, `validate_deck`, `export_deck`, and `patch_slide_object`.
+1. JSON report file export and richer repair hints for object-level validation.
+2. AI patch review: accept field-level or object-level changes instead of replacing the whole deck.
+3. PDF/PNG export based on the standalone renderer.
+4. Optional local MCP/service mode exposing `create_deck`, `validate_deck`, `export_deck`, and `patch_slide_object`.
+5. Broader typed inspectors for cards, metrics, timeline, quote, code, compare, and shape objects.

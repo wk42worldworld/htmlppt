@@ -877,6 +877,19 @@ textarea:focus {
   font-size: 12px;
 }
 
+.object-command-group[hidden],
+.typed-object-editor[hidden] {
+  display: none !important;
+}
+
+.typed-object-editor textarea {
+  min-height: 88px;
+}
+
+.object-advanced-json textarea {
+  min-height: 86px;
+}
+
 .context-menu {
   position: fixed;
   z-index: 10020;

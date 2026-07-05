@@ -86,13 +86,14 @@ P0 now:
 - Codex skill for generation, repair, and maintenance.
 - Repository `AGENTS.md`.
 - Integration docs.
+- Object-level validation for `slide.objects[]`.
+- Typed inspectors for image/video/audio, chart, and table objects.
+- One-click AI repair prompt from the Quality Check dialog.
 
 P0 next:
 
-- Object-level validation for `slide.objects[]`.
-- Typed inspectors for image/video/audio, charts, and tables.
-- One-click AI repair prompt.
 - Export deck JSON and validation report files.
+- Richer object validation repair hints and JSON report fields.
 
 P1:
 

@@ -80,6 +80,7 @@ P0:
 - `AGENTS.md` と接続ドキュメント。
 - `slide.objects[]` のオブジェクト単位検証。
 - 画像、動画、音声、チャート、テーブルの Typed Inspector。
+- 品質チェックから AI 修復 Prompt をコピー。
 
 P1:
 

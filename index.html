@@ -762,9 +762,71 @@
               <button type="button" id="objectTableDeleteColumnBtn" class="style-toggle" data-object-control data-i18n-title="table.deleteColumn"><svg><use href="#icon-column-delete"></use></svg><span data-i18n="table.deleteColumn">删列</span></button>
             </div>
           </div>
-          <div class="object-command-group" role="group" aria-label="对象数据" data-i18n-group="object.data">
+          <div class="object-command-group typed-object-editor" id="objectMediaEditor" role="group" aria-label="媒体数据" data-i18n-group="object.typedMedia" hidden>
+            <span data-i18n="object.typedMedia">媒体内容</span>
             <label>
-              <span data-i18n="field.objectData">对象数据</span>
+              <span data-i18n="field.mediaSrc">媒体 URL 或 Data URI</span>
+              <input id="objectMediaSrcInput" data-object-control data-object-typed-control type="text">
+            </label>
+            <label id="objectMediaPosterField">
+              <span data-i18n="field.poster">封面 URL</span>
+              <input id="objectMediaPosterInput" data-object-control data-object-typed-control type="text">
+            </label>
+            <label>
+              <span data-i18n="field.caption">说明</span>
+              <input id="objectMediaCaptionInput" data-object-control data-object-typed-control type="text">
+            </label>
+            <label id="objectMediaAltField">
+              <span data-i18n="field.alt">替代文字</span>
+              <input id="objectMediaAltInput" data-object-control data-object-typed-control type="text">
+            </label>
+            <label id="objectMediaFitField">
+              <span data-i18n="field.fit">适配</span>
+              <select id="objectMediaFitInput" data-object-control data-object-typed-control>
+                <option value="cover" data-i18n="option.cover">填充裁切</option>
+                <option value="contain" data-i18n="option.contain">完整显示</option>
+              </select>
+            </label>
+          </div>
+          <div class="object-command-group typed-object-editor" id="objectChartEditor" role="group" aria-label="图表数据" data-i18n-group="object.typedChart" hidden>
+            <span data-i18n="object.typedChart">图表内容</span>
+            <div class="style-grid">
+              <label>
+                <span data-i18n="field.chartKind">图表类型</span>
+                <select id="objectChartKindInput" data-object-control data-object-typed-control>
+                  <option value="bar" data-i18n="option.bar">柱状图</option>
+                  <option value="line" data-i18n="option.line">折线图</option>
+                  <option value="donut" data-i18n="option.donut">环形图</option>
+                </select>
+              </label>
+              <label>
+                <span data-i18n="field.unit">单位</span>
+                <input id="objectChartUnitInput" data-object-control data-object-typed-control type="text">
+              </label>
+            </div>
+            <label>
+              <span data-i18n="field.chartLabels">标签，用 | 分隔</span>
+              <input id="objectChartLabelsInput" data-object-control data-object-typed-control type="text" placeholder="Q1 | Q2 | Q3">
+            </label>
+            <label>
+              <span data-i18n="field.chartSeries">数据系列：每行一个系列，名称 | 数值 | 数值</span>
+              <textarea id="objectChartSeriesInput" data-object-control data-object-typed-control rows="4" spellcheck="false"></textarea>
+            </label>
+          </div>
+          <div class="object-command-group typed-object-editor" id="objectTableEditor" role="group" aria-label="表格数据" data-i18n-group="object.typedTable" hidden>
+            <span data-i18n="object.typedTable">表格内容</span>
+            <label>
+              <span data-i18n="field.tableColumns">表头，用 | 分隔</span>
+              <input id="objectTableColumnsInput" data-object-control data-object-typed-control type="text">
+            </label>
+            <label>
+              <span data-i18n="field.tableRows">每行一组单元格，用 | 分隔</span>
+              <textarea id="objectTableRowsInput" data-object-control data-object-typed-control rows="5" spellcheck="false"></textarea>
+            </label>
+          </div>
+          <div class="object-command-group" role="group" aria-label="对象数据" data-i18n-group="object.data">
+            <label class="object-advanced-json">
+              <span data-i18n="field.objectData">对象数据 JSON（高级）</span>
               <textarea id="objectDataInput" data-object-control rows="7" spellcheck="false"></textarea>
             </label>
           </div>
@@ -1081,6 +1143,7 @@
       </div>
       <footer>
         <button type="button" id="copyValidationBtn" data-i18n="dialog.copyReport" data-i18n-title="dialog.copyReport">复制报告</button>
+        <button type="button" id="copyRepairPromptBtn" data-i18n="dialog.copyRepairPrompt" data-i18n-title="dialog.copyRepairPrompt">复制 AI 修复 Prompt</button>
       </footer>
     </form>
   </dialog>

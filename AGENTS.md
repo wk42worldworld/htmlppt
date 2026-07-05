@@ -93,9 +93,8 @@ Keep that diff only when renderer output intentionally changed.
 Immediate priorities:
 
 1. Agent CLI, skill, and documentation.
-2. Object-level validation for inserted modules.
-3. Typed inspectors for image/video/audio, chart, and table objects.
-4. One-click AI repair prompt and JSON report export.
+2. Keep object-level validation and typed object inspectors covered by smoke tests.
+3. Expand JSON report export and repair workflows beyond the current copy-prompt path.
 
 Next priorities:
 
