@@ -10,6 +10,7 @@ const rendererPath = path.join(root, "renderer.js");
 const code = fs.readFileSync(rendererPath, "utf8");
 const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const appJs = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const appJsLf = appJs.replace(/\r\n/g, "\n");
 const electronMain = fs.readFileSync(path.join(root, "electron/main.js"), "utf8");
 const stylesCss = fs.readFileSync(path.join(root, "styles.css"), "utf8");
 const context = { window: {}, console };
@@ -101,7 +102,7 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
 assert.match(appJs, /function createSlideThumbPreview/);
 assert.match(appJs, /function updateSlideListSelection/);
 {
-  const selectSlideSource = appJs.match(/function selectSlide[\s\S]*?\n  }\n\n  function focusCurrentSlideThumb/)[0];
+  const selectSlideSource = appJsLf.match(/function selectSlide[\s\S]*?\n  }\n\n  function focusCurrentSlideThumb/)[0];
   assert.match(selectSlideSource, /updateSlideListSelection\(\)/);
   assert.match(selectSlideSource, /renderCanvas\(\)/);
   assert.doesNotMatch(selectSlideSource, /renderAll\(\)/);
