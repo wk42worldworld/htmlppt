@@ -327,7 +327,7 @@ AI 可以输出可访问的 URL 或 Data URI。无法确定资源时应留空，
 - 键名仍然是结构化字段路径，例如 `title`、`subtitle`、`body`、`cards.0.text`、`metrics.1.value`、`table.rows.1.2`、`textBoxes.0.text`、`objects.0`。
 - 支持字段：`fontFamily`、`fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle`。
 - 颜色使用 hex 或 `rgb()` / `rgba()`。不要写自由 CSS、类名、选择器或脚本。
-- `fontFamily` 使用安全字体族 token：`system`、`display`、`arial`、`helvetica`、`avenir`、`serif`、`georgia`、`times`、`cjk-sans`、`pingfang`、`yahei`、`cjk-serif`、`songti`、`kaiti`、`yu-mincho`、`mono`、`menlo`、`consolas`、`handwriting`。不要写任意 CSS 字体字符串。
+- `fontFamily` 使用安全字体族 token：`system`、`display`、`arial`、`helvetica`、`aptos`、`calibri`、`verdana`、`tahoma`、`avenir`、`serif`、`georgia`、`times`、`cambria`、`cjk-sans`、`pingfang`、`yahei`、`dengxian`、`simhei`、`stheiti`、`hiragino-sans`、`noto-sans-cjk`、`cjk-serif`、`songti`、`simsun`、`fangsong`、`kaiti`、`yu-mincho`、`noto-serif-cjk`、`yu-gothic`、`meiryo`、`malgun`、`mono`、`menlo`、`consolas`、`courier`、`handwriting`。不要写任意 CSS 字体字符串。
 - `fontSize` 是像素数；`textAlign` 可用 `left`、`center`、`right`、`justify`；`fontWeight` 建议使用 `"400"` 到 `"900"`；`fontStyle` 当前只支持 `"italic"`。
 - AI 修正文案时应保留已有 `styles`，除非用户明确要求“清除样式”或“恢复默认主题”。
 

@@ -16,6 +16,7 @@ const appJsLf = appJs.replace(/\r\n/g, "\n");
 const electronMain = fs.readFileSync(path.join(root, "electron/main.js"), "utf8");
 const stylesCss = fs.readFileSync(path.join(root, "styles.css"), "utf8");
 const releaseWorkflow = fs.readFileSync(path.join(root, ".github", "workflows", "release.yml"), "utf8");
+const schema = JSON.parse(fs.readFileSync(path.join(root, "schema", "ppt-html-v0.1.schema.json"), "utf8"));
 const context = { window: {}, console };
 
 vm.runInNewContext(code, context, { filename: rendererPath });
@@ -132,6 +133,16 @@ assert.match(appJs, /lowerKey === "m"/);
 assert.match(appJs, /function selectedExplicitTableInfo/);
 assert.match(appJs, /function sameTableScope/);
 assert.match(appJs, /function previewCanvasSelectionBox/);
+assert.match(appJs, /function createMultiSelectionClipboard/);
+assert.match(appJs, /kind: "multi"/);
+assert.match(appJs, /function pasteMultiPayload/);
+assert.match(appJs, /function hasCopyableCanvasSelection/);
+assert.match(appJs, /function startCanvasMarquee/);
+assert.match(appJs, /function updateCanvasMarqueePreview/);
+assert.match(appJs, /function selectableCanvasPathsInRect/);
+assert.match(appJs, /function resolveCanvasSnap/);
+assert.match(appJs, /snapDisabled = event\.altKey/);
+assert.match(appJs, /function renderCanvasSnapGuides/);
 assert.match(appJs, /function textBoxPreset/);
 assert.match(appJs, /function fontFamilyStack/);
 assert.match(appJs, /function syncTypedObjectPanel/);
@@ -201,6 +212,28 @@ assert.match(appJs, /canvasZoomMode/);
 ].forEach((pattern) => {
   assert.match(appJs, pattern);
 });
+[
+  "aptos",
+  "calibri",
+  "verdana",
+  "tahoma",
+  "cambria",
+  "dengxian",
+  "simhei",
+  "simsun",
+  "fangsong",
+  "noto-sans-cjk",
+  "noto-serif-cjk",
+  "yu-gothic",
+  "meiryo",
+  "malgun",
+  "courier"
+].forEach((token) => {
+  assert.ok(
+    schema.$defs.styleOverride.properties.fontFamily.enum.includes(token),
+    `schema missing font token ${token}`
+  );
+});
 const i18nKeys = Array.from(indexHtml.matchAll(/data-i18n(?:-[a-z]+)?="([^"]+)"/g)).map((match) => match[1]);
 Array.from(new Set(i18nKeys)).forEach((key) => {
   assert.match(appJs, new RegExp(`"${key.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}"`), `missing i18n key ${key}`);
@@ -218,6 +251,9 @@ assert.match(stylesCss, /\.canvas-zoom-controls/);
 assert.match(stylesCss, /button\.icon-button\.labeled-action/);
 assert.match(stylesCss, /\.template-grid \{[\s\S]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
 assert.match(stylesCss, /\.stage-frame\.is-canvas-moving \[data-canvas-edit\]/);
+assert.match(stylesCss, /\.stage-frame \.canvas-marquee-box/);
+assert.match(stylesCss, /\.stage-frame \.canvas-snap-guide-x/);
+assert.match(stylesCss, /\.stage-frame \.canvas-snap-guide-y/);
 assert.match(stylesCss, /contain: layout paint/);
 assert.match(stylesCss, /\.stage-frame \.ppt-object-table/);
 assert.match(stylesCss, /Layout stability pass/);
@@ -448,6 +484,29 @@ assert.match(styleHtml, /"fontSize": 88/);
 assert.match(styleHtml, /function sty/);
 assert.match(styleHtml, /s\.fontFamily/);
 assert.match(styleHtml, /style\.fontSize/);
+
+const extendedFontDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Extended fonts",
+  slides: [
+    {
+      layout: "hero",
+      title: "Fonts",
+      styles: {
+        title: { fontFamily: "aptos" },
+        subtitle: { fontFamily: "yahei" },
+        body: { fontFamily: "courier" }
+      }
+    }
+  ]
+});
+assert.equal(extendedFontDeck.slides[0].styles.title.fontFamily, "aptos");
+assert.equal(extendedFontDeck.slides[0].styles.subtitle.fontFamily, "yahei");
+assert.equal(extendedFontDeck.slides[0].styles.body.fontFamily, "courier");
+const extendedFontHtml = ppt.exportStandalone(extendedFontDeck);
+assert.match(extendedFontHtml, /"fontFamily": "aptos"/);
+assert.match(extendedFontHtml, /Aptos, Calibri/);
+assert.match(extendedFontHtml, /Courier New/);
 
 const textBoxDeck = ppt.normalizeDeck({
   version: "0.1",

@@ -1215,9 +1215,12 @@
 
   function normalizeStyleFontFamily(value) {
     return [
-      "system", "display", "arial", "helvetica", "avenir", "serif", "georgia", "times",
-      "cjk-sans", "pingfang", "yahei", "cjk-serif", "songti", "kaiti", "yu-mincho",
-      "mono", "menlo", "consolas", "handwriting"
+      "system", "display", "arial", "helvetica", "aptos", "calibri", "verdana", "tahoma", "avenir",
+      "serif", "georgia", "times", "cambria",
+      "cjk-sans", "pingfang", "yahei", "dengxian", "simhei", "stheiti", "hiragino-sans", "noto-sans-cjk",
+      "cjk-serif", "songti", "simsun", "fangsong", "kaiti", "yu-mincho", "noto-serif-cjk",
+      "yu-gothic", "meiryo", "malgun",
+      "mono", "menlo", "consolas", "courier", "handwriting"
     ].indexOf(value) !== -1 ? value : "";
   }
 
@@ -1227,20 +1230,37 @@
       display: "\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif",
       arial: "Arial, Helvetica, ui-sans-serif, sans-serif",
       helvetica: "\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif",
+      aptos: "Aptos, Calibri, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
+      calibri: "Calibri, Aptos, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
+      verdana: "Verdana, Geneva, Tahoma, Arial, ui-sans-serif, sans-serif",
+      tahoma: "Tahoma, Verdana, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
       avenir: "\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif",
       serif: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
       georgia: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
       times: "\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif",
-      "cjk-sans": "\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif",
+      cambria: "Cambria, Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      "cjk-sans": "\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, SimHei, \"Noto Sans CJK SC\", sans-serif",
       pingfang: "\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif",
-      yahei: "\"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
-      "cjk-serif": "\"Songti SC\", \"SimSun\", \"Noto Serif CJK SC\", \"Yu Mincho\", serif",
+      yahei: "\"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      dengxian: "DengXian, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      simhei: "SimHei, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      stheiti: "\"STHeiti\", \"Heiti SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+      "hiragino-sans": "\"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", \"Yu Gothic\", \"Meiryo\", sans-serif",
+      "noto-sans-cjk": "\"Noto Sans CJK SC\", \"Noto Sans CJK JP\", \"Noto Sans CJK KR\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+      "cjk-serif": "\"Songti SC\", SimSun, FangSong, \"Noto Serif CJK SC\", \"Yu Mincho\", serif",
       songti: "\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif",
+      simsun: "SimSun, \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      fangsong: "FangSong, STFangsong, \"Songti SC\", \"Noto Serif CJK SC\", serif",
       kaiti: "\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive",
       "yu-mincho": "\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      "noto-serif-cjk": "\"Noto Serif CJK SC\", \"Noto Serif CJK JP\", \"Noto Serif CJK KR\", \"Source Han Serif SC\", \"Songti SC\", SimSun, serif",
+      "yu-gothic": "\"Yu Gothic\", \"Yu Gothic UI\", \"Hiragino Sans\", Meiryo, sans-serif",
+      meiryo: "Meiryo, \"Yu Gothic\", \"Hiragino Sans\", sans-serif",
+      malgun: "\"Malgun Gothic\", \"Apple SD Gothic Neo\", \"Noto Sans CJK KR\", sans-serif",
       mono: "\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace",
       menlo: "Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace",
       consolas: "Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace",
+      courier: "\"Courier New\", Courier, Consolas, Menlo, monospace",
       handwriting: "\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive"
     };
     return stacks[token] || "";
@@ -2914,7 +2934,7 @@
       "function li(l,j,t,v,u){var it=e('div','ppt-chart-legend-item'),sw=e('span','ppt-chart-swatch '+cc(j)),b=e('div','');it.appendChild(sw);a(b,'strong','',t);if(v!=null)a(b,'small','',v+(u?' '+u:''));it.appendChild(b);l.appendChild(it)}" +
       "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
       "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
-      "function ff(v){return{system:'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif',display:'\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif',arial:'Arial, Helvetica, ui-sans-serif, sans-serif',helvetica:'\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif',avenir:'\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif',serif:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',georgia:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',times:'\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif','cjk-sans':'\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif',pingfang:'\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif',yahei:'\"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif','cjk-serif':'\"Songti SC\", \"SimSun\", \"Noto Serif CJK SC\", \"Yu Mincho\", serif',songti:'\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif',kaiti:'\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive','yu-mincho':'\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif',mono:'\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace',menlo:'Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace',consolas:'Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace',handwriting:'\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive'}[v]||''}" +
+      "function ff(v){return{system:'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif',display:'\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif',arial:'Arial, Helvetica, ui-sans-serif, sans-serif',helvetica:'\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif',aptos:'Aptos, Calibri, \"Segoe UI\", Arial, ui-sans-serif, sans-serif',calibri:'Calibri, Aptos, \"Segoe UI\", Arial, ui-sans-serif, sans-serif',verdana:'Verdana, Geneva, Tahoma, Arial, ui-sans-serif, sans-serif',tahoma:'Tahoma, Verdana, \"Segoe UI\", Arial, ui-sans-serif, sans-serif',avenir:'\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif',serif:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',georgia:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',times:'\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif',cambria:'Cambria, Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif','cjk-sans':'\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, SimHei, \"Noto Sans CJK SC\", sans-serif',pingfang:'\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif',yahei:'\"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif',dengxian:'DengXian, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif',simhei:'SimHei, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif',stheiti:'\"STHeiti\", \"Heiti SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif','hiragino-sans':'\"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", \"Yu Gothic\", \"Meiryo\", sans-serif','noto-sans-cjk':'\"Noto Sans CJK SC\", \"Noto Sans CJK JP\", \"Noto Sans CJK KR\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif','cjk-serif':'\"Songti SC\", SimSun, FangSong, \"Noto Serif CJK SC\", \"Yu Mincho\", serif',songti:'\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif',simsun:'SimSun, \"Songti SC\", \"Noto Serif CJK SC\", serif',fangsong:'FangSong, STFangsong, \"Songti SC\", \"Noto Serif CJK SC\", serif',kaiti:'\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive','yu-mincho':'\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif','noto-serif-cjk':'\"Noto Serif CJK SC\", \"Noto Serif CJK JP\", \"Noto Serif CJK KR\", \"Source Han Serif SC\", \"Songti SC\", SimSun, serif','yu-gothic':'\"Yu Gothic\", \"Yu Gothic UI\", \"Hiragino Sans\", Meiryo, sans-serif',meiryo:'Meiryo, \"Yu Gothic\", \"Hiragino Sans\", sans-serif',malgun:'\"Malgun Gothic\", \"Apple SD Gothic Neo\", \"Noto Sans CJK KR\", sans-serif',mono:'\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace',menlo:'Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace',consolas:'Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace',courier:'\"Courier New\", Courier, Consolas, Menlo, monospace',handwriting:'\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive'}[v]||''}" +
       "function sty(x,s){if(!s||typeof s!=='object')return;if(s.fontFamily&&ff(s.fontFamily))x.style.fontFamily=ff(s.fontFamily);if(s.fontSize)x.style.fontSize=num(s.fontSize)+'px';if(s.color)x.style.color=s.color;if(s.backgroundColor)x.style.backgroundColor=s.backgroundColor;if(s.textAlign)x.style.textAlign=s.textAlign;if(s.fontWeight)x.style.fontWeight=s.fontWeight;if(s.fontStyle)x.style.fontStyle=s.fontStyle;if(s.borderColor){x.style.borderColor=s.borderColor;x.style.borderStyle='solid';if(s.borderWidth==null)x.style.borderWidth='1px'}if(s.borderWidth!=null){x.style.borderWidth=num(s.borderWidth)+'px';x.style.borderStyle=num(s.borderWidth)?'solid':''}if(s.borderRadius!=null)x.style.borderRadius=num(s.borderRadius)+'px';if(s.opacity!=null)x.style.opacity=s.opacity}" +
       "function sk(k){k=String(k||'rectangle');if(k==='rect')return'rectangle';if(k==='roundRect'||k==='rounded'||k==='rounded-rectangle')return'roundedRectangle';if(k==='ellipse'||k==='oval'||k==='circle')return'ellipse';if(k==='line'||k==='arrow'||k==='callout')return k;if(k==='speechBubble'||k==='speech-bubble')return'callout';return'rectangle'}" +
       "function pt(v,f){v=String(v==null?'':v).trim();return v||f}" +

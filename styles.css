@@ -566,6 +566,36 @@ button.danger {
   pointer-events: none;
 }
 
+.stage-frame .canvas-marquee-box {
+  position: absolute;
+  z-index: 19;
+  border: 1px solid rgba(37, 99, 235, .72);
+  border-radius: 4px;
+  background: rgba(37, 99, 235, .12);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .55);
+  pointer-events: none;
+}
+
+.stage-frame .canvas-snap-guide {
+  position: absolute;
+  z-index: 18;
+  background: #2563eb;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .72);
+  pointer-events: none;
+}
+
+.stage-frame .canvas-snap-guide-x {
+  top: 0;
+  width: 1px;
+  height: 100%;
+}
+
+.stage-frame .canvas-snap-guide-y {
+  left: 0;
+  width: 100%;
+  height: 1px;
+}
+
 .stage-frame .canvas-selection-label {
   position: absolute;
   left: 0;

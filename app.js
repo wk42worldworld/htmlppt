@@ -21,6 +21,7 @@
   var activeEditPushed = false;
   var activeCanvasEdit = null;
   var activeCanvasDrag = null;
+  var activeCanvasMarquee = null;
   var activeCanvasResize = null;
   var selectedCanvasPath = "";
   var selectedCanvasPaths = [];
@@ -5092,6 +5093,7 @@
     event.preventDefault();
     drag.pendingDx = dx;
     drag.pendingDy = dy;
+    drag.snapDisabled = event.altKey;
     if (!drag.frame) {
       drag.frame = window.requestAnimationFrame(function () {
         drag.frame = 0;
@@ -5102,20 +5104,21 @@
 
   function applyCanvasDragPreview(drag) {
     if (!drag || !drag.node) return;
+    var delta = resolveCanvasDragDelta(drag);
     if (drag.paths && drag.paths.length > 1) {
-      applyMultiCanvasDragPreview(drag);
+      applyMultiCanvasDragPreview(drag, delta);
       return;
     }
     var nextOffset = {
-      x: clamp(drag.origin.x + drag.pendingDx, -420, 420),
-      y: clamp(drag.origin.y + drag.pendingDy, -240, 240),
+      x: clamp(drag.origin.x + delta.dx, -420, 420),
+      y: clamp(drag.origin.y + delta.dy, -240, 240),
       w: drag.origin.w,
       h: drag.origin.h
     };
     if (drag.isObject) {
       nextOffset = clampObjectGeometry({
-        x: drag.origin.x + drag.pendingDx,
-        y: drag.origin.y + drag.pendingDy,
+        x: drag.origin.x + delta.dx,
+        y: drag.origin.y + delta.dy,
         w: drag.origin.w,
         h: drag.origin.h
       });
@@ -5135,9 +5138,9 @@
     node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0)";
   }
 
-  function applyMultiCanvasDragPreview(drag) {
-    var dx = drag.pendingDx;
-    var dy = drag.pendingDy;
+  function applyMultiCanvasDragPreview(drag, delta) {
+    var dx = delta ? delta.dx : drag.pendingDx;
+    var dy = delta ? delta.dy : drag.pendingDy;
     drag.paths.forEach(function (path, index) {
       var node = drag.nodes[index];
       var origin = drag.origins[index];
@@ -5153,6 +5156,107 @@
     if (bounds) {
       previewCanvasSelectionBox(drag.selectionBox, dx, dy);
     }
+  }
+
+  function resolveCanvasDragDelta(drag) {
+    if (drag.snapDisabled) {
+      clearCanvasSnapGuides();
+      return { dx: drag.pendingDx, dy: drag.pendingDy, guides: [] };
+    }
+    var bounds = drag.startSelectionBounds || drag.startBox;
+    var snap = resolveCanvasSnap(bounds, drag.pendingDx, drag.pendingDy, drag.paths || [drag.path]);
+    drag.snapDx = snap.dx;
+    drag.snapDy = snap.dy;
+    renderCanvasSnapGuides(snap.guides);
+    return snap;
+  }
+
+  function resolveCanvasSnap(bounds, dx, dy, selectedPaths) {
+    if (!bounds || !isFinite(bounds.x) || !isFinite(bounds.y)) {
+      clearCanvasSnapGuides();
+      return { dx: dx, dy: dy, guides: [] };
+    }
+    var threshold = 6;
+    var candidates = canvasSnapCandidates(selectedPaths);
+    var snapX = nearestCanvasSnap([
+      bounds.x + dx,
+      bounds.x + bounds.w / 2 + dx,
+      bounds.x + bounds.w + dx
+    ], candidates.x, threshold);
+    var snapY = nearestCanvasSnap([
+      bounds.y + dy,
+      bounds.y + bounds.h / 2 + dy,
+      bounds.y + bounds.h + dy
+    ], candidates.y, threshold);
+    var nextDx = snapX ? dx + snapX.diff : dx;
+    var nextDy = snapY ? dy + snapY.diff : dy;
+    var guides = [];
+    if (snapX) guides.push({ axis: "x", value: snapX.value });
+    if (snapY) guides.push({ axis: "y", value: snapY.value });
+    return { dx: nextDx, dy: nextDy, guides: guides };
+  }
+
+  function nearestCanvasSnap(movingLines, candidateLines, threshold) {
+    var best = null;
+    movingLines.forEach(function (line) {
+      candidateLines.forEach(function (candidate) {
+        var diff = candidate - line;
+        if (Math.abs(diff) > threshold) return;
+        if (!best || Math.abs(diff) < Math.abs(best.diff)) {
+          best = { diff: diff, value: candidate };
+        }
+      });
+    });
+    return best;
+  }
+
+  function canvasSnapCandidates(selectedPaths) {
+    var selected = {};
+    (selectedPaths || []).forEach(function (path) {
+      selected[path] = true;
+    });
+    var x = [0, PPTHtml.baseWidth / 2, PPTHtml.baseWidth];
+    var y = [0, PPTHtml.baseHeight / 2, PPTHtml.baseHeight];
+    Array.prototype.forEach.call(els.stageFrame.querySelectorAll("[data-canvas-edit]"), function (node) {
+      var path = node.getAttribute("data-canvas-edit");
+      if (!path || selected[path]) return;
+      if (parseCanvasOptions(node).noDrag) return;
+      var box = getNodeFrameBounds(node);
+      if (!box || box.w <= 0 || box.h <= 0) return;
+      x.push(box.x, box.x + box.w / 2, box.x + box.w);
+      y.push(box.y, box.y + box.h / 2, box.y + box.h);
+    });
+    return {
+      x: uniqueNumbersRounded(x),
+      y: uniqueNumbersRounded(y)
+    };
+  }
+
+  function uniqueNumbersRounded(values) {
+    var unique = [];
+    values.forEach(function (value) {
+      var rounded = Math.round(Number(value) || 0);
+      if (unique.indexOf(rounded) === -1) unique.push(rounded);
+    });
+    return unique;
+  }
+
+  function renderCanvasSnapGuides(guides) {
+    clearCanvasSnapGuides();
+    (guides || []).forEach(function (guide) {
+      var line = document.createElement("div");
+      line.className = "canvas-snap-guide canvas-snap-guide-" + guide.axis;
+      if (guide.axis === "x") line.style.left = Math.round(guide.value) + "px";
+      if (guide.axis === "y") line.style.top = Math.round(guide.value) + "px";
+      els.stageFrame.appendChild(line);
+    });
+  }
+
+  function clearCanvasSnapGuides() {
+    if (!els.stageFrame) return;
+    els.stageFrame.querySelectorAll(".canvas-snap-guide").forEach(function (guide) {
+      guide.remove();
+    });
   }
 
   function previewCanvasSelectionBox(box, dx, dy, width, height) {
@@ -5178,6 +5282,7 @@
       node.style.willChange = "";
     });
     els.stageFrame.classList.remove("is-canvas-moving");
+    clearCanvasSnapGuides();
   }
 
   function flushCanvasDragPreview(drag) {
@@ -5264,6 +5369,10 @@
       startCanvasPan(event);
       return;
     }
+    if (shouldStartCanvasMarquee(event)) {
+      startCanvasMarquee(event);
+      return;
+    }
     if (event.target.closest("[data-canvas-edit]") || event.target.closest(".canvas-selection-box")) return;
     if (!selectedCanvasPath) return;
     clearCanvasSelection();
@@ -5274,6 +5383,153 @@
     if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
     if (event.target.closest("button, input, textarea, select, dialog, .canvas-selection-box")) return false;
     return event.button === 1 || (event.button === 0 && canvasSpacePanning);
+  }
+
+  function shouldStartCanvasMarquee(event) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize || activeCanvasPan) return false;
+    if (event.button !== 0 || canvasSpacePanning) return false;
+    if (event.target.closest("button, input, textarea, select, dialog, .canvas-selection-box")) return false;
+    if (event.target.closest("[data-canvas-edit]")) return false;
+    return Boolean(els.stageFrame && els.stageFrame.contains(event.target));
+  }
+
+  function startCanvasMarquee(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    hideTooltip();
+    hideCanvasContextMenu();
+    hideSlideContextMenu();
+    var start = canvasPointFromEvent(event);
+    var box = document.createElement("div");
+    box.className = "canvas-marquee-box";
+    box.hidden = true;
+    els.stageFrame.appendChild(box);
+    activeCanvasMarquee = {
+      pointerId: event.pointerId,
+      start: start,
+      current: start,
+      box: box,
+      basePaths: event.shiftKey ? currentCanvasSelectionPaths() : [],
+      additive: event.shiftKey,
+      moved: false,
+      frame: 0
+    };
+    els.stageFrame.classList.add("is-marquee-selecting");
+    if (els.stageViewport.setPointerCapture && event.pointerId != null) {
+      try {
+        els.stageViewport.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Window listeners keep marquee selection active if capture is unavailable.
+      }
+    }
+    window.addEventListener("pointermove", handleCanvasMarqueePointerMove);
+    window.addEventListener("pointerup", handleCanvasMarqueePointerEnd);
+    window.addEventListener("pointercancel", handleCanvasMarqueePointerEnd);
+  }
+
+  function handleCanvasMarqueePointerMove(event) {
+    if (!activeCanvasMarquee) return;
+    event.preventDefault();
+    var marquee = activeCanvasMarquee;
+    marquee.current = canvasPointFromEvent(event);
+    if (!marquee.moved && Math.hypot(marquee.current.x - marquee.start.x, marquee.current.y - marquee.start.y) < 4) return;
+    marquee.moved = true;
+    if (!marquee.frame) {
+      marquee.frame = window.requestAnimationFrame(function () {
+        marquee.frame = 0;
+        updateCanvasMarqueePreview(marquee);
+      });
+    }
+  }
+
+  function handleCanvasMarqueePointerEnd(event) {
+    if (!activeCanvasMarquee) return;
+    var marquee = activeCanvasMarquee;
+    activeCanvasMarquee = null;
+    if (marquee.frame) {
+      window.cancelAnimationFrame(marquee.frame);
+      marquee.frame = 0;
+      updateCanvasMarqueePreview(marquee);
+    }
+    window.removeEventListener("pointermove", handleCanvasMarqueePointerMove);
+    window.removeEventListener("pointerup", handleCanvasMarqueePointerEnd);
+    window.removeEventListener("pointercancel", handleCanvasMarqueePointerEnd);
+    if (els.stageViewport.releasePointerCapture && marquee.pointerId != null) {
+      try {
+        els.stageViewport.releasePointerCapture(marquee.pointerId);
+      } catch (error) {
+        // The pointer may already be released.
+      }
+    }
+    if (marquee.box) marquee.box.remove();
+    els.stageFrame.classList.remove("is-marquee-selecting");
+    if (!marquee.moved) {
+      if (!marquee.additive) {
+        clearCanvasSelection();
+        renderCanvasControls();
+      }
+      return;
+    }
+    event.preventDefault();
+    applyCanvasMarqueeSelection(marquee);
+  }
+
+  function updateCanvasMarqueePreview(marquee) {
+    if (!marquee || !marquee.moved) return;
+    var rect = canvasRectFromPoints(marquee.start, marquee.current);
+    if (marquee.box) {
+      marquee.box.hidden = false;
+      marquee.box.style.left = rect.left + "px";
+      marquee.box.style.top = rect.top + "px";
+      marquee.box.style.width = Math.max(1, rect.w) + "px";
+      marquee.box.style.height = Math.max(1, rect.h) + "px";
+    }
+    applyCanvasMarqueeSelection(marquee);
+  }
+
+  function applyCanvasMarqueeSelection(marquee) {
+    var rect = canvasRectFromPoints(marquee.start, marquee.current);
+    var paths = selectableCanvasPathsInRect(rect);
+    if (marquee.additive) paths = uniqueStrings(marquee.basePaths.concat(paths));
+    if (sameStringArray(paths, currentCanvasSelectionPaths())) return;
+    setCanvasSelection(paths, paths[paths.length - 1] || "");
+    renderCanvasControls();
+  }
+
+  function canvasRectFromPoints(start, current) {
+    var left = Math.min(start.x, current.x);
+    var top = Math.min(start.y, current.y);
+    var right = Math.max(start.x, current.x);
+    var bottom = Math.max(start.y, current.y);
+    return {
+      left: left,
+      top: top,
+      right: right,
+      bottom: bottom,
+      x: left,
+      y: top,
+      w: right - left,
+      h: bottom - top
+    };
+  }
+
+  function selectableCanvasPathsInRect(rect) {
+    var paths = [];
+    Array.prototype.forEach.call(els.stageFrame.querySelectorAll("[data-canvas-edit]"), function (node) {
+      var path = node.getAttribute("data-canvas-edit");
+      if (!path || paths.indexOf(path) !== -1) return;
+      if (parseCanvasOptions(node).noDrag) return;
+      var box = getNodeFrameBounds(node);
+      if (!box || box.w <= 0 || box.h <= 0) return;
+      if (rectsIntersect(rect, { left: box.x, top: box.y, right: box.x + box.w, bottom: box.y + box.h })) {
+        paths.push(path);
+      }
+    });
+    return paths;
+  }
+
+  function rectsIntersect(a, b) {
+    return a.left <= b.right && a.right >= b.left && a.top <= b.bottom && a.bottom >= b.top;
   }
 
   function startCanvasPan(event) {
@@ -6358,6 +6614,14 @@
     return unique;
   }
 
+  function sameStringArray(left, right) {
+    if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false;
+    for (var index = 0; index < left.length; index += 1) {
+      if (left[index] !== right[index]) return false;
+    }
+    return true;
+  }
+
   function selectedGeometryInfos() {
     return currentCanvasSelectionPaths().map(geometryInfoForPath).filter(Boolean);
   }
@@ -6515,6 +6779,11 @@
   }
 
   function createSelectionClipboard() {
+    var paths = currentCanvasSelectionPaths();
+    if (paths.length > 1) {
+      var multi = createMultiSelectionClipboard(paths);
+      if (multi && multi.items.length) return multi;
+    }
     var objectInfo = selectedObjectInfo();
     if (objectInfo) {
       return {
@@ -6532,6 +6801,58 @@
       };
     }
     return null;
+  }
+
+  function hasCopyableCanvasSelection() {
+    return currentCanvasSelectionPaths().some(function (path) {
+      return Boolean(copyableCanvasSelectionItem(path));
+    });
+  }
+
+  function copyableCanvasSelectionItem(path) {
+    var slide = currentSlide();
+    var objectIndex = objectIndexFromPath(path);
+    if (objectIndex >= 0 && Array.isArray(slide.objects) && slide.objects[objectIndex]) {
+      return {
+        kind: "object",
+        value: clonePlain(slide.objects[objectIndex]),
+        style: clonePathStyle(slide, "objects." + objectIndex)
+      };
+    }
+    var textBoxIndex = textBoxIndexFromPath(path);
+    if (textBoxIndex >= 0 && Array.isArray(slide.textBoxes) && slide.textBoxes[textBoxIndex]) {
+      return {
+        kind: "textBox",
+        value: clonePlain(slide.textBoxes[textBoxIndex]),
+        style: clonePathStyle(slide, "textBoxes." + textBoxIndex + ".text")
+      };
+    }
+    return null;
+  }
+
+  function createMultiSelectionClipboard(paths) {
+    var items = [];
+    (paths || []).forEach(function (path) {
+      var item = copyableCanvasSelectionItem(path);
+      if (item) items.push(item);
+    });
+    if (!items.length) return null;
+    var infos = items.map(function (item) {
+      var value = item.value || {};
+      return {
+        geometry: {
+          x: Number(value.x) || 0,
+          y: Number(value.y) || 0,
+          w: Math.max(44, Number(value.w) || (item.kind === "textBox" ? 380 : 320)),
+          h: Math.max(24, Number(value.h) || (item.kind === "textBox" ? 96 : 180))
+        }
+      };
+    });
+    return {
+      kind: "multi",
+      items: items,
+      bounds: geometryBounds(infos)
+    };
   }
 
   function copySelectedCanvas() {
@@ -6555,18 +6876,75 @@
 
   function pasteCanvasPayload(payload, point) {
     var nextPath = "";
+    var nextPaths = [];
     commit(function () {
       if (payload.kind === "object") nextPath = pasteObjectPayload(payload, point);
       if (payload.kind === "textBox") nextPath = pasteTextBoxPayload(payload, point);
-      setCanvasSelection(nextPath ? [nextPath] : []);
+      if (payload.kind === "multi") nextPaths = pasteMultiPayload(payload, point);
+      setCanvasSelection(nextPaths.length ? nextPaths : (nextPath ? [nextPath] : []));
     });
-    if (!nextPath) return false;
+    if (!nextPath && !nextPaths.length) return false;
     toast(t("toast.objectPasted"));
     window.setTimeout(function () {
+      if (nextPaths.length) {
+        setCanvasSelection(nextPaths, nextPaths[nextPaths.length - 1]);
+        renderCanvasControls();
+        return;
+      }
       var node = canvasNodeByPath(nextPath);
       if (node) selectCanvasTarget(node);
     }, 0);
     return true;
+  }
+
+  function pasteMultiPayload(payload, point) {
+    var items = Array.isArray(payload.items) ? payload.items : [];
+    var bounds = payload.bounds || { left: 0, top: 0, w: 0, h: 0 };
+    var offset = point && isFinite(point.x) && isFinite(point.y)
+      ? {
+        x: point.x - (Number(bounds.left) || 0) - (Number(bounds.w) || 0) / 2,
+        y: point.y - (Number(bounds.top) || 0) - (Number(bounds.h) || 0) / 2
+      }
+      : { x: 24, y: 24 };
+    var paths = [];
+    items.forEach(function (item) {
+      if (item.kind === "object") {
+        paths.push(pasteObjectPayload({
+          value: offsetPayloadGeometry(item.value, offset, true),
+          style: item.style,
+          preserveGeometry: true
+        }));
+      }
+      if (item.kind === "textBox") {
+        paths.push(pasteTextBoxPayload({
+          value: offsetPayloadGeometry(item.value, offset, false),
+          style: item.style,
+          preserveGeometry: true
+        }));
+      }
+    });
+    return paths.filter(Boolean);
+  }
+
+  function offsetPayloadGeometry(value, offset, isObject) {
+    var copy = clonePlain(value);
+    var width = Math.max(44, Number(copy.w) || (isObject ? 320 : 380));
+    var height = Math.max(24, Number(copy.h) || (isObject ? 180 : 96));
+    var x = (Number(copy.x) || 0) + (Number(offset.x) || 0);
+    var y = (Number(copy.y) || 0) + (Number(offset.y) || 0);
+    var geometry = isObject
+      ? clampObjectGeometry({ x: x, y: y, w: width, h: height })
+      : {
+        x: clamp(x, 0, PPTHtml.baseWidth - 40),
+        y: clamp(y, 0, PPTHtml.baseHeight - 24),
+        w: width,
+        h: height
+      };
+    copy.x = Math.round(geometry.x);
+    copy.y = Math.round(geometry.y);
+    copy.w = Math.round(geometry.w);
+    copy.h = Math.round(geometry.h);
+    return copy;
   }
 
   function pasteObjectPayload(payload, point) {
@@ -6576,7 +6954,9 @@
     object.id = PPTHtml.uid("object");
     object.zIndex = nextObjectZIndex();
     object.rotation = Number(object.rotation) || 0;
-    var geometry = offsetPastedGeometry(object, point, { w: 320, h: 180 });
+    var geometry = payload.preserveGeometry
+      ? clampObjectGeometry({ x: Number(object.x) || 0, y: Number(object.y) || 0, w: Math.max(44, Number(object.w) || 320), h: Math.max(24, Number(object.h) || 180) })
+      : offsetPastedGeometry(object, point, { w: 320, h: 180 });
     object.x = geometry.x;
     object.y = geometry.y;
     object.w = geometry.w;
@@ -6594,7 +6974,10 @@
     box.id = PPTHtml.uid("textbox");
     var width = Math.max(44, Number(box.w) || 380);
     var height = Math.max(24, Number(box.h) || 96);
-    if (point && isFinite(point.x) && isFinite(point.y)) {
+    if (payload.preserveGeometry) {
+      box.x = Math.round(clamp(Number(box.x) || 0, 0, PPTHtml.baseWidth - 40));
+      box.y = Math.round(clamp(Number(box.y) || 0, 0, PPTHtml.baseHeight - 24));
+    } else if (point && isFinite(point.x) && isFinite(point.y)) {
       box.x = Math.round(clamp(point.x - width / 2, 0, PPTHtml.baseWidth - 40));
       box.y = Math.round(clamp(point.y - height / 2, 0, PPTHtml.baseHeight - 24));
     } else {
@@ -7064,7 +7447,13 @@
     canvasContextPoint = canvasPointFromEvent(event);
     var target = event.target.closest("[data-canvas-edit]");
     if (target && els.stageFrame.contains(target)) {
-      setCanvasSelection([target.getAttribute("data-canvas-edit")]);
+      var targetPath = target.getAttribute("data-canvas-edit");
+      var paths = currentCanvasSelectionPaths();
+      if (paths.indexOf(targetPath) === -1) {
+        setCanvasSelection([targetPath], targetPath);
+      } else {
+        setCanvasSelection(paths, targetPath);
+      }
       renderCanvasControls();
     } else if (!event.target.closest(".canvas-selection-box")) {
       clearCanvasSelection();
@@ -7096,7 +7485,7 @@
     if (!els.canvasContextMenu) return;
     var hasSelection = Boolean(selectedCanvasPath);
     var hasObject = Boolean(selectedObjectInfo());
-    var hasClipboardSource = Boolean(selectedObjectInfo() || selectedTextBoxInfo());
+    var hasClipboardSource = hasCopyableCanvasSelection();
     var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
     var hasTable = Boolean(tableInfo);
     var tableActions = [
