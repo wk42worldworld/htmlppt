@@ -1977,7 +1977,7 @@
     "insert.shape.callout.title": "插入标注框",
     "panel.object": "对象",
     "object.noSelection": "选中画布对象后，可调整位置、尺寸、图层和数据。",
-    "object.target": "{name} · ID {id}",
+    "object.target": "{name}",
     "object.layers": "对象列表",
     "object.noObjects": "当前页还没有自由对象",
     "object.lock": "锁定对象",
@@ -1986,6 +1986,8 @@
     "object.show": "显示对象",
     "object.locked": "已锁定",
     "object.hidden": "已隐藏",
+    "object.layerTop": "最上层",
+    "object.layerNumber": "第 {level} 层",
     "object.duplicate": "重复",
     "object.forward": "上移一层",
     "object.backward": "下移一层",
@@ -2042,7 +2044,7 @@
     "insert.shape.callout.title": "Insert callout",
     "panel.object": "Object",
     "object.noSelection": "Select a canvas object to edit position, size, layer, and data.",
-    "object.target": "{name} · ID {id}",
+    "object.target": "{name}",
     "object.layers": "Object list",
     "object.noObjects": "No freeform objects on this slide",
     "object.lock": "Lock object",
@@ -2051,6 +2053,8 @@
     "object.show": "Show object",
     "object.locked": "Locked",
     "object.hidden": "Hidden",
+    "object.layerTop": "Top layer",
+    "object.layerNumber": "Layer {level}",
     "object.duplicate": "Duplicate",
     "object.forward": "Bring forward",
     "object.backward": "Send backward",
@@ -2107,7 +2111,7 @@
     "insert.shape.callout.title": "吹き出しを挿入",
     "panel.object": "オブジェクト",
     "object.noSelection": "キャンバス上のオブジェクトを選択すると、位置、サイズ、レイヤー、データを編集できます。",
-    "object.target": "{name} · ID {id}",
+    "object.target": "{name}",
     "object.layers": "オブジェクト一覧",
     "object.noObjects": "このスライドに自由配置オブジェクトはありません",
     "object.lock": "ロック",
@@ -2116,6 +2120,8 @@
     "object.show": "表示",
     "object.locked": "ロック中",
     "object.hidden": "非表示",
+    "object.layerTop": "最前面",
+    "object.layerNumber": "レイヤー {level}",
     "object.duplicate": "複製",
     "object.forward": "前面へ",
     "object.backward": "背面へ",
@@ -2172,7 +2178,7 @@
     "insert.shape.callout.title": "말풍선 삽입",
     "panel.object": "개체",
     "object.noSelection": "캔버스 개체를 선택하면 위치, 크기, 레이어, 데이터를 편집할 수 있습니다.",
-    "object.target": "{name} · ID {id}",
+    "object.target": "{name}",
     "object.layers": "개체 목록",
     "object.noObjects": "이 슬라이드에 자유 개체가 없습니다",
     "object.lock": "개체 잠금",
@@ -2181,6 +2187,8 @@
     "object.show": "개체 보이기",
     "object.locked": "잠김",
     "object.hidden": "숨김",
+    "object.layerTop": "맨 앞",
+    "object.layerNumber": "{level} 레이어",
     "object.duplicate": "복제",
     "object.forward": "앞으로",
     "object.backward": "뒤로",
@@ -5907,6 +5915,9 @@
     els.objectPanel.querySelectorAll("[data-object-control]").forEach(function (control) {
       control.disabled = !canEditObject;
     });
+    if (els.objectDuplicateBtn) {
+      els.objectDuplicateBtn.disabled = !hasObject;
+    }
     if (els.objectTableTools) {
       var showTableTools = hasTableContext;
       els.objectTableTools.hidden = !showTableTools;
@@ -5966,12 +5977,12 @@
     }).sort(function (a, b) {
       if (a.z !== b.z) return b.z - a.z;
       return b.index - a.index;
-    }).forEach(function (entry) {
-      els.objectLayerList.appendChild(createObjectLayerRow(entry.object, entry.index));
+    }).forEach(function (entry, displayIndex) {
+      els.objectLayerList.appendChild(createObjectLayerRow(entry.object, entry.index, displayIndex));
     });
   }
 
-  function createObjectLayerRow(object, index) {
+  function createObjectLayerRow(object, index, displayIndex) {
     var path = "objects." + index;
     var row = document.createElement("div");
     row.className = "object-layer-row";
@@ -5991,7 +6002,8 @@
     meta.appendChild(title);
 
     var detail = document.createElement("span");
-    var badges = [objectTypeLabel(object.type), "z " + (Number(object.zIndex) || 0)];
+    var layerLabel = displayIndex === 0 ? t("object.layerTop") : formatText(t("object.layerNumber"), { level: displayIndex + 1 });
+    var badges = [objectTypeLabel(object.type), layerLabel];
     if (object.locked) badges.push(t("object.locked"));
     if (object.hidden) badges.push(t("object.hidden"));
     detail.textContent = badges.join(" · ");
@@ -6071,6 +6083,7 @@
 
   function handleObjectLayerListKeydown(event) {
     if (event.key !== "Enter" && event.key !== " ") return;
+    if (event.target.closest("[data-object-layer-action]")) return;
     var row = event.target.closest("[data-object-layer-path]");
     if (!row) return;
     event.preventDefault();
@@ -6177,11 +6190,12 @@
   function updateObjectCommandControlState() {
     if (!els.objectPanel) return;
     var geometryCount = selectedGeometryInfos().length;
+    var hasLocked = hasLockedCanvasSelection();
     els.objectPanel.querySelectorAll("[data-align-control]").forEach(function (control) {
-      control.disabled = geometryCount < 2;
+      control.disabled = hasLocked || geometryCount < 2;
     });
     els.objectPanel.querySelectorAll("[data-distribute-control]").forEach(function (control) {
-      control.disabled = geometryCount < 3;
+      control.disabled = hasLocked || geometryCount < 3;
     });
   }
 
@@ -6918,14 +6932,8 @@
     return (paths || currentCanvasSelectionPaths()).some(isLockedCanvasPath);
   }
 
-  function editableCanvasSelectionPaths(paths) {
-    return (paths || currentCanvasSelectionPaths()).filter(function (path) {
-      return !isLockedCanvasPath(path);
-    });
-  }
-
-  function selectedGeometryInfos() {
-    return editableCanvasSelectionPaths().map(geometryInfoForPath).filter(Boolean);
+  function selectedGeometryInfos(paths) {
+    return uniqueStrings(paths || currentCanvasSelectionPaths()).map(geometryInfoForPath).filter(Boolean);
   }
 
   function geometryInfoForPath(path) {
@@ -6961,7 +6969,12 @@
   }
 
   function alignSelectedCanvasTargets(action) {
-    var infos = selectedGeometryInfos();
+    var paths = currentCanvasSelectionPaths();
+    if (hasLockedCanvasSelection(paths)) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
+    var infos = selectedGeometryInfos(paths);
     if (infos.length < 2) return false;
     return commitGeometryInfos(infos, function () {
       var bounds = geometryBounds(infos);
@@ -6979,7 +6992,12 @@
   }
 
   function distributeSelectedCanvasTargets(axis) {
-    var infos = selectedGeometryInfos();
+    var paths = currentCanvasSelectionPaths();
+    if (hasLockedCanvasSelection(paths)) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
+    var infos = selectedGeometryInfos(paths);
     if (infos.length < 3) return false;
     return commitGeometryInfos(infos, function () {
       var horizontal = axis === "horizontal";
@@ -7254,6 +7272,8 @@
     slide.objects = Array.isArray(slide.objects) ? slide.objects : [];
     var object = clonePlain(payload.value);
     object.id = PPTHtml.uid("object");
+    delete object.locked;
+    delete object.hidden;
     object.zIndex = nextObjectZIndex();
     object.rotation = Number(object.rotation) || 0;
     var geometry = payload.preserveGeometry
@@ -7429,6 +7449,10 @@
     return null;
   }
 
+  function isLockedTableInfo(info) {
+    return Boolean(info && info.kind === "object" && info.object && info.object.locked);
+  }
+
   function parseTablePath(path) {
     var value = String(path || "");
     var objectColumn = value.match(/^objects\.(\d+)\.data\.columns\.(\d+)$/);
@@ -7518,6 +7542,11 @@
   function mutateSelectedTable(action) {
     var info = selectedTableInfo();
     if (!info) return false;
+    if (isLockedTableInfo(info)) {
+      toast(t("toast.lockedSelection"));
+      syncObjectPanel();
+      return false;
+    }
     var before = JSON.stringify(deck);
     var table = info.table;
     var columnCount = normalizeEditableTable(table);
@@ -7628,6 +7657,10 @@
 
   function clearSelectedTableCell() {
     if (!isTableCellPath(selectedCanvasPath)) return false;
+    if (isLockedCanvasPath(selectedCanvasPath)) {
+      toast(t("toast.lockedSelection"));
+      return false;
+    }
     var before = JSON.stringify(deck);
     setPath(currentSlide(), selectedCanvasPath, "");
     if (before === JSON.stringify(deck)) return false;
@@ -7800,6 +7833,7 @@
     var hasClipboardSource = hasCopyableCanvasSelection();
     var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
     var hasTable = Boolean(tableInfo);
+    var hasLockedTable = isLockedTableInfo(tableInfo);
     var tableActions = [
       "tableInsertRowAbove",
       "tableInsertRowBelow",
@@ -7819,8 +7853,8 @@
       if (action === "copy" || action === "duplicate") enabled = hasClipboardSource;
       if (action === "delete") enabled = hasSelection && !hasLockedSelection;
       if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject && !hasLockedSelection;
-      if (tableActions.indexOf(action) !== -1) enabled = hasTable;
-      if (action === "tableClearCell") enabled = hasTable && isTableCellPath(selectedCanvasPath);
+      if (tableActions.indexOf(action) !== -1) enabled = hasTable && !hasLockedTable;
+      if (action === "tableClearCell") enabled = hasTable && !hasLockedTable && isTableCellPath(selectedCanvasPath);
       button.disabled = !enabled;
     });
   }

@@ -3870,3 +3870,80 @@ textarea:focus {
     max-height: 86px;
   }
 }
+
+/* Presenter mobile controls: keep the playback bar fully visible on portrait phones. */
+@media (max-width: 520px) {
+  .presenter-controls {
+    left: max(8px, env(safe-area-inset-left));
+    right: max(8px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-columns: 38px minmax(52px, 1fr) 38px repeat(4, 34px);
+    gap: 5px;
+    width: auto;
+    max-width: none;
+    overflow: visible;
+    padding: 5px;
+    transform: translateY(14px) scale(.98);
+  }
+
+  .presenter:not(.is-ui-hidden) .presenter-controls,
+  .presenter:not(.is-ui-hidden):hover .presenter-controls,
+  .presenter:not(.is-ui-hidden):active .presenter-controls,
+  .presenter:not(.is-ui-hidden):focus-within .presenter-controls,
+  .presenter-controls:hover,
+  .presenter-controls:focus-within {
+    transform: translateY(0) scale(1);
+  }
+
+  .presenter.is-ui-hidden .presenter-controls {
+    transform: translateY(14px) scale(.98);
+  }
+
+  .presenter-controls button {
+    width: 34px;
+    min-width: 0;
+    height: 34px;
+    padding: 0;
+    gap: 0;
+  }
+
+  #presentPrevBtn,
+  #presentNextBtn {
+    width: 38px;
+  }
+
+  #presentCounter {
+    min-width: 0;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .presenter-controls button span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .presenter-controls {
+    grid-template-columns: 34px minmax(44px, 1fr) 34px repeat(4, 30px);
+    gap: 4px;
+  }
+
+  .presenter-controls button {
+    width: 30px;
+    height: 32px;
+  }
+
+  #presentPrevBtn,
+  #presentNextBtn {
+    width: 34px;
+  }
+}
