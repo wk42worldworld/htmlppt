@@ -362,6 +362,16 @@ button.danger {
   user-select: none;
 }
 
+.stage-frame .ppt-object.is-canvas-dragging {
+  background: transparent;
+  will-change: transform;
+}
+
+.stage-frame .ppt-object.is-canvas-dragging img,
+.stage-frame .ppt-object.is-canvas-dragging video {
+  pointer-events: none;
+}
+
 .stage-frame .canvas-selection-box {
   position: absolute;
   z-index: 20;
@@ -1272,6 +1282,10 @@ button.primary {
 
 .stage-frame {
   filter: drop-shadow(0 24px 48px rgba(15, 23, 42, .18));
+}
+
+.stage-frame.is-canvas-moving {
+  filter: none;
 }
 
 .stage-frame [data-canvas-edit]:hover {

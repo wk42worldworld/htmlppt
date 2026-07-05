@@ -3231,8 +3231,19 @@
       startY: event.clientY,
       origin: getCanvasOffset(target.getAttribute("data-canvas-edit")),
       scale: currentFrameScale(),
+      pointerId: event.pointerId,
+      frame: 0,
+      pendingDx: 0,
+      pendingDy: 0,
       moved: false
     };
+    if (target.setPointerCapture && event.pointerId != null) {
+      try {
+        target.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Pointer capture is best-effort; window listeners still keep the drag working.
+      }
+    }
     window.addEventListener("pointermove", handleCanvasPointerMove);
     window.addEventListener("pointerup", handleCanvasPointerEnd);
     window.addEventListener("pointercancel", handleCanvasPointerEnd);
@@ -3247,34 +3258,80 @@
     if (!drag.moved) {
       drag.moved = true;
       drag.node.classList.add("is-canvas-dragging");
+      els.stageFrame.classList.add("is-canvas-moving");
     }
     event.preventDefault();
+    drag.pendingDx = dx;
+    drag.pendingDy = dy;
+    if (!drag.frame) {
+      drag.frame = window.requestAnimationFrame(function () {
+        drag.frame = 0;
+        applyCanvasDragPreview(drag);
+      });
+    }
+  }
+
+  function applyCanvasDragPreview(drag) {
+    if (!drag || !drag.node) return;
     var nextOffset = {
-      x: clamp(drag.origin.x + dx, -420, 420),
-      y: clamp(drag.origin.y + dy, -240, 240),
+      x: clamp(drag.origin.x + drag.pendingDx, -420, 420),
+      y: clamp(drag.origin.y + drag.pendingDy, -240, 240),
       w: drag.origin.w,
       h: drag.origin.h
     };
     if (getObjectByPath(drag.path)) {
       nextOffset = clampObjectGeometry({
-        x: drag.origin.x + dx,
-        y: drag.origin.y + dy,
+        x: drag.origin.x + drag.pendingDx,
+        y: drag.origin.y + drag.pendingDy,
         w: drag.origin.w,
         h: drag.origin.h
       });
+      setObjectDragPreviewStyle(drag.node, drag.origin, nextOffset);
+      positionCanvasSelectionBoxFromBounds(nextOffset);
+      return;
     }
     setCanvasOffsetStyle(drag.node, nextOffset);
     positionCanvasSelectionBox(drag.node);
   }
 
+  function setObjectDragPreviewStyle(node, origin, nextOffset) {
+    var dx = Math.round((Number(nextOffset.x) || 0) - (Number(origin.x) || 0));
+    var dy = Math.round((Number(nextOffset.y) || 0) - (Number(origin.y) || 0));
+    node.dataset.canvasX = String(nextOffset.x);
+    node.dataset.canvasY = String(nextOffset.y);
+    node.dataset.canvasW = String(nextOffset.w);
+    node.dataset.canvasH = String(nextOffset.h);
+    node.style.willChange = "transform";
+    node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0)";
+  }
+
+  function flushCanvasDragPreview(drag) {
+    if (!drag || !drag.moved) return;
+    if (drag.frame) {
+      window.cancelAnimationFrame(drag.frame);
+      drag.frame = 0;
+    }
+    applyCanvasDragPreview(drag);
+  }
+
   function handleCanvasPointerEnd(event) {
     if (!activeCanvasDrag) return;
     var drag = activeCanvasDrag;
+    flushCanvasDragPreview(drag);
     activeCanvasDrag = null;
     window.removeEventListener("pointermove", handleCanvasPointerMove);
     window.removeEventListener("pointerup", handleCanvasPointerEnd);
     window.removeEventListener("pointercancel", handleCanvasPointerEnd);
     drag.node.classList.remove("is-canvas-dragging");
+    els.stageFrame.classList.remove("is-canvas-moving");
+    drag.node.style.willChange = "";
+    if (drag.node.releasePointerCapture && drag.pointerId != null) {
+      try {
+        drag.node.releasePointerCapture(drag.pointerId);
+      } catch (error) {
+        // The pointer may already be released by the browser.
+      }
+    }
     if (!drag.moved) return;
     event.preventDefault();
 
@@ -3284,7 +3341,10 @@
     if (history.length > 80) history.shift();
     future = [];
     var foldedTextBox = foldTextBoxGeometry(drag.path, offset);
-    if (!foldedTextBox) setCanvasOffset(drag.path, offset);
+    if (!foldedTextBox) {
+      setCanvasOffset(drag.path, offset);
+      setCanvasOffsetStyle(drag.node, getCanvasOffset(drag.path));
+    }
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     if (foldedTextBox) renderCanvas();
@@ -3524,7 +3584,12 @@
   function positionCanvasSelectionBox(node, existingBox) {
     var box = existingBox || els.stageFrame.querySelector(".canvas-selection-box");
     if (!box || !node) return;
-    var bounds = getNodeFrameBounds(node);
+    positionCanvasSelectionBoxFromBounds(getNodeFrameBounds(node), box);
+  }
+
+  function positionCanvasSelectionBoxFromBounds(bounds, existingBox) {
+    var box = existingBox || els.stageFrame.querySelector(".canvas-selection-box");
+    if (!box || !bounds) return;
     box.style.left = bounds.x + "px";
     box.style.top = bounds.y + "px";
     box.style.width = Math.max(8, bounds.w) + "px";
