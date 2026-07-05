@@ -72,6 +72,7 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="zoomInBtn"/,
   /class="rail-action"/,
   /id="slideContextMenu"/,
+  /id="slideLayoutMenu" hidden/,
   /id="newDeckBtn"[\s\S]*data-i18n="action\.newShort"/,
   /id="templatesBtn"[\s\S]*data-i18n="action\.templatesShort"/,
   /id="templateDialog"[\s\S]*data-i18n="dialog\.templatesHint"/,
@@ -96,6 +97,13 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="shortcutDialog"/
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
+});
+[
+  "text", "hero", "section", "imageRight", "imageLeft", "imageFull", "imageBackground",
+  "compare", "threeCards", "chart", "data", "table", "timeline", "quote", "video",
+  "audio", "code", "ending"
+].forEach((layout) => {
+  assert.match(indexHtml, new RegExp(`data-slide-layout="${layout}"`));
 });
 [
   /data-insert="chart" data-variant="line"[\s\S]*?#icon-chart-line/,
@@ -140,8 +148,18 @@ assert.match(appJs, /function deleteSelectedCanvasContent/);
 assert.match(appJs, /function deleteSlideAt/);
 assert.match(appJs, /function handleSlideShortcut/);
 assert.match(appJs, /function handleSlideContextMenuAction/);
+assert.match(appJs, /function showSlideLayoutMenu/);
+assert.match(appJs, /function handleSlideLayoutMenuAction/);
+assert.match(appJs, /function createSlideForLayout/);
+assert.match(appJs, /addSlideBtn\.addEventListener\("click", function \(\) \{ showSlideLayoutMenuForButton\(els\.addSlideBtn, currentIndex\); \}\)/);
+assert.match(appJs, /deck\.slides\.splice\(insertIndex, 0, createSlideForLayout\(settings\.layout, insertIndex\)\)/);
+assert.match(appJs, /imageBackground: "image"/);
+assert.match(appJs, /data: "metrics"/);
+assert.match(appJs, /addSlideAfter\(index, \{ focusThumb: true, layout: layout \}\)/);
 assert.match(appJs, /addSlideAfter\(currentIndex/);
 assert.match(appJs, /lowerKey === "m"/);
+assert.match(appJs, /key === "Escape"[\s\S]*hideSlideLayoutMenu\(\)/);
+assert.match(appJs, /function openPresenter\(index\)[\s\S]*hideSlideLayoutMenu\(\)/);
 assert.match(appJs, /function selectedExplicitTableInfo/);
 assert.match(appJs, /function sameTableScope/);
 assert.match(appJs, /function previewCanvasSelectionBox/);
@@ -295,6 +313,7 @@ assert.match(stylesCss, /\.ppt-object\.is-canvas-locked/);
 assert.match(stylesCss, /\.object-data-grid/);
 assert.match(stylesCss, /\.object-grid-table/);
 assert.match(stylesCss, /\.object-grid-input:focus/);
+assert.match(stylesCss, /\.slide-layout-menu/);
 assert.match(stylesCss, /Presenter mobile controls/);
 assert.match(stylesCss, /grid-template-columns: 38px minmax\(52px, 1fr\) 38px repeat\(4, 34px\)/);
 assert.match(stylesCss, /\.presenter-controls button span/);

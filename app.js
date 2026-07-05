@@ -29,6 +29,7 @@
   var canvasContextPoint = null;
   var slideClipboard = null;
   var slideContextIndex = -1;
+  var slideLayoutMenuIndex = -1;
   var presenterUiTimer = 0;
   var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
@@ -2559,7 +2560,7 @@
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFitBtn", "presentFitLabel", "presentShortcutsBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
-      "templateDialog", "shortcutDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "toast"
+      "templateDialog", "shortcutDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "slideLayoutMenu", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
@@ -2925,7 +2926,7 @@
       });
     });
 
-    els.addSlideBtn.addEventListener("click", function () { addSlideAfter(currentIndex, { focusThumb: true }); });
+    els.addSlideBtn.addEventListener("click", function () { showSlideLayoutMenuForButton(els.addSlideBtn, currentIndex); });
     els.duplicateSlideBtn.addEventListener("click", function () { duplicateSlideAt(currentIndex, { focusThumb: true }); });
     els.moveSlideUpBtn.addEventListener("click", function () { moveSlideRelative(currentIndex, -1, { focusThumb: true }); });
     els.moveSlideDownBtn.addEventListener("click", function () { moveSlideRelative(currentIndex, 1, { focusThumb: true }); });
@@ -3135,12 +3136,21 @@
       });
       els.slideContextMenu.addEventListener("click", handleSlideContextMenuAction);
     }
+    if (els.slideLayoutMenu) {
+      els.slideLayoutMenu.addEventListener("pointerdown", function (event) {
+        event.stopPropagation();
+      });
+      els.slideLayoutMenu.addEventListener("click", handleSlideLayoutMenuAction);
+    }
     document.addEventListener("pointerdown", function (event) {
       if (els.canvasContextMenu && !event.target.closest("#canvasContextMenu")) hideCanvasContextMenu();
       if (els.slideContextMenu && !event.target.closest("#slideContextMenu")) hideSlideContextMenu();
+      if (els.slideLayoutMenu && !event.target.closest("#slideLayoutMenu") && !event.target.closest("#addSlideBtn")) hideSlideLayoutMenu();
     });
     window.addEventListener("resize", hideCanvasContextMenu);
+    window.addEventListener("resize", hideSlideLayoutMenu);
     window.addEventListener("scroll", hideCanvasContextMenu, true);
+    window.addEventListener("scroll", hideSlideLayoutMenu, true);
     document.addEventListener("keydown", handleGlobalKeydown);
     document.addEventListener("keyup", handleGlobalKeyup);
   }
@@ -3958,6 +3968,7 @@
     if (key === "Escape") {
       hideCanvasContextMenu();
       hideSlideContextMenu();
+      hideSlideLayoutMenu();
     }
 
     if (event.target && event.target.closest && event.target.closest("dialog")) return;
@@ -4779,21 +4790,60 @@
     return true;
   }
 
+  function isValidSlideLayout(layout) {
+    return Array.isArray(PPTHtml.layouts) && PPTHtml.layouts.some(function (item) {
+      return item[0] === layout;
+    });
+  }
+
+  function createSlideForLayout(layout, index) {
+    var chosenLayout = isValidSlideLayout(layout) ? layout : "text";
+    var slide = {
+      id: PPTHtml.uid("slide"),
+      layout: chosenLayout,
+      title: ""
+    };
+    var componentMap = {
+      text: "text",
+      imageRight: "image",
+      imageLeft: "image",
+      imageFull: "image",
+      imageBackground: "image",
+      compare: "compare",
+      threeCards: "cards",
+      chart: "chart",
+      data: "metrics",
+      table: "table",
+      timeline: "timeline",
+      quote: "quote",
+      video: "video",
+      audio: "audio",
+      code: "code"
+    };
+    if (componentMap[chosenLayout]) {
+      applyComponentToSlide(slide, componentMap[chosenLayout]);
+      if (componentMap[chosenLayout] === "image") slide.layout = chosenLayout;
+    } else {
+      slide.title = t("sample.newSlideTitle");
+      slide.subtitle = t("sample.newSlideSubtitle");
+      if (chosenLayout === "hero") slide.kicker = "PPT.html";
+      if (chosenLayout === "section") slide.kicker = "";
+      if (chosenLayout === "ending") slide.subtitle = "PPT.html";
+    }
+    if (!slide.title) slide.title = t("sample.newSlideTitle");
+    return PPTHtml.normalizeSlide(slide, index);
+  }
+
   function addSlideAfter(index, options) {
+    var settings = options || {};
     commitActiveCanvasEdit();
     var insertIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1) + 1;
     commit(function () {
-      deck.slides.splice(insertIndex, 0, PPTHtml.normalizeSlide({
-        id: PPTHtml.uid("slide"),
-        layout: "text",
-        kicker: "New Slide",
-        title: t("sample.newSlideTitle"),
-        subtitle: t("sample.newSlideSubtitle")
-      }, insertIndex));
+      deck.slides.splice(insertIndex, 0, createSlideForLayout(settings.layout, insertIndex));
       currentIndex = insertIndex;
       clearCanvasSelection();
     });
-    if (options && options.focusThumb) focusCurrentSlideThumb();
+    if (settings.focusThumb) focusCurrentSlideThumb();
   }
 
   function duplicateSlideAt(index, options) {
@@ -8227,6 +8277,7 @@
   function showSlideContextMenu(x, y, index) {
     if (!els.slideContextMenu) return;
     hideCanvasContextMenu();
+    hideSlideLayoutMenu();
     slideContextIndex = clamp(Number(index), 0, deck.slides.length - 1);
     updateSlideContextMenuState();
     els.slideContextMenu.hidden = false;
@@ -8242,6 +8293,32 @@
   function hideSlideContextMenu() {
     slideContextIndex = -1;
     if (els.slideContextMenu) els.slideContextMenu.hidden = true;
+  }
+
+  function showSlideLayoutMenuForButton(button, index) {
+    if (!button) return;
+    var rect = button.getBoundingClientRect();
+    showSlideLayoutMenu(rect.left, rect.bottom + 6, index);
+  }
+
+  function showSlideLayoutMenu(x, y, index) {
+    if (!els.slideLayoutMenu) return;
+    hideCanvasContextMenu();
+    hideSlideContextMenu();
+    slideLayoutMenuIndex = clamp(Number(index), 0, deck.slides.length - 1);
+    els.slideLayoutMenu.hidden = false;
+    els.slideLayoutMenu.style.left = "0px";
+    els.slideLayoutMenu.style.top = "0px";
+    var rect = els.slideLayoutMenu.getBoundingClientRect();
+    var left = clamp(x, 8, Math.max(8, window.innerWidth - rect.width - 8));
+    var top = clamp(y, 8, Math.max(8, window.innerHeight - rect.height - 8));
+    els.slideLayoutMenu.style.left = Math.round(left) + "px";
+    els.slideLayoutMenu.style.top = Math.round(top) + "px";
+  }
+
+  function hideSlideLayoutMenu() {
+    slideLayoutMenuIndex = -1;
+    if (els.slideLayoutMenu) els.slideLayoutMenu.hidden = true;
   }
 
   function updateSlideContextMenuState() {
@@ -8265,7 +8342,11 @@
     event.stopPropagation();
     var action = button.getAttribute("data-slide-action");
     var index = slideContextIndex >= 0 ? slideContextIndex : currentIndex;
-    if (action === "new") addSlideAfter(index, { focusThumb: true });
+    if (action === "new") {
+      var rect = button.getBoundingClientRect();
+      showSlideLayoutMenu(rect.right + 6, rect.top, index);
+      return;
+    }
     if (action === "duplicate") duplicateSlideAt(index, { focusThumb: true });
     if (action === "copy") copySlideAt(index);
     if (action === "paste") pasteSlideAfter(index, { focusThumb: true });
@@ -8273,6 +8354,17 @@
     if (action === "moveDown") moveSlideRelative(index, 1, { focusThumb: true });
     if (action === "delete") deleteSlideAt(index, { focusThumb: true });
     hideSlideContextMenu();
+  }
+
+  function handleSlideLayoutMenuAction(event) {
+    var button = event.target.closest("[data-slide-layout]");
+    if (!button) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var layout = button.getAttribute("data-slide-layout") || "text";
+    var index = slideLayoutMenuIndex >= 0 ? slideLayoutMenuIndex : currentIndex;
+    addSlideAfter(index, { focusThumb: true, layout: layout });
+    hideSlideLayoutMenu();
   }
 
   function handleCanvasContextMenu(event) {
@@ -9627,6 +9719,9 @@
 
   function openPresenter(index) {
     commitActiveCanvasEdit();
+    hideCanvasContextMenu();
+    hideSlideContextMenu();
+    hideSlideLayoutMenu();
     presenting = true;
     presentIndex = index || 0;
     presenterBlankMode = "";

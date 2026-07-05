@@ -1163,6 +1163,21 @@ textarea:focus {
   opacity: .42;
 }
 
+.slide-layout-menu {
+  width: min(380px, calc(100vw - 16px));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+  gap: 4px;
+}
+
+.slide-layout-menu[hidden] {
+  display: none;
+}
+
+.slide-layout-menu button {
+  min-width: 0;
+}
+
 .context-menu hr {
   height: 1px;
   margin: 6px 4px;
