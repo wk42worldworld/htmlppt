@@ -152,38 +152,37 @@ function drawPolygon(canvas, points, color) {
 
 function renderIcon() {
   var canvas = createCanvas(size, size);
-  var deep = hexColor("#121a23");
-  var teal = hexColor("#0f8b8d");
-  var blue = hexColor("#356dff");
-  var paper = hexColor("#f8fbff");
-  var ink = hexColor("#17202a");
-  var orange = hexColor("#ffb000");
+  var deep = hexColor("#0b1117");
+  var deepLift = hexColor("#16232d");
+  var page = hexColor("#f4fbfa");
+  var pageShadow = hexColor("#000000", 54);
+  var panel = hexColor("#111a22");
+  var panelLine = hexColor("#dcecea");
+  var accent = hexColor("#20d6c7");
+  var warm = hexColor("#ffb000");
+  var muted = hexColor("#8da4ad");
 
   drawRoundedRect(canvas, 52, 52, 920, 920, 196, function (px, py) {
     var diagonal = (px + py) / (size * 2);
-    var sweep = clamp((px - 210) / 840, 0, 1);
-    return mix(mix(deep, teal, diagonal * 0.95), blue, sweep * 0.2);
+    var lift = clamp((py - 96) / 860, 0, 1);
+    return mix(mix(deep, deepLift, diagonal * 0.55), deep, lift * 0.25);
   });
 
-  drawRoundedRect(canvas, 184, 196, 676, 560, 80, [0, 0, 0, 42]);
-  drawRoundedRect(canvas, 170, 170, 684, 560, 76, paper);
-  drawRoundedRect(canvas, 226, 224, 572, 88, 32, teal);
-  drawCircle(canvas, 270, 268, 12, hexColor("#dff7f2"));
-  drawCircle(canvas, 314, 268, 12, hexColor("#b7f78b"));
-  drawCircle(canvas, 358, 268, 12, hexColor("#ffcf54"));
+  drawRoundedRect(canvas, 230, 184, 578, 688, 78, pageShadow);
+  drawRoundedRect(canvas, 206, 152, 578, 688, 78, page);
+  drawPolygon(canvas, [[660, 152], [784, 276], [660, 276]], [0, 0, 0, 28]);
+  drawPolygon(canvas, [[668, 164], [768, 264], [668, 264]], accent);
 
-  drawRoundedRect(canvas, 236, 358, 404, 250, 34, hexColor("#edf3fa"));
-  drawLine(canvas, 382, 414, 304, 486, 42, ink);
-  drawLine(canvas, 304, 486, 382, 558, 42, ink);
-  drawLine(canvas, 512, 414, 590, 486, 42, ink);
-  drawLine(canvas, 590, 486, 512, 558, 42, ink);
-  drawLine(canvas, 460, 570, 508, 402, 34, hexColor("#0f8b8d"));
+  drawRoundedRect(canvas, 276, 302, 438, 274, 42, panel);
+  drawRoundedRect(canvas, 276, 302, 438, 274, 42, [255, 255, 255, 26]);
+  drawRoundedRect(canvas, 324, 362, 170, 26, 13, warm);
+  drawRoundedRect(canvas, 324, 424, 246, 22, 11, panelLine);
+  drawRoundedRect(canvas, 324, 472, 190, 22, 11, muted);
+  drawPolygon(canvas, [[590, 376], [680, 439], [590, 502]], accent);
 
-  drawPolygon(canvas, [[680, 424], [790, 492], [680, 560]], orange);
-  drawRoundedRect(canvas, 622, 616, 174, 46, 23, hexColor("#eaf2ff"));
-  drawRoundedRect(canvas, 656, 633, 32, 12, 6, teal);
-  drawRoundedRect(canvas, 704, 633, 32, 12, 6, blue);
-  drawRoundedRect(canvas, 752, 633, 20, 12, 6, orange);
+  drawRoundedRect(canvas, 306, 632, 210, 28, 14, accent);
+  drawRoundedRect(canvas, 306, 690, 342, 22, 11, muted);
+  drawRoundedRect(canvas, 306, 738, 254, 22, 11, muted);
 
   return canvas;
 }

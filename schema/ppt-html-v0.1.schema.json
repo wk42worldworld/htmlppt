@@ -335,6 +335,30 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "fontFamily": {
+          "type": "string",
+          "enum": [
+            "system",
+            "display",
+            "arial",
+            "helvetica",
+            "avenir",
+            "serif",
+            "georgia",
+            "times",
+            "cjk-sans",
+            "pingfang",
+            "yahei",
+            "cjk-serif",
+            "songti",
+            "kaiti",
+            "yu-mincho",
+            "mono",
+            "menlo",
+            "consolas",
+            "handwriting"
+          ]
+        },
         "fontSize": {
           "type": "number",
           "minimum": 8,

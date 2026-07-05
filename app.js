@@ -26,14 +26,28 @@
   var selectedCanvasPaths = [];
   var canvasClipboard = null;
   var canvasContextPoint = null;
+  var slideClipboard = null;
+  var slideContextIndex = -1;
   var presenterUiTimer = 0;
   var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
+  var presenterBlankMode = "";
+  var presenterJumpBuffer = "";
+  var presenterJumpTimer = 0;
+  var presenterClickTimer = 0;
   var pendingMediaInsertType = "";
   var pendingMediaObjectPath = "";
+  var pendingMediaPlaceholderPath = "";
   var liveRenderFrame = 0;
   var pendingLiveCanvas = false;
   var pendingLiveSlideList = false;
+  var canvasZoomMode = "fit";
+  var canvasZoom = 1;
+  var canvasFitScale = 1;
+  var canvasPanX = 0;
+  var canvasPanY = 0;
+  var canvasSpacePanning = false;
+  var activeCanvasPan = null;
   var persistTimer = 0;
   var tooltipEl = null;
   var tooltipTarget = null;
@@ -50,7 +64,7 @@
       "action.saveAs": "另存为",
       "action.aiJson": "AI JSON",
       "action.validate": "检查",
-      "action.present": "演示",
+      "action.present": "从当前页演示",
       "action.undo": "撤销",
       "action.redo": "重做",
       "action.pickImage": "选择本地图片",
@@ -61,12 +75,16 @@
       "aria.workspace": "编辑画布",
       "aria.inspector": "属性面板",
       "language.label": "界面语言",
-      "rail.pages": "页面",
-      "rail.addSlide": "添加页面",
-      "rail.duplicate": "复制页面",
-      "rail.moveUp": "上移",
-      "rail.moveDown": "下移",
-      "rail.delete": "删除",
+      "rail.pages": "幻灯片",
+      "rail.addSlide": "新建幻灯片",
+      "rail.duplicate": "复制幻灯片",
+      "rail.duplicateShort": "复制",
+      "rail.moveUp": "上移幻灯片",
+      "rail.moveUpShort": "上移",
+      "rail.moveDown": "下移幻灯片",
+      "rail.moveDownShort": "下移",
+      "rail.delete": "删除幻灯片",
+      "rail.deleteShort": "删除",
       "insert.title": "插入",
       "insert.text": "文本",
       "insert.image": "图片",
@@ -79,8 +97,8 @@
       "insert.quote": "引用",
       "insert.code": "代码",
       "insert.text.title": "新增可编辑文本框",
-      "insert.image.title": "插入图片，或拖到画布创建图片页",
-      "insert.video.title": "插入视频，或拖到画布创建视频页",
+      "insert.image.title": "插入图片到当前页，或拖到画布定位",
+      "insert.video.title": "插入视频到当前页，或拖到画布定位",
       "insert.chart.title": "插入可编辑图表",
       "insert.table.title": "插入表格",
       "insert.cards.title": "插入三卡片组件",
@@ -144,6 +162,7 @@
       "present.exit": "退出",
       "dialog.aiJson": "AI JSON",
       "dialog.templates": "选择模板",
+      "dialog.templatesHint": "从模板开始时会替换当前文稿；空白文稿请点顶部的新建。",
       "dialog.validation": "质量检查",
       "dialog.close": "关闭",
       "dialog.cancel": "取消",
@@ -151,13 +170,25 @@
       "dialog.loadJson": "从文本载入",
       "dialog.copyReport": "复制报告",
       "template.aiCamera.name": "AI 导演相机",
-      "template.aiCamera.desc": "产品发布 demo，适合展示一个新想法。",
+      "template.aiCamera.desc": "硬件发布 demo：问题、流程、数据和产品主张。",
       "template.productPitch.name": "产品发布",
-      "template.productPitch.desc": "问题、方案、价值和下一步。",
-      "template.lesson.name": "课程课件",
-      "template.lesson.desc": "学习目标、概念、练习和课后任务。",
-      "template.projectUpdate.name": "项目汇报",
-      "template.projectUpdate.desc": "状态、风险、决策和里程碑。",
+      "template.productPitch.desc": "知识库 AI 助手发布稿，含痛点、证据、发布计划。",
+      "template.investorPitch.name": "融资路演",
+      "template.investorPitch.desc": "种子轮融资范例，含市场压力、牵引力、资金用途。",
+      "template.enterpriseProposal.name": "企业销售方案",
+      "template.enterpriseProposal.desc": "面向客户的解决方案、ROI 和试点成功计划。",
+      "template.researchBrief.name": "研究决策简报",
+      "template.researchBrief.desc": "用访谈、数据和竞品证据支持一个产品决策。",
+      "template.productReview.name": "产品评审",
+      "template.productReview.desc": "评审流程改版，含问题、路径、取舍和实验指标。",
+      "template.projectUpdate.name": "QBR 业务复盘",
+      "template.projectUpdate.desc": "季度业务复盘，含漏斗、学习、下季度下注。",
+      "template.lesson.name": "实战工作坊",
+      "template.lesson.desc": "90 分钟培训课，含目标、流程、练习材料和作业。",
+      "template.incidentReview.name": "事故复盘",
+      "template.incidentReview.desc": "线上事故复盘，含影响、时间线、根因和行动项。",
+      "template.marketingCampaign.name": "营销战役",
+      "template.marketingCampaign.desc": "会员增长活动，含人群洞察、渠道预算和 21 天节奏。",
       "layout.hero": "封面",
       "layout.section": "章节",
       "layout.text": "文本",
@@ -180,6 +211,7 @@
       "status.unsaved": "未保存",
       "slide.untitled": "未命名页面",
       "slide.current": "第 {number} 页",
+      "slide.copySuffix": "副本",
       "canvas.image": "图片",
       "canvas.video": "视频",
       "canvas.chart": "图表",
@@ -192,12 +224,15 @@
       "canvas.reset": "重置",
       "canvas.resetTitle": "重置这个元素的位置和尺寸",
       "canvas.resize": "拖拽调整尺寸",
-      "tooltip.slideThumb": "第 {number} 页：{title} · {layout}",
+      "canvas.delete": "删除",
+      "canvas.deleteTitle": "删除选中的画布元素",
+      "tooltip.slideThumb": "第 {number} 张幻灯片：{title} · {layout}。拖动可调整顺序。",
       "toast.languageChanged": "语言已切换",
       "toast.imageAdded": "图片已加入当前页面",
       "toast.videoAdded": "视频已加入当前页面",
       "toast.componentInserted": "已插入{name}",
       "toast.componentSelected": "已选中{name}，可以拖拽或调整尺寸",
+      "toast.deleted": "已删除选中元素",
       "toast.jsonCopied": "JSON 已复制",
       "toast.jsonLoaded": "JSON 已载入",
       "toast.reportCopied": "检查报告已复制",
@@ -213,21 +248,26 @@
       "alert.loadFailed": "载入失败：{message}",
       "alert.saveFailed": "保存失败：{message}",
       "confirm.keepOneSlide": "至少保留一页。",
-      "confirm.deleteSlide": "删除当前页面？",
+      "confirm.deleteSlide": "删除当前幻灯片？",
       "confirm.discard": "当前文稿有未保存修改。继续会丢失这些修改。",
       "validation.pass": "检查通过：{count} 页，可正常分享。",
       "validation.needsFix": "需要修复：{errors} 个错误，{warnings} 个警告。",
       "sample.newSlideTitle": "新页面",
-      "sample.newSlideSubtitle": "在右侧面板编辑内容",
+      "sample.newSlideSubtitle": "把核心信息整理成一页清晰的演示内容。",
       "sample.textTitle": "新的文本页",
-      "sample.textBody": "双击文字可以直接编辑；拖拽文字块可以移动位置。",
-      "sample.textBox": "新文本框",
+      "sample.textBody": "用一段清晰正文说明观点，再用要点承接下一页。",
+      "sample.textBox": "双击输入文本",
+      "sample.textTitleBox": "点击输入标题",
+      "sample.textSubtitleBox": "点击输入副标题",
+      "sample.textBodyBox": "用一段正文说明关键观点。",
+      "sample.textBulletBox": "• 第一个要点\n• 第二个要点\n• 第三个要点",
+      "sample.textLabelBox": "标签",
       "sample.point1": "第一个要点",
       "sample.point2": "第二个要点",
       "sample.imageTitle": "图片展示",
-      "sample.imageCaption": "双击图片可替换本地文件",
+      "sample.imageCaption": "",
       "sample.videoTitle": "视频展示",
-      "sample.videoCaption": "双击视频可替换本地文件",
+      "sample.videoCaption": "",
       "sample.chartTitle": "季度增长",
       "sample.q1": "Q1",
       "sample.q2": "Q2",
@@ -251,8 +291,8 @@
       "sample.card1Text": "把复杂内容拆成可理解的结构。",
       "sample.card2Title": "稳定",
       "sample.card2Text": "用模板保证每页都能正常展示。",
-      "sample.card3Title": "可编辑",
-      "sample.card3Text": "AI 和人类都能继续修改。",
+      "sample.card3Title": "可复用",
+      "sample.card3Text": "结构和素材可以沉淀为后续项目资产。",
       "sample.metricsTitle": "关键数据",
       "sample.speed": "速度",
       "sample.speedDetail": "从想法到演示更快。",
@@ -280,7 +320,7 @@
     "action.saveDesktop": "Save",
     "action.saveAs": "Save As",
     "action.validate": "Check",
-    "action.present": "Present",
+    "action.present": "Present current slide",
     "action.undo": "Undo",
     "action.redo": "Redo",
     "action.pickImage": "Choose Image",
@@ -294,9 +334,13 @@
     "rail.pages": "Slides",
     "rail.addSlide": "Add slide",
     "rail.duplicate": "Duplicate slide",
+    "rail.duplicateShort": "Duplicate",
     "rail.moveUp": "Move up",
+    "rail.moveUpShort": "Up",
     "rail.moveDown": "Move down",
+    "rail.moveDownShort": "Down",
     "rail.delete": "Delete",
+    "rail.deleteShort": "Delete",
     "insert.title": "Insert",
     "insert.text": "Text",
     "insert.image": "Image",
@@ -309,8 +353,8 @@
     "insert.quote": "Quote",
     "insert.code": "Code",
     "insert.text.title": "Add editable text box",
-    "insert.image.title": "Insert an image, or drag to the canvas",
-    "insert.video.title": "Insert a video, or drag to the canvas",
+    "insert.image.title": "Insert an image on this slide, or drag to position it",
+    "insert.video.title": "Insert a video on this slide, or drag to position it",
     "insert.chart.title": "Insert an editable chart",
     "insert.table.title": "Insert a table",
     "insert.cards.title": "Insert a three-card section",
@@ -372,6 +416,7 @@
     "present.next": "Next",
     "present.exit": "Exit",
     "dialog.templates": "Choose Template",
+    "dialog.templatesHint": "Templates replace the current deck. Use New for a blank deck.",
     "dialog.validation": "Quality Check",
     "dialog.close": "Close",
     "dialog.cancel": "Cancel",
@@ -379,13 +424,25 @@
     "dialog.loadJson": "Load From Text",
     "dialog.copyReport": "Copy Report",
     "template.aiCamera.name": "AI Director Camera",
-    "template.aiCamera.desc": "Product launch demo for presenting a new idea.",
+    "template.aiCamera.desc": "Hardware launch demo with problem, workflow, data, and positioning.",
     "template.productPitch.name": "Product Pitch",
-    "template.productPitch.desc": "Problem, solution, value, and next step.",
-    "template.lesson.name": "Lesson Deck",
-    "template.lesson.desc": "Goals, concepts, practice, and homework.",
-    "template.projectUpdate.name": "Project Update",
-    "template.projectUpdate.desc": "Status, risks, decisions, and milestones.",
+    "template.productPitch.desc": "Knowledge-base AI assistant launch with pain, evidence, and rollout plan.",
+    "template.investorPitch.name": "Investor Pitch",
+    "template.investorPitch.desc": "Seed round example with market pressure, traction, and use of funds.",
+    "template.enterpriseProposal.name": "Enterprise Proposal",
+    "template.enterpriseProposal.desc": "Client-facing solution, ROI, and pilot success plan.",
+    "template.researchBrief.name": "Research Brief",
+    "template.researchBrief.desc": "Use interviews, data, and competitors to support one product decision.",
+    "template.productReview.name": "Product Review",
+    "template.productReview.desc": "Review a flow redesign with problem, journey, tradeoffs, and experiment metrics.",
+    "template.projectUpdate.name": "QBR Business Review",
+    "template.projectUpdate.desc": "Quarterly review with funnel, learnings, and next-quarter bets.",
+    "template.lesson.name": "Workshop Deck",
+    "template.lesson.desc": "90-minute training with outcomes, agenda, exercise materials, and homework.",
+    "template.incidentReview.name": "Incident Review",
+    "template.incidentReview.desc": "Production incident review with impact, timeline, root cause, and actions.",
+    "template.marketingCampaign.name": "Marketing Campaign",
+    "template.marketingCampaign.desc": "Membership growth campaign with audience insight, channel budget, and 21-day calendar.",
     "layout.hero": "Hero",
     "layout.section": "Section",
     "layout.text": "Text",
@@ -408,6 +465,7 @@
     "status.unsaved": "Unsaved",
     "slide.untitled": "Untitled Slide",
     "slide.current": "Slide {number}",
+    "slide.copySuffix": "Copy",
     "canvas.image": "Image",
     "canvas.video": "Video",
     "canvas.chart": "Chart",
@@ -420,12 +478,15 @@
     "canvas.reset": "Reset",
     "canvas.resetTitle": "Reset this element position and size",
     "canvas.resize": "Drag to resize",
-    "tooltip.slideThumb": "Slide {number}: {title} · {layout}",
+    "canvas.delete": "Delete",
+    "canvas.deleteTitle": "Delete the selected canvas element",
+    "tooltip.slideThumb": "Slide {number}: {title} · {layout}. Drag to reorder.",
     "toast.languageChanged": "Language changed",
     "toast.imageAdded": "Image added to this slide",
     "toast.videoAdded": "Video added to this slide",
     "toast.componentInserted": "Inserted {name}",
     "toast.componentSelected": "{name} selected. Drag or resize it.",
+    "toast.deleted": "Deleted selected element",
     "toast.jsonCopied": "JSON copied",
     "toast.jsonLoaded": "JSON loaded",
     "toast.reportCopied": "Report copied",
@@ -446,16 +507,21 @@
     "validation.pass": "Passed: {count} slides, ready to share.",
     "validation.needsFix": "Needs fixes: {errors} errors, {warnings} warnings.",
     "sample.newSlideTitle": "New Slide",
-    "sample.newSlideSubtitle": "Edit content in the right panel",
+    "sample.newSlideSubtitle": "A clear slide placeholder for the next part of the story.",
     "sample.textTitle": "New Text Slide",
-    "sample.textBody": "Double-click text to edit it directly; drag text blocks to move them.",
-    "sample.textBox": "New text box",
+    "sample.textBody": "Use this body copy to frame the idea before the supporting points.",
+    "sample.textBox": "Click to type",
+    "sample.textTitleBox": "Click to add title",
+    "sample.textSubtitleBox": "Click to add subtitle",
+    "sample.textBodyBox": "Use a body paragraph to explain the key idea.",
+    "sample.textBulletBox": "• First point\n• Second point\n• Third point",
+    "sample.textLabelBox": "Label",
     "sample.point1": "First point",
     "sample.point2": "Second point",
     "sample.imageTitle": "Image Showcase",
-    "sample.imageCaption": "Double-click the image to replace it",
+    "sample.imageCaption": "",
     "sample.videoTitle": "Video Showcase",
-    "sample.videoCaption": "Double-click the video to replace it",
+    "sample.videoCaption": "",
     "sample.chartTitle": "Quarterly Growth",
     "sample.revenue": "Revenue",
     "sample.cost": "Cost",
@@ -475,8 +541,8 @@
     "sample.card1Text": "Break complex content into understandable structure.",
     "sample.card2Title": "Stable",
     "sample.card2Text": "Templates keep every slide presentable.",
-    "sample.card3Title": "Editable",
-    "sample.card3Text": "Both AI and humans can keep editing.",
+    "sample.card3Title": "Reusable",
+    "sample.card3Text": "Structure and assets can become a starting point for the next deck.",
     "sample.metricsTitle": "Key Metrics",
     "sample.speed": "Speed",
     "sample.speedDetail": "Faster from idea to presentation.",
@@ -503,7 +569,7 @@
     "action.saveDesktop": "保存",
     "action.saveAs": "別名で保存",
     "action.validate": "チェック",
-    "action.present": "発表",
+    "action.present": "現在のスライドから発表",
     "action.undo": "元に戻す",
     "action.redo": "やり直す",
     "action.pickImage": "画像を選択",
@@ -517,8 +583,12 @@
     "rail.pages": "スライド",
     "rail.addSlide": "スライドを追加",
     "rail.duplicate": "複製",
+    "rail.duplicateShort": "複製",
     "rail.moveUp": "上へ",
+    "rail.moveUpShort": "上へ",
     "rail.moveDown": "下へ",
+    "rail.moveDownShort": "下へ",
+    "rail.deleteShort": "削除",
     "rail.delete": "削除",
     "insert.title": "挿入",
     "insert.text": "テキスト",
@@ -532,8 +602,8 @@
     "insert.quote": "引用",
     "insert.code": "コード",
     "insert.text.title": "編集可能なテキストボックスを追加",
-    "insert.image.title": "画像を挿入、またはキャンバスへドラッグ",
-    "insert.video.title": "動画を挿入、またはキャンバスへドラッグ",
+    "insert.image.title": "現在のスライドに画像を挿入、またはドラッグして配置",
+    "insert.video.title": "現在のスライドに動画を挿入、またはドラッグして配置",
     "insert.chart.title": "編集可能なグラフを挿入",
     "insert.table.title": "表を挿入",
     "insert.cards.title": "3カードを挿入",
@@ -581,12 +651,33 @@
     "present.next": "次へ",
     "present.exit": "終了",
     "dialog.templates": "テンプレートを選択",
+    "dialog.templatesHint": "テンプレートは現在の文書を置き換えます。空白文書は「新規」を使ってください。",
     "dialog.validation": "品質チェック",
     "dialog.close": "閉じる",
     "dialog.cancel": "キャンセル",
     "dialog.copyJson": "JSON をコピー",
     "dialog.loadJson": "テキストから読み込み",
     "dialog.copyReport": "レポートをコピー",
+    "template.aiCamera.name": "AI ディレクターカメラ",
+    "template.aiCamera.desc": "ハードウェア発表 demo。課題、流れ、データ、製品メッセージを含みます。",
+    "template.productPitch.name": "製品発表",
+    "template.productPitch.desc": "ナレッジベース AI アシスタントの発表。課題、証拠、展開計画付き。",
+    "template.investorPitch.name": "投資家向けピッチ",
+    "template.investorPitch.desc": "シードラウンド例。市場圧力、トラクション、資金用途を含みます。",
+    "template.enterpriseProposal.name": "法人提案",
+    "template.enterpriseProposal.desc": "顧客向けの解決策、ROI、試験導入の成功計画。",
+    "template.researchBrief.name": "調査意思決定メモ",
+    "template.researchBrief.desc": "インタビュー、データ、競合証拠で製品判断を支えます。",
+    "template.productReview.name": "製品レビュー",
+    "template.productReview.desc": "導線改善のレビュー。課題、経路、取捨選択、実験指標付き。",
+    "template.projectUpdate.name": "QBR 事業レビュー",
+    "template.projectUpdate.desc": "四半期レビュー。ファネル、学び、次期の重点施策付き。",
+    "template.lesson.name": "実践ワークショップ",
+    "template.lesson.desc": "90分研修。目標、進行、演習材料、宿題を含みます。",
+    "template.incidentReview.name": "インシデント振り返り",
+    "template.incidentReview.desc": "本番障害の振り返り。影響、時系列、根因、対策付き。",
+    "template.marketingCampaign.name": "マーケティング施策",
+    "template.marketingCampaign.desc": "会員成長施策。顧客洞察、チャネル予算、21日計画付き。",
     "layout.hero": "表紙",
     "layout.section": "章",
     "layout.text": "テキスト",
@@ -609,6 +700,9 @@
     "status.unsaved": "未保存",
     "slide.untitled": "無題のスライド",
     "slide.current": "{number} 枚目",
+    "slide.copySuffix": "コピー",
+    "canvas.delete": "削除",
+    "canvas.deleteTitle": "選択したキャンバス要素を削除",
     "canvas.object": "オブジェクト",
     "canvas.reset": "リセット",
     "canvas.resetTitle": "この要素の位置とサイズをリセット",
@@ -619,6 +713,7 @@
     "toast.videoAdded": "動画を追加しました",
     "toast.componentInserted": "{name}を挿入しました",
     "toast.componentSelected": "{name}を選択しました。ドラッグやサイズ変更ができます。",
+    "toast.deleted": "選択した要素を削除しました",
     "toast.jsonCopied": "JSON をコピーしました",
     "toast.jsonLoaded": "JSON を読み込みました",
     "toast.reportCopied": "レポートをコピーしました",
@@ -628,13 +723,13 @@
     "validation.pass": "チェック完了: {count} 枚、共有できます。",
     "validation.needsFix": "修正が必要: エラー {errors} 件、警告 {warnings} 件。",
     "sample.newSlideTitle": "新しいスライド",
-    "sample.newSlideSubtitle": "右側パネルで内容を編集",
+    "sample.newSlideSubtitle": "次の内容を整理するためのシンプルなスライドです。",
     "sample.textTitle": "新しいテキストスライド",
-    "sample.textBody": "文字をダブルクリックして編集し、ドラッグして位置を調整できます。",
+    "sample.textBody": "本文で主張を簡潔に示し、下の要点につなげます。",
     "sample.imageTitle": "画像表示",
-    "sample.imageCaption": "画像をダブルクリックして差し替え",
+    "sample.imageCaption": "",
     "sample.videoTitle": "動画表示",
-    "sample.videoCaption": "動画をダブルクリックして差し替え",
+    "sample.videoCaption": "",
     "sample.chartTitle": "四半期成長",
     "sample.revenue": "売上",
     "sample.cost": "コスト",
@@ -643,7 +738,9 @@
     "sample.metricsTitle": "主要指標",
     "sample.timelineTitle": "実行手順",
     "sample.quoteText": "良いプレゼンは情報を詰め込むのではなく、聞き手が考えを追えるようにします。",
-    "sample.codeTitle": "コード例"
+    "sample.codeTitle": "コード例",
+    "sample.card3Title": "再利用可能",
+    "sample.card3Text": "構造と素材を次の資料づくりの起点にできます。"
   });
 
   extendLang("ko-KR", {
@@ -654,7 +751,7 @@
     "action.saveDesktop": "저장",
     "action.saveAs": "다른 이름 저장",
     "action.validate": "검사",
-    "action.present": "발표",
+    "action.present": "현재 슬라이드부터 발표",
     "action.undo": "실행 취소",
     "action.redo": "다시 실행",
     "action.pickImage": "이미지 선택",
@@ -668,9 +765,13 @@
     "rail.pages": "슬라이드",
     "rail.addSlide": "슬라이드 추가",
     "rail.duplicate": "복제",
+    "rail.duplicateShort": "복제",
     "rail.moveUp": "위로",
+    "rail.moveUpShort": "위로",
     "rail.moveDown": "아래로",
+    "rail.moveDownShort": "아래",
     "rail.delete": "삭제",
+    "rail.deleteShort": "삭제",
     "insert.title": "삽입",
     "insert.text": "텍스트",
     "insert.image": "이미지",
@@ -683,8 +784,8 @@
     "insert.quote": "인용",
     "insert.code": "코드",
     "insert.text.title": "편집 가능한 텍스트 상자 추가",
-    "insert.image.title": "이미지를 삽입하거나 캔버스로 드래그",
-    "insert.video.title": "비디오를 삽입하거나 캔버스로 드래그",
+    "insert.image.title": "현재 슬라이드에 이미지를 삽입하거나 드래그해 배치",
+    "insert.video.title": "현재 슬라이드에 비디오를 삽입하거나 드래그해 배치",
     "insert.chart.title": "편집 가능한 차트 삽입",
     "insert.table.title": "표 삽입",
     "insert.cards.title": "세 카드 컴포넌트 삽입",
@@ -732,12 +833,33 @@
     "present.next": "다음",
     "present.exit": "종료",
     "dialog.templates": "템플릿 선택",
+    "dialog.templatesHint": "템플릿은 현재 문서를 대체합니다. 빈 문서는 새로 만들기를 사용하세요.",
     "dialog.validation": "품질 검사",
     "dialog.close": "닫기",
     "dialog.cancel": "취소",
     "dialog.copyJson": "JSON 복사",
     "dialog.loadJson": "텍스트에서 불러오기",
     "dialog.copyReport": "보고서 복사",
+    "template.aiCamera.name": "AI 디렉터 카메라",
+    "template.aiCamera.desc": "하드웨어 출시 demo. 문제, 흐름, 데이터, 제품 메시지를 포함합니다.",
+    "template.productPitch.name": "제품 출시",
+    "template.productPitch.desc": "지식베이스 AI 어시스턴트 출시 자료. 문제, 근거, 출시 계획 포함.",
+    "template.investorPitch.name": "투자자 피치",
+    "template.investorPitch.desc": "시드 라운드 예시. 시장 압력, 트랙션, 자금 사용 계획 포함.",
+    "template.enterpriseProposal.name": "기업 제안서",
+    "template.enterpriseProposal.desc": "고객용 솔루션, ROI, 파일럿 성공 계획.",
+    "template.researchBrief.name": "리서치 의사결정 브리프",
+    "template.researchBrief.desc": "인터뷰, 데이터, 경쟁사 근거로 제품 결정을 지원합니다.",
+    "template.productReview.name": "제품 리뷰",
+    "template.productReview.desc": "플로우 개선 리뷰. 문제, 여정, 트레이드오프, 실험 지표 포함.",
+    "template.projectUpdate.name": "QBR 비즈니스 리뷰",
+    "template.projectUpdate.desc": "분기 리뷰. 퍼널, 배운 점, 다음 분기 집중 과제 포함.",
+    "template.lesson.name": "실전 워크숍",
+    "template.lesson.desc": "90분 교육. 목표, 진행, 실습 자료, 과제 포함.",
+    "template.incidentReview.name": "장애 회고",
+    "template.incidentReview.desc": "운영 장애 회고. 영향, 타임라인, 원인, 조치 항목 포함.",
+    "template.marketingCampaign.name": "마케팅 캠페인",
+    "template.marketingCampaign.desc": "회원 성장 캠페인. 고객 인사이트, 채널 예산, 21일 일정 포함.",
     "layout.hero": "표지",
     "layout.section": "섹션",
     "layout.text": "텍스트",
@@ -760,6 +882,9 @@
     "status.unsaved": "저장 안 됨",
     "slide.untitled": "제목 없는 슬라이드",
     "slide.current": "{number}번 슬라이드",
+    "slide.copySuffix": "복사본",
+    "canvas.delete": "삭제",
+    "canvas.deleteTitle": "선택한 캔버스 요소 삭제",
     "canvas.object": "개체",
     "canvas.reset": "초기화",
     "canvas.resetTitle": "이 요소의 위치와 크기를 초기화",
@@ -770,6 +895,7 @@
     "toast.videoAdded": "비디오가 추가되었습니다",
     "toast.componentInserted": "{name} 삽입됨",
     "toast.componentSelected": "{name} 선택됨. 드래그하거나 크기를 조절하세요.",
+    "toast.deleted": "선택한 요소를 삭제했습니다",
     "toast.jsonCopied": "JSON 복사됨",
     "toast.jsonLoaded": "JSON 불러옴",
     "toast.reportCopied": "보고서 복사됨",
@@ -779,13 +905,13 @@
     "validation.pass": "검사 통과: {count}장, 공유할 수 있습니다.",
     "validation.needsFix": "수정 필요: 오류 {errors}개, 경고 {warnings}개.",
     "sample.newSlideTitle": "새 슬라이드",
-    "sample.newSlideSubtitle": "오른쪽 패널에서 내용을 편집하세요",
+    "sample.newSlideSubtitle": "다음 내용을 정리하기 위한 간결한 슬라이드입니다.",
     "sample.textTitle": "새 텍스트 슬라이드",
-    "sample.textBody": "텍스트를 더블 클릭해 직접 편집하고 드래그해 위치를 옮길 수 있습니다.",
+    "sample.textBody": "본문으로 핵심 메시지를 정리하고 아래 요점으로 이어갑니다.",
     "sample.imageTitle": "이미지 쇼케이스",
-    "sample.imageCaption": "이미지를 더블 클릭해 교체",
+    "sample.imageCaption": "",
     "sample.videoTitle": "비디오 쇼케이스",
-    "sample.videoCaption": "비디오를 더블 클릭해 교체",
+    "sample.videoCaption": "",
     "sample.chartTitle": "분기 성장",
     "sample.revenue": "매출",
     "sample.cost": "비용",
@@ -794,7 +920,9 @@
     "sample.metricsTitle": "핵심 지표",
     "sample.timelineTitle": "실행 단계",
     "sample.quoteText": "좋은 발표는 내용을 가득 채우는 것이 아니라 청중이 생각을 따라오게 합니다.",
-    "sample.codeTitle": "코드 예시"
+    "sample.codeTitle": "코드 예시",
+    "sample.card3Title": "재사용 가능",
+    "sample.card3Text": "구조와 소재를 다음 발표 자료의 출발점으로 삼을 수 있습니다."
   });
 
   Object.assign(I18N["en-US"], {
@@ -866,7 +994,7 @@
   Object.assign(I18N["zh-CN"], {
     "action.pickAudio": "选择本地音频",
     "insert.audio": "音频",
-    "insert.audio.title": "插入音频，或拖到画布创建音频页",
+    "insert.audio.title": "插入音频到当前页，或拖到画布定位",
     "panel.audio": "音频",
     "field.audioSrc": "音频 URL 或 Data URI",
     "layout.audio": "音频",
@@ -876,13 +1004,13 @@
     "alert.assetPackageFailed": "保存前需要把所有资源打包进单文件，但以下资源读取失败：\n{details}\n请选择本地文件，或换成可访问的 URL。",
     "asset.failureLine": "第 {slide} 页 {path}: {src} ({message})",
     "sample.audioTitle": "音频播放",
-    "sample.audioCaption": "双击音频可替换本地文件"
+    "sample.audioCaption": ""
   });
 
   Object.assign(I18N["en-US"], {
     "action.pickAudio": "Choose Audio",
     "insert.audio": "Audio",
-    "insert.audio.title": "Insert audio, or drag to the canvas",
+    "insert.audio.title": "Insert audio on this slide, or drag to position it",
     "panel.audio": "Audio",
     "field.audioSrc": "Audio URL or Data URI",
     "layout.audio": "Audio",
@@ -892,13 +1020,13 @@
     "alert.assetPackageFailed": "Saving requires every asset to be embedded in the single file, but these assets could not be read:\n{details}\nChoose local files or use reachable URLs.",
     "asset.failureLine": "Slide {slide} {path}: {src} ({message})",
     "sample.audioTitle": "Audio Playback",
-    "sample.audioCaption": "Double-click the audio block to replace it"
+    "sample.audioCaption": ""
   });
 
   Object.assign(I18N["ja-JP"], {
     "action.pickAudio": "音声を選択",
     "insert.audio": "音声",
-    "insert.audio.title": "音声を挿入、またはキャンバスへドラッグ",
+    "insert.audio.title": "現在のスライドに音声を挿入、またはドラッグして配置",
     "panel.audio": "音声",
     "field.audioSrc": "音声 URL または Data URI",
     "layout.audio": "音声",
@@ -909,14 +1037,19 @@
     "alert.assetPackageFailed": "保存前にすべてのアセットを単一ファイルへ埋め込む必要がありますが、次のアセットを読み込めませんでした:\n{details}\nローカルファイルを選ぶか、アクセス可能な URL に変更してください。",
     "asset.failureLine": "{slide} 枚目 {path}: {src} ({message})",
     "sample.audioTitle": "音声再生",
-    "sample.audioCaption": "音声をダブルクリックして差し替え",
-    "sample.textBox": "新しいテキストボックス"
+    "sample.audioCaption": "",
+    "sample.textBox": "タップして入力",
+    "sample.textTitleBox": "タイトルを入力",
+    "sample.textSubtitleBox": "サブタイトルを入力",
+    "sample.textBodyBox": "本文で重要な考えを説明します。",
+    "sample.textBulletBox": "• 1つ目の要点\n• 2つ目の要点\n• 3つ目の要点",
+    "sample.textLabelBox": "ラベル"
   });
 
   Object.assign(I18N["ko-KR"], {
     "action.pickAudio": "오디오 선택",
     "insert.audio": "오디오",
-    "insert.audio.title": "오디오를 삽입하거나 캔버스로 드래그",
+    "insert.audio.title": "현재 슬라이드에 오디오를 삽입하거나 드래그해 배치",
     "panel.audio": "오디오",
     "field.audioSrc": "오디오 URL 또는 Data URI",
     "layout.audio": "오디오",
@@ -927,8 +1060,13 @@
     "alert.assetPackageFailed": "저장하려면 모든 자산을 단일 파일에 포함해야 하지만 다음 자산을 읽을 수 없습니다:\n{details}\n로컬 파일을 선택하거나 접근 가능한 URL로 바꾸세요.",
     "asset.failureLine": "{slide}번 슬라이드 {path}: {src} ({message})",
     "sample.audioTitle": "오디오 재생",
-    "sample.audioCaption": "오디오 블록을 더블 클릭해 교체",
-    "sample.textBox": "새 텍스트 상자"
+    "sample.audioCaption": "",
+    "sample.textBox": "클릭해 입력",
+    "sample.textTitleBox": "제목 입력",
+    "sample.textSubtitleBox": "부제 입력",
+    "sample.textBodyBox": "본문으로 핵심 아이디어를 설명합니다.",
+    "sample.textBulletBox": "• 첫 번째 요점\n• 두 번째 요점\n• 세 번째 요점",
+    "sample.textLabelBox": "라벨"
   });
 
   Object.assign(I18N["zh-CN"], {
@@ -940,6 +1078,19 @@
     "insert.group.metrics": "数据",
     "insert.group.timeline": "流程",
     "insert.group.other": "其他",
+    "insert.text.title": "标题",
+    "insert.text.titleLabel": "标题",
+    "insert.text.title.title": "插入大标题文本",
+    "insert.text.subtitle": "副标题",
+    "insert.text.subtitle.title": "插入副标题文本",
+    "insert.text.body": "正文",
+    "insert.text.body.title": "插入正文段落",
+    "insert.text.bullet": "列表",
+    "insert.text.bullet.title": "插入项目符号列表",
+    "insert.text.label": "标签",
+    "insert.text.label.title": "插入小标签文本",
+    "insert.text.box": "文本框",
+    "insert.text.box.title": "插入普通文本框",
     "insert.compare": "对比",
     "insert.compare.beforeAfter": "前后",
     "insert.compare.beforeAfter.title": "插入前后对比页，适合展示改版、优化、转型效果",
@@ -1004,6 +1155,7 @@
     "sample.optionB": "方案 B",
     "sample.recommendation": "建议",
     "sample.low": "低",
+    "sample.fast": "快",
     "sample.medium": "中",
     "sample.high": "高",
     "sample.scale": "扩展性",
@@ -1022,7 +1174,7 @@
     "sample.feature2Title": "单文件分享",
     "sample.feature2Text": "图片、视频、音频可以打包进一个 ppt.html 文件。",
     "sample.feature3Title": "画布编辑",
-    "sample.feature3Text": "用户可以直接双击、拖拽、缩放常见元素。",
+    "sample.feature3Text": "文字、图表、媒体和版式可以在同一画布中统一管理。",
     "sample.cardsProsConsTitle": "优劣与下一步",
     "sample.proTitle": "优势",
     "sample.proText": "生成快、结构清楚、便于 AI 和人类继续修改。",
@@ -1071,6 +1223,19 @@
     "insert.group.metrics": "Data",
     "insert.group.timeline": "Flow",
     "insert.group.other": "Other",
+    "insert.text.title": "Title",
+    "insert.text.titleLabel": "Title",
+    "insert.text.title.title": "Insert a large title text block",
+    "insert.text.subtitle": "Subtitle",
+    "insert.text.subtitle.title": "Insert a subtitle text block",
+    "insert.text.body": "Body",
+    "insert.text.body.title": "Insert a body paragraph",
+    "insert.text.bullet": "Bullets",
+    "insert.text.bullet.title": "Insert a bullet list",
+    "insert.text.label": "Label",
+    "insert.text.label.title": "Insert a small label",
+    "insert.text.box": "Text box",
+    "insert.text.box.title": "Insert a plain text box",
     "insert.compare": "Compare",
     "insert.compare.beforeAfter": "Before",
     "insert.compare.beforeAfter.title": "Insert a before/after comparison slide",
@@ -1135,6 +1300,7 @@
     "sample.optionB": "Option B",
     "sample.recommendation": "Recommendation",
     "sample.low": "Low",
+    "sample.fast": "Fast",
     "sample.medium": "Medium",
     "sample.high": "High",
     "sample.scale": "Scale",
@@ -1153,7 +1319,7 @@
     "sample.feature2Title": "Single file",
     "sample.feature2Text": "Package images, video, and audio into one ppt.html file.",
     "sample.feature3Title": "Canvas editing",
-    "sample.feature3Text": "Double-click, drag, and resize common slide elements.",
+    "sample.feature3Text": "Manage text, charts, media, and layout on one shared canvas.",
     "sample.cardsProsConsTitle": "Pros and Next Step",
     "sample.proTitle": "Strength",
     "sample.proText": "Fast generation, clear structure, and easy follow-up editing.",
@@ -1202,6 +1368,19 @@
     "insert.group.metrics": "データ",
     "insert.group.timeline": "流れ",
     "insert.group.other": "その他",
+    "insert.text.title": "タイトル",
+    "insert.text.titleLabel": "タイトル",
+    "insert.text.title.title": "大きなタイトル文字を挿入",
+    "insert.text.subtitle": "サブタイトル",
+    "insert.text.subtitle.title": "サブタイトル文字を挿入",
+    "insert.text.body": "本文",
+    "insert.text.body.title": "本文段落を挿入",
+    "insert.text.bullet": "リスト",
+    "insert.text.bullet.title": "箇条書きを挿入",
+    "insert.text.label": "ラベル",
+    "insert.text.label.title": "小さなラベルを挿入",
+    "insert.text.box": "テキスト枠",
+    "insert.text.box.title": "通常のテキスト枠を挿入",
     "insert.compare": "比較",
     "insert.compare.beforeAfter": "前後",
     "insert.compare.beforeAfter.title": "改善前後の比較スライドを挿入",
@@ -1266,6 +1445,7 @@
     "sample.optionB": "案 B",
     "sample.recommendation": "推奨",
     "sample.low": "低",
+    "sample.fast": "速い",
     "sample.medium": "中",
     "sample.high": "高",
     "sample.scale": "拡張性",
@@ -1284,7 +1464,7 @@
     "sample.feature2Title": "単一ファイル",
     "sample.feature2Text": "画像、動画、音声を1つの ppt.html にまとめます。",
     "sample.feature3Title": "キャンバス編集",
-    "sample.feature3Text": "文字や要素を直接編集、移動、サイズ変更できます。",
+    "sample.feature3Text": "文字、グラフ、メディア、レイアウトを同じキャンバスで管理します。",
     "sample.cardsProsConsTitle": "利点と次の一手",
     "sample.proTitle": "強み",
     "sample.proText": "生成が速く、構造が明確で、続けて編集しやすい。",
@@ -1333,6 +1513,19 @@
     "insert.group.metrics": "데이터",
     "insert.group.timeline": "흐름",
     "insert.group.other": "기타",
+    "insert.text.title": "제목",
+    "insert.text.titleLabel": "제목",
+    "insert.text.title.title": "큰 제목 텍스트 삽입",
+    "insert.text.subtitle": "부제",
+    "insert.text.subtitle.title": "부제 텍스트 삽입",
+    "insert.text.body": "본문",
+    "insert.text.body.title": "본문 단락 삽입",
+    "insert.text.bullet": "목록",
+    "insert.text.bullet.title": "글머리 목록 삽입",
+    "insert.text.label": "라벨",
+    "insert.text.label.title": "작은 라벨 텍스트 삽입",
+    "insert.text.box": "텍스트 상자",
+    "insert.text.box.title": "일반 텍스트 상자 삽입",
     "insert.compare": "비교",
     "insert.compare.beforeAfter": "전후",
     "insert.compare.beforeAfter.title": "개선 전후 비교 슬라이드 삽입",
@@ -1397,6 +1590,7 @@
     "sample.optionB": "방안 B",
     "sample.recommendation": "추천",
     "sample.low": "낮음",
+    "sample.fast": "빠름",
     "sample.medium": "중간",
     "sample.high": "높음",
     "sample.scale": "확장성",
@@ -1415,7 +1609,7 @@
     "sample.feature2Title": "단일 파일",
     "sample.feature2Text": "이미지, 비디오, 오디오를 하나의 ppt.html에 담습니다.",
     "sample.feature3Title": "캔버스 편집",
-    "sample.feature3Text": "요소를 직접 편집하고 이동하며 크기를 조절합니다.",
+    "sample.feature3Text": "텍스트, 차트, 미디어, 레이아웃을 하나의 캔버스에서 관리합니다.",
     "sample.cardsProsConsTitle": "장점과 다음 단계",
     "sample.proTitle": "강점",
     "sample.proText": "생성이 빠르고 구조가 명확하며 계속 편집하기 쉽습니다.",
@@ -1509,6 +1703,44 @@
     "style.clearColor": "恢复默认文字色",
     "style.clearBackground": "清除背景色",
     "style.clearBorder": "清除边框色",
+    "field.fontFamily": "字体",
+    "font.default": "默认",
+    "font.system": "系统无衬线",
+    "font.display": "演示标题",
+    "font.arial": "Arial",
+    "font.helvetica": "Helvetica",
+    "font.aptos": "Aptos",
+    "font.calibri": "Calibri",
+    "font.verdana": "Verdana",
+    "font.tahoma": "Tahoma",
+    "font.avenir": "Avenir",
+    "font.serif": "衬线",
+    "font.georgia": "Georgia",
+    "font.times": "Times",
+    "font.cambria": "Cambria",
+    "font.cjkSans": "中文黑体",
+    "font.pingfang": "苹方",
+    "font.yahei": "微软雅黑",
+    "font.dengxian": "等线",
+    "font.simhei": "黑体",
+    "font.stheiti": "华文黑体",
+    "font.hiraginoSans": "冬青黑体",
+    "font.notoSansCjk": "思源黑体 / Noto Sans CJK",
+    "font.cjkSerif": "宋体 / 明朝",
+    "font.songti": "宋体",
+    "font.simsun": "中易宋体",
+    "font.fangsong": "仿宋",
+    "font.kaiti": "楷体",
+    "font.yuMincho": "游明朝",
+    "font.notoSerifCjk": "思源宋体 / Noto Serif CJK",
+    "font.yuGothic": "游ゴシック",
+    "font.meiryo": "Meiryo",
+    "font.malgun": "Malgun Gothic",
+    "font.mono": "等宽",
+    "font.menlo": "Menlo",
+    "font.consolas": "Consolas",
+    "font.courier": "Courier New",
+    "font.handwriting": "手写感",
     "field.fontSize": "字号",
     "field.textColor": "文字颜色",
     "field.backgroundColor": "背景色",
@@ -1534,6 +1766,44 @@
     "style.clearColor": "Restore default text color",
     "style.clearBackground": "Clear background",
     "style.clearBorder": "Clear border color",
+    "field.fontFamily": "Font",
+    "font.default": "Default",
+    "font.system": "System sans",
+    "font.display": "Presentation title",
+    "font.arial": "Arial",
+    "font.helvetica": "Helvetica",
+    "font.aptos": "Aptos",
+    "font.calibri": "Calibri",
+    "font.verdana": "Verdana",
+    "font.tahoma": "Tahoma",
+    "font.avenir": "Avenir",
+    "font.serif": "Serif",
+    "font.georgia": "Georgia",
+    "font.times": "Times",
+    "font.cambria": "Cambria",
+    "font.cjkSans": "CJK sans",
+    "font.pingfang": "PingFang",
+    "font.yahei": "Microsoft YaHei",
+    "font.dengxian": "DengXian",
+    "font.simhei": "SimHei",
+    "font.stheiti": "STHeiti",
+    "font.hiraginoSans": "Hiragino Sans",
+    "font.notoSansCjk": "Noto Sans CJK",
+    "font.cjkSerif": "CJK serif",
+    "font.songti": "Songti",
+    "font.simsun": "SimSun",
+    "font.fangsong": "FangSong",
+    "font.kaiti": "Kaiti",
+    "font.yuMincho": "Yu Mincho",
+    "font.notoSerifCjk": "Noto Serif CJK",
+    "font.yuGothic": "Yu Gothic",
+    "font.meiryo": "Meiryo",
+    "font.malgun": "Malgun Gothic",
+    "font.mono": "Monospace",
+    "font.menlo": "Menlo",
+    "font.consolas": "Consolas",
+    "font.courier": "Courier New",
+    "font.handwriting": "Handwriting",
     "field.fontSize": "Font size",
     "field.textColor": "Text color",
     "field.backgroundColor": "Background",
@@ -1559,6 +1829,44 @@
     "style.clearColor": "文字色を既定に戻す",
     "style.clearBackground": "背景をクリア",
     "style.clearBorder": "枠線色をクリア",
+    "field.fontFamily": "フォント",
+    "font.default": "既定",
+    "font.system": "システム角ゴシック",
+    "font.display": "プレゼン見出し",
+    "font.arial": "Arial",
+    "font.helvetica": "Helvetica",
+    "font.aptos": "Aptos",
+    "font.calibri": "Calibri",
+    "font.verdana": "Verdana",
+    "font.tahoma": "Tahoma",
+    "font.avenir": "Avenir",
+    "font.serif": "セリフ",
+    "font.georgia": "Georgia",
+    "font.times": "Times",
+    "font.cambria": "Cambria",
+    "font.cjkSans": "CJK ゴシック",
+    "font.pingfang": "PingFang",
+    "font.yahei": "Microsoft YaHei",
+    "font.dengxian": "DengXian",
+    "font.simhei": "SimHei",
+    "font.stheiti": "華文黒体",
+    "font.hiraginoSans": "ヒラギノ角ゴ",
+    "font.notoSansCjk": "Noto Sans CJK",
+    "font.cjkSerif": "CJK 明朝",
+    "font.songti": "Songti",
+    "font.simsun": "SimSun",
+    "font.fangsong": "FangSong",
+    "font.kaiti": "Kaiti",
+    "font.yuMincho": "游明朝",
+    "font.notoSerifCjk": "Noto Serif CJK",
+    "font.yuGothic": "游ゴシック",
+    "font.meiryo": "メイリオ",
+    "font.malgun": "Malgun Gothic",
+    "font.mono": "等幅",
+    "font.menlo": "Menlo",
+    "font.consolas": "Consolas",
+    "font.courier": "Courier New",
+    "font.handwriting": "手書き風",
     "field.fontSize": "文字サイズ",
     "field.textColor": "文字色",
     "field.backgroundColor": "背景色",
@@ -1584,6 +1892,44 @@
     "style.clearColor": "기본 글자색으로 복원",
     "style.clearBackground": "배경 지우기",
     "style.clearBorder": "테두리 색 지우기",
+    "field.fontFamily": "글꼴",
+    "font.default": "기본",
+    "font.system": "시스템 산세리프",
+    "font.display": "발표 제목",
+    "font.arial": "Arial",
+    "font.helvetica": "Helvetica",
+    "font.aptos": "Aptos",
+    "font.calibri": "Calibri",
+    "font.verdana": "Verdana",
+    "font.tahoma": "Tahoma",
+    "font.avenir": "Avenir",
+    "font.serif": "세리프",
+    "font.georgia": "Georgia",
+    "font.times": "Times",
+    "font.cambria": "Cambria",
+    "font.cjkSans": "CJK 산세리프",
+    "font.pingfang": "PingFang",
+    "font.yahei": "Microsoft YaHei",
+    "font.dengxian": "DengXian",
+    "font.simhei": "SimHei",
+    "font.stheiti": "STHeiti",
+    "font.hiraginoSans": "Hiragino Sans",
+    "font.notoSansCjk": "Noto Sans CJK",
+    "font.cjkSerif": "CJK 세리프",
+    "font.songti": "Songti",
+    "font.simsun": "SimSun",
+    "font.fangsong": "FangSong",
+    "font.kaiti": "Kaiti",
+    "font.yuMincho": "Yu Mincho",
+    "font.notoSerifCjk": "Noto Serif CJK",
+    "font.yuGothic": "Yu Gothic",
+    "font.meiryo": "Meiryo",
+    "font.malgun": "맑은 고딕",
+    "font.mono": "고정폭",
+    "font.menlo": "Menlo",
+    "font.consolas": "Consolas",
+    "font.courier": "Courier New",
+    "font.handwriting": "손글씨 느낌",
     "field.fontSize": "글자 크기",
     "field.textColor": "글자색",
     "field.backgroundColor": "배경색",
@@ -1628,6 +1974,7 @@
     "object.alignBottom": "底对齐",
     "object.distributeH": "横向分布",
     "object.distributeV": "纵向分布",
+    "object.delete": "删除",
     "selection.multiple": "已选 {count} 个对象",
     "field.objectX": "X",
     "field.objectY": "Y",
@@ -1676,6 +2023,7 @@
     "object.alignBottom": "Align bottom",
     "object.distributeH": "Distribute horizontally",
     "object.distributeV": "Distribute vertically",
+    "object.delete": "Delete",
     "selection.multiple": "{count} objects selected",
     "field.objectX": "X",
     "field.objectY": "Y",
@@ -1724,6 +2072,7 @@
     "object.alignBottom": "下揃え",
     "object.distributeH": "左右に分布",
     "object.distributeV": "上下に分布",
+    "object.delete": "削除",
     "selection.multiple": "{count} 個を選択中",
     "field.objectX": "X",
     "field.objectY": "Y",
@@ -1772,6 +2121,7 @@
     "object.alignBottom": "아래 정렬",
     "object.distributeH": "가로 분배",
     "object.distributeV": "세로 분배",
+    "object.delete": "삭제",
     "selection.multiple": "{count}개 선택됨",
     "field.objectX": "X",
     "field.objectY": "Y",
@@ -1791,6 +2141,174 @@
     "toast.objectDataInvalid": "개체 데이터가 올바른 JSON이 아닙니다"
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "present.fullscreen": "全屏",
+    "table.commands": "表格操作",
+    "table.addRow": "加行",
+    "table.insertRowAbove": "上方插入行",
+    "table.insertRowBelow": "下方插入行",
+    "table.deleteRow": "删行",
+    "table.addColumn": "加列",
+    "table.insertColumnLeft": "左侧插入列",
+    "table.insertColumnRight": "右侧插入列",
+    "table.deleteColumn": "删列",
+    "table.clearCell": "清空单元格",
+    "canvas.tableHeader": "表格表头",
+    "canvas.tableCell": "表格单元格",
+    "toast.tableChanged": "表格已更新"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "present.fullscreen": "Full screen",
+    "table.commands": "Table actions",
+    "table.addRow": "Add row",
+    "table.insertRowAbove": "Insert row above",
+    "table.insertRowBelow": "Insert row below",
+    "table.deleteRow": "Delete row",
+    "table.addColumn": "Add column",
+    "table.insertColumnLeft": "Insert column left",
+    "table.insertColumnRight": "Insert column right",
+    "table.deleteColumn": "Delete column",
+    "table.clearCell": "Clear cell",
+    "canvas.tableHeader": "Table header",
+    "canvas.tableCell": "Table cell",
+    "toast.tableChanged": "Table updated"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "present.fullscreen": "全画面",
+    "table.commands": "表の操作",
+    "table.addRow": "行を追加",
+    "table.insertRowAbove": "上に行を挿入",
+    "table.insertRowBelow": "下に行を挿入",
+    "table.deleteRow": "行を削除",
+    "table.addColumn": "列を追加",
+    "table.insertColumnLeft": "左に列を挿入",
+    "table.insertColumnRight": "右に列を挿入",
+    "table.deleteColumn": "列を削除",
+    "table.clearCell": "セルをクリア",
+    "canvas.tableHeader": "表の見出し",
+    "canvas.tableCell": "表のセル",
+    "toast.tableChanged": "表を更新しました"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "present.fullscreen": "전체 화면",
+    "table.commands": "표 작업",
+    "table.addRow": "행 추가",
+    "table.insertRowAbove": "위에 행 삽입",
+    "table.insertRowBelow": "아래에 행 삽입",
+    "table.deleteRow": "행 삭제",
+    "table.addColumn": "열 추가",
+    "table.insertColumnLeft": "왼쪽에 열 삽입",
+    "table.insertColumnRight": "오른쪽에 열 삽입",
+    "table.deleteColumn": "열 삭제",
+    "table.clearCell": "셀 비우기",
+    "canvas.tableHeader": "표 머리글",
+    "canvas.tableCell": "표 셀",
+    "toast.tableChanged": "표가 업데이트되었습니다"
+  });
+
+  Object.assign(I18N["zh-CN"], {
+    "action.new": "新建演示文稿",
+    "action.newShort": "新建",
+    "action.templates": "从模板新建",
+    "action.templatesShort": "模板",
+    "action.open": "打开 PPT.html 或 JSON",
+    "action.save": "下载单文件 PPT.html",
+    "action.saveDesktop": "保存当前文件",
+    "action.aiJson": "打开 AI JSON 数据面板",
+    "action.validate": "质量检查当前文稿",
+    "toolbar.file": "文件操作",
+    "toolbar.edit": "编辑操作",
+    "toolbar.review": "检查与数据",
+    "toolbar.present": "播放",
+    "object.geometry": "位置和尺寸",
+    "object.layer": "图层",
+    "object.data": "对象数据",
+    "zoom.controls": "画布缩放",
+    "zoom.in": "放大画布",
+    "zoom.out": "缩小画布",
+    "zoom.fit": "适合窗口",
+    "zoom.fitLabel": "适合",
+    "zoom.level": "{percent}%"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "action.new": "New presentation",
+    "action.newShort": "New",
+    "action.templates": "New from template",
+    "action.templatesShort": "Templates",
+    "action.open": "Open PPT.html or JSON",
+    "action.save": "Download single-file PPT.html",
+    "action.saveDesktop": "Save current file",
+    "action.aiJson": "Open AI JSON data panel",
+    "action.validate": "Check this deck",
+    "toolbar.file": "File actions",
+    "toolbar.edit": "Edit actions",
+    "toolbar.review": "Check and data",
+    "toolbar.present": "Presentation",
+    "object.geometry": "Position and size",
+    "object.layer": "Layer",
+    "object.data": "Object data",
+    "zoom.controls": "Canvas zoom",
+    "zoom.in": "Zoom in",
+    "zoom.out": "Zoom out",
+    "zoom.fit": "Fit to window",
+    "zoom.fitLabel": "Fit",
+    "zoom.level": "{percent}%"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "action.new": "新しいプレゼンを作成",
+    "action.newShort": "新規",
+    "action.templates": "テンプレートから作成",
+    "action.templatesShort": "テンプレート",
+    "action.open": "PPT.html または JSON を開く",
+    "action.save": "単一ファイルの PPT.html をダウンロード",
+    "action.saveDesktop": "現在のファイルを保存",
+    "action.aiJson": "AI JSON データパネルを開く",
+    "action.validate": "この文書をチェック",
+    "toolbar.file": "ファイル操作",
+    "toolbar.edit": "編集操作",
+    "toolbar.review": "チェックとデータ",
+    "toolbar.present": "発表",
+    "object.geometry": "位置とサイズ",
+    "object.layer": "レイヤー",
+    "object.data": "オブジェクトデータ",
+    "zoom.controls": "キャンバスのズーム",
+    "zoom.in": "拡大",
+    "zoom.out": "縮小",
+    "zoom.fit": "ウィンドウに合わせる",
+    "zoom.fitLabel": "自動",
+    "zoom.level": "{percent}%"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "action.new": "새 프레젠테이션",
+    "action.newShort": "새로 만들기",
+    "action.templates": "템플릿으로 새로 만들기",
+    "action.templatesShort": "템플릿",
+    "action.open": "PPT.html 또는 JSON 열기",
+    "action.save": "단일 파일 PPT.html 다운로드",
+    "action.saveDesktop": "현재 파일 저장",
+    "action.aiJson": "AI JSON 데이터 패널 열기",
+    "action.validate": "현재 문서 검사",
+    "toolbar.file": "파일 작업",
+    "toolbar.edit": "편집 작업",
+    "toolbar.review": "검사 및 데이터",
+    "toolbar.present": "발표",
+    "object.geometry": "위치와 크기",
+    "object.layer": "레이어",
+    "object.data": "개체 데이터",
+    "zoom.controls": "캔버스 확대/축소",
+    "zoom.in": "확대",
+    "zoom.out": "축소",
+    "zoom.fit": "창에 맞춤",
+    "zoom.fitLabel": "맞춤",
+    "zoom.level": "{percent}%"
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -1802,6 +2320,7 @@
     renderAll();
     window.addEventListener("resize", function () {
       fitFrame(els.stageFrame, els.stageViewport);
+      fitSlideThumbPreviews();
       renderCanvasControls();
       if (presenting) fitPresentationFrame(els.presenterStage, els.presenter);
     });
@@ -1814,18 +2333,20 @@
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
-      "stylePanel", "styleTargetLabel", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
+      "stylePanel", "styleTargetLabel", "styleFontFamilyInput", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
       "styleBackgroundInput", "styleBackgroundResetBtn", "styleBorderColorInput", "styleBorderColorResetBtn", "styleBorderWidthInput", "styleRadiusInput", "styleOpacityInput", "styleResetBtn",
       "objectPanel", "objectTargetLabel", "objectXInput", "objectYInput", "objectWInput", "objectHInput", "objectRotationInput", "objectZInput",
-      "objectDuplicateBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
+      "objectDuplicateBtn", "objectDeleteBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
       "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
+      "objectTableTools", "objectTableAddRowBtn", "objectTableDeleteRowBtn", "objectTableAddColumnBtn", "objectTableDeleteColumnBtn",
+      "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
-      "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
-      "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
+      "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
+      "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
-      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "canvasContextMenu", "toast"
+      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "canvasContextMenu", "slideContextMenu", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
@@ -1847,7 +2368,9 @@
 
   function t(key) {
     var lang = I18N[uiLang] ? uiLang : "zh-CN";
-    return (I18N[lang] && I18N[lang][key]) || I18N["zh-CN"][key] || key;
+    if (I18N[lang] && Object.prototype.hasOwnProperty.call(I18N[lang], key)) return I18N[lang][key];
+    if (I18N["zh-CN"] && Object.prototype.hasOwnProperty.call(I18N["zh-CN"], key)) return I18N["zh-CN"][key];
+    return key;
   }
 
   function formatText(template, values) {
@@ -1875,9 +2398,13 @@
     document.querySelectorAll("[data-i18n-aria]").forEach(function (node) {
       node.setAttribute("aria-label", t(node.getAttribute("data-i18n-aria")));
     });
+    document.querySelectorAll("[data-i18n-group]").forEach(function (node) {
+      node.setAttribute("aria-label", t(node.getAttribute("data-i18n-group")));
+    });
 
     populateLayoutSelect();
     refreshTooltips();
+    updateZoomLabel();
     if (!settings.skipRender) renderAll();
   }
 
@@ -2020,8 +2547,12 @@
         if (command === "save") saveDeck(false);
         if (command === "saveAs") saveDeck(true);
         if (command === "validate") showValidationDialog();
-        if (command === "presentFromStart") openPresenter(0);
-        if (command === "present") openPresenter(currentIndex);
+        if (command === "presentFromStart" && !isTextEditingTarget(document.activeElement)) openPresenter(0);
+        if (command === "present" && !isTextEditingTarget(document.activeElement)) openPresenter(currentIndex);
+        if (command === "canvasZoomIn") stepCanvasZoom(1);
+        if (command === "canvasZoomOut") stepCanvasZoom(-1);
+        if (command === "canvasZoomFit") fitCanvasToViewport();
+        if (command === "canvasZoomActual") setCanvasZoom(1, { mode: "manual" });
       });
     }
     updateFileStatus();
@@ -2135,11 +2666,14 @@
     els.stageFrame.addEventListener("pointerdown", handleCanvasPointerDown);
     els.stageFrame.addEventListener("dblclick", handleCanvasDblClick);
     els.stageFrame.addEventListener("contextmenu", handleCanvasContextMenu);
-    els.stageViewport.addEventListener("pointerdown", handleCanvasViewportPointerDown);
+    els.stageFrame.addEventListener("dragstart", handleCanvasNativeDragStart);
+    els.stageViewport.addEventListener("pointerdown", handleCanvasViewportPointerDown, true);
+    els.stageViewport.addEventListener("wheel", handleCanvasWheel, { passive: false });
     els.stageViewport.addEventListener("dragover", handleCanvasDragOver);
     els.stageViewport.addEventListener("dragenter", handleCanvasDragEnter);
     els.stageViewport.addEventListener("dragleave", handleCanvasDragLeave);
     els.stageViewport.addEventListener("drop", handleCanvasDrop);
+    els.slideList.addEventListener("contextmenu", handleSlideListContextMenu);
 
     document.querySelectorAll("[data-insert]").forEach(function (button) {
       button.addEventListener("click", function () {
@@ -2163,61 +2697,17 @@
       });
     });
 
-    els.addSlideBtn.addEventListener("click", function () {
-      commit(function () {
-        deck.slides.splice(currentIndex + 1, 0, PPTHtml.normalizeSlide({
-          id: PPTHtml.uid("slide"),
-          layout: "text",
-          kicker: "New Slide",
-          title: t("sample.newSlideTitle"),
-          subtitle: t("sample.newSlideSubtitle")
-        }, currentIndex + 1));
-        currentIndex += 1;
-      });
-    });
-
-    els.duplicateSlideBtn.addEventListener("click", function () {
-      commit(function () {
-        var copy = JSON.parse(JSON.stringify(currentSlide()));
-        copy.id = PPTHtml.uid("slide");
-        copy.title = copy.title + " Copy";
-        deck.slides.splice(currentIndex + 1, 0, copy);
-        currentIndex += 1;
-      });
-    });
-
-    els.moveSlideUpBtn.addEventListener("click", function () {
-      if (currentIndex <= 0) return;
-      commit(function () {
-        var slide = deck.slides.splice(currentIndex, 1)[0];
-        currentIndex -= 1;
-        deck.slides.splice(currentIndex, 0, slide);
-      });
-    });
-
-    els.moveSlideDownBtn.addEventListener("click", function () {
-      if (currentIndex >= deck.slides.length - 1) return;
-      commit(function () {
-        var slide = deck.slides.splice(currentIndex, 1)[0];
-        currentIndex += 1;
-        deck.slides.splice(currentIndex, 0, slide);
-      });
-    });
-
-    els.deleteSlideBtn.addEventListener("click", function () {
-      if (deck.slides.length <= 1) {
-        alert(t("confirm.keepOneSlide"));
-        return;
-      }
-      if (!confirm(t("confirm.deleteSlide"))) return;
-      commit(function () {
-        deck.slides.splice(currentIndex, 1);
-        currentIndex = Math.max(0, currentIndex - 1);
-      });
-    });
+    els.addSlideBtn.addEventListener("click", function () { addSlideAfter(currentIndex, { focusThumb: true }); });
+    els.duplicateSlideBtn.addEventListener("click", function () { duplicateSlideAt(currentIndex, { focusThumb: true }); });
+    els.moveSlideUpBtn.addEventListener("click", function () { moveSlideRelative(currentIndex, -1, { focusThumb: true }); });
+    els.moveSlideDownBtn.addEventListener("click", function () { moveSlideRelative(currentIndex, 1, { focusThumb: true }); });
+    els.deleteSlideBtn.addEventListener("click", function () { deleteSlideAt(currentIndex, { confirm: true, focusThumb: true }); });
 
     els.undoBtn.addEventListener("click", undo);
     els.redoBtn.addEventListener("click", redo);
+    els.zoomOutBtn.addEventListener("click", function () { stepCanvasZoom(-1); });
+    els.zoomInBtn.addEventListener("click", function () { stepCanvasZoom(1); });
+    els.zoomFitBtn.addEventListener("click", fitCanvasToViewport);
 
     bindDeckInput(els.deckTitleInput, function (value) { deck.title = value; });
     bindDeckInput(els.deckThemeInput, function (value) { deck.theme = value; });
@@ -2244,13 +2734,18 @@
     bindSlideInput(els.chartLabelsInput, function (slide, value) { ensureChart(slide).labels = splitCells(value); });
     bindSlideInput(els.chartSeriesInput, function (slide, value) { ensureChart(slide).series = parseChartSeries(value); });
     bindSlideInput(els.chartUnitInput, function (slide, value) { ensureChart(slide).unit = value; });
-    bindSlideInput(els.tableColumnsInput, function (slide, value) { slide.table.columns = splitCells(value); });
+    bindSlideInput(els.tableColumnsInput, function (slide, value) { slide.table.columns = splitTableCells(value); });
     bindSlideInput(els.tableRowsInput, function (slide, value) { slide.table.rows = parseTableRows(value); });
+    els.tableAddRowBtn.addEventListener("click", function () { mutateSelectedTable("addRow"); });
+    els.tableDeleteRowBtn.addEventListener("click", function () { mutateSelectedTable("deleteRow"); });
+    els.tableAddColumnBtn.addEventListener("click", function () { mutateSelectedTable("addColumn"); });
+    els.tableDeleteColumnBtn.addEventListener("click", function () { mutateSelectedTable("deleteColumn"); });
     bindSlideInput(els.quoteInput, function (slide, value) { slide.quote = value; });
     bindSlideInput(els.authorInput, function (slide, value) { slide.author = value; });
     bindSlideInput(els.codeInput, function (slide, value) { slide.code = value; });
     bindSlideInput(els.notesInput, function (slide, value) { slide.notes = value; });
 
+    bindStyleInput(els.styleFontFamilyInput, "fontFamily");
     bindStyleInput(els.styleFontSizeInput, "fontSize", { number: true, min: 8, max: 180 });
     bindStyleInput(els.styleAlignInput, "textAlign");
     bindStyleInput(els.styleColorInput, "color");
@@ -2277,6 +2772,13 @@
     els.objectDataInput.addEventListener("focus", captureEditStart);
     els.objectDataInput.addEventListener("change", commitObjectDataFromPanel);
     els.objectDuplicateBtn.addEventListener("click", duplicateSelectedCanvas);
+    els.objectDeleteBtn.addEventListener("click", function () {
+      if (deleteSelectedObject()) {
+        toast(t("toast.deleted"));
+        return;
+      }
+      deleteSelectedCanvasContent();
+    });
     els.objectBringForwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("forward"); });
     els.objectSendBackwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("backward"); });
     els.objectBringFrontBtn.addEventListener("click", function () { moveSelectedObjectLayer("front"); });
@@ -2289,6 +2791,10 @@
     els.objectAlignBottomBtn.addEventListener("click", function () { alignSelectedCanvasTargets("bottom"); });
     els.objectDistributeHBtn.addEventListener("click", function () { distributeSelectedCanvasTargets("horizontal"); });
     els.objectDistributeVBtn.addEventListener("click", function () { distributeSelectedCanvasTargets("vertical"); });
+    els.objectTableAddRowBtn.addEventListener("click", function () { mutateSelectedTable("addRow"); });
+    els.objectTableDeleteRowBtn.addEventListener("click", function () { mutateSelectedTable("deleteRow"); });
+    els.objectTableAddColumnBtn.addEventListener("click", function () { mutateSelectedTable("addColumn"); });
+    els.objectTableDeleteColumnBtn.addEventListener("click", function () { mutateSelectedTable("deleteColumn"); });
 
     els.imageFileBtn.addEventListener("click", function () {
       openImagePicker();
@@ -2297,13 +2803,13 @@
     els.imageFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
       if (!file) {
-        pendingMediaInsertType = "";
-        pendingMediaObjectPath = "";
+        cancelPendingMediaInsert();
         return;
       }
       readImageFile(file);
       event.target.value = "";
     });
+    els.imageFileInput.addEventListener("cancel", cancelPendingMediaInsert);
 
     els.videoFileBtn.addEventListener("click", function () {
       openVideoPicker();
@@ -2312,13 +2818,13 @@
     els.videoFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
       if (!file) {
-        pendingMediaInsertType = "";
-        pendingMediaObjectPath = "";
+        cancelPendingMediaInsert();
         return;
       }
       readVideoFile(file);
       event.target.value = "";
     });
+    els.videoFileInput.addEventListener("cancel", cancelPendingMediaInsert);
 
     bindSlideInput(els.videoFitInput, function (slide, value) { slide.video.fit = value; });
     bindSlideInput(els.videoSrcInput, function (slide, value) { slide.video.src = value; });
@@ -2332,13 +2838,13 @@
     els.audioFileInput.addEventListener("change", function (event) {
       var file = event.target.files && event.target.files[0];
       if (!file) {
-        pendingMediaInsertType = "";
-        pendingMediaObjectPath = "";
+        cancelPendingMediaInsert();
         return;
       }
       readAudioFile(file);
       event.target.value = "";
     });
+    els.audioFileInput.addEventListener("cancel", cancelPendingMediaInsert);
 
     bindSlideInput(els.audioSrcInput, function (slide, value) { slide.audio.src = value; });
     bindSlideInput(els.audioCaptionInput, function (slide, value) { slide.audio.caption = value; });
@@ -2346,9 +2852,14 @@
     els.presentBtn.addEventListener("click", function () { openPresenter(currentIndex); });
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
+    els.presentFullscreenBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      togglePresenterFullscreen();
+    });
     els.presentExitBtn.addEventListener("click", closePresenter);
-    els.presenter.addEventListener("pointermove", showPresenterChrome);
-    els.presenter.addEventListener("pointerdown", showPresenterChrome);
+    els.presenter.addEventListener("pointermove", handlePresenterPointerMove);
+    els.presenter.addEventListener("pointerdown", handlePresenterPointerDown);
+    els.presenter.addEventListener("click", handlePresenterClick);
     els.presenter.addEventListener("focusin", showPresenterChrome);
     els.presenter.addEventListener("dblclick", togglePresenterFullscreen);
     document.addEventListener("fullscreenchange", handleDocumentFullscreenChange);
@@ -2359,12 +2870,20 @@
       });
       els.canvasContextMenu.addEventListener("click", handleCanvasContextMenuAction);
     }
+    if (els.slideContextMenu) {
+      els.slideContextMenu.addEventListener("pointerdown", function (event) {
+        event.stopPropagation();
+      });
+      els.slideContextMenu.addEventListener("click", handleSlideContextMenuAction);
+    }
     document.addEventListener("pointerdown", function (event) {
       if (els.canvasContextMenu && !event.target.closest("#canvasContextMenu")) hideCanvasContextMenu();
+      if (els.slideContextMenu && !event.target.closest("#slideContextMenu")) hideSlideContextMenu();
     });
     window.addEventListener("resize", hideCanvasContextMenu);
     window.addEventListener("scroll", hideCanvasContextMenu, true);
     document.addEventListener("keydown", handleGlobalKeydown);
+    document.addEventListener("keyup", handleGlobalKeyup);
   }
 
   function readImageFile(file) {
@@ -2374,6 +2893,7 @@
       var createSlide = pendingMediaInsertType === "image";
       pendingMediaInsertType = "";
       pendingMediaObjectPath = "";
+      pendingMediaPlaceholderPath = "";
       commit(function () {
         if (objectPath && setObjectMediaSource(objectPath, "image", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
@@ -2395,6 +2915,7 @@
       var createSlide = pendingMediaInsertType === "video";
       pendingMediaInsertType = "";
       pendingMediaObjectPath = "";
+      pendingMediaPlaceholderPath = "";
       commit(function () {
         if (objectPath && setObjectMediaSource(objectPath, "video", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
@@ -2414,6 +2935,7 @@
       var createSlide = pendingMediaInsertType === "audio";
       pendingMediaInsertType = "";
       pendingMediaObjectPath = "";
+      pendingMediaPlaceholderPath = "";
       commit(function () {
         if (objectPath && setObjectMediaSource(objectPath, "audio", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
@@ -2426,27 +2948,50 @@
     reader.readAsDataURL(file);
   }
 
+  function cancelPendingMediaInsert() {
+    var placeholderPath = pendingMediaPlaceholderPath;
+    pendingMediaInsertType = "";
+    pendingMediaObjectPath = "";
+    pendingMediaPlaceholderPath = "";
+    if (!placeholderPath) return;
+
+    var index = objectIndexFromPath(placeholderPath);
+    var slide = currentSlide();
+    if (index < 0 || !Array.isArray(slide.objects) || !slide.objects[index]) return;
+    commit(function () {
+      slide.objects.splice(index, 1);
+      remapObjectCanvasPaths(slide, index);
+      clearCanvasSelection();
+    });
+  }
+
   function openImagePicker(insertType) {
+    pendingMediaPlaceholderPath = "";
     if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "image") {
       pendingMediaObjectPath = selectedCanvasPath;
     }
     pendingMediaInsertType = insertType === "component" ? "image" : "";
+    els.imageFileInput.value = "";
     els.imageFileInput.click();
   }
 
   function openVideoPicker(insertType) {
+    pendingMediaPlaceholderPath = "";
     if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "video") {
       pendingMediaObjectPath = selectedCanvasPath;
     }
     pendingMediaInsertType = insertType === "component" ? "video" : "";
+    els.videoFileInput.value = "";
     els.videoFileInput.click();
   }
 
   function openAudioPicker(insertType) {
+    pendingMediaPlaceholderPath = "";
     if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "audio") {
       pendingMediaObjectPath = selectedCanvasPath;
     }
     pendingMediaInsertType = insertType === "component" ? "audio" : "";
+    els.audioFileInput.value = "";
     els.audioFileInput.click();
   }
 
@@ -2456,7 +3001,7 @@
     if (type === "text") {
       var nextPath = "";
       commit(function () {
-        nextPath = addTextBoxToSlide(currentSlide(), settings.point);
+        nextPath = addTextBoxToSlide(currentSlide(), settings.point, variant);
         setCanvasSelection([nextPath]);
       });
       toast(formatText(t("toast.componentInserted"), { name: insertLabel(type, variant) }));
@@ -2468,17 +3013,26 @@
     }
     if (type === "image" && settings.source === "click") {
       pendingMediaObjectPath = insertObjectToCurrentSlide("image", variant, settings.point);
-      openImagePicker();
+      pendingMediaPlaceholderPath = pendingMediaObjectPath;
+      pendingMediaInsertType = "";
+      els.imageFileInput.value = "";
+      els.imageFileInput.click();
       return;
     }
     if (type === "video" && settings.source === "click") {
       pendingMediaObjectPath = insertObjectToCurrentSlide("video", variant, settings.point);
-      openVideoPicker();
+      pendingMediaPlaceholderPath = pendingMediaObjectPath;
+      pendingMediaInsertType = "";
+      els.videoFileInput.value = "";
+      els.videoFileInput.click();
       return;
     }
     if (type === "audio" && settings.source === "click") {
       pendingMediaObjectPath = insertObjectToCurrentSlide("audio", variant, settings.point);
-      openAudioPicker();
+      pendingMediaPlaceholderPath = pendingMediaObjectPath;
+      pendingMediaInsertType = "";
+      els.audioFileInput.value = "";
+      els.audioFileInput.click();
       return;
     }
 
@@ -2506,28 +3060,147 @@
   function addObjectToSlide(slide, type, variant, point) {
     slide.objects = Array.isArray(slide.objects) ? slide.objects : [];
     var index = slide.objects.length;
-    var object = createSlideObject(type, variant, point, index);
+    var object = createSlideObject(slide, type, variant, point, index);
     slide.objects.push(object);
     return "objects." + index;
   }
 
-  function createSlideObject(type, variant, point, index) {
+  function createSlideObject(slide, type, variant, point, index) {
     var objectType = normalizeInsertObjectType(type);
-    var size = defaultObjectSize(objectType, variant);
-    var center = point || defaultObjectCenter(index);
-    var x = clamp(center.x - size.w / 2, 32, PPTHtml.baseWidth - size.w - 32);
-    var y = clamp(center.y - size.h / 2, 36, PPTHtml.baseHeight - size.h - 36);
+    var data = createObjectData(objectType, variant);
+    var size = defaultObjectSize(objectType, variant, data);
+    var origin = point
+      ? objectOriginFromPoint(point, size)
+      : findObjectPlacement(slide, size, index, objectType);
     return {
       id: PPTHtml.uid("object"),
       type: objectType,
-      x: Math.round(x),
-      y: Math.round(y),
+      x: Math.round(origin.x),
+      y: Math.round(origin.y),
       w: size.w,
       h: size.h,
       rotation: 0,
       zIndex: nextObjectZIndex(),
-      data: createObjectData(objectType, variant)
+      data: data
     };
+  }
+
+  function objectOriginFromPoint(point, size) {
+    return {
+      x: clamp(point.x - size.w / 2, 32, PPTHtml.baseWidth - size.w - 32),
+      y: clamp(point.y - size.h / 2, 36, PPTHtml.baseHeight - size.h - 36)
+    };
+  }
+
+  function findObjectPlacement(slide, size, index, objectType) {
+    var margin = 40;
+    var center = defaultObjectCenter(index);
+    var candidates = [
+      { x: PPTHtml.baseWidth - size.w - margin, y: PPTHtml.baseHeight - size.h - margin },
+      { x: margin, y: PPTHtml.baseHeight - size.h - margin },
+      { x: PPTHtml.baseWidth - size.w - margin, y: margin },
+      { x: margin, y: margin },
+      { x: center.x - size.w / 2, y: center.y - size.h / 2 },
+      { x: (PPTHtml.baseWidth - size.w) / 2, y: PPTHtml.baseHeight - size.h - 56 },
+      { x: (PPTHtml.baseWidth - size.w) / 2, y: 76 }
+    ].map(function (candidate) {
+      return {
+        x: clamp(candidate.x, margin, PPTHtml.baseWidth - size.w - margin),
+        y: clamp(candidate.y, margin, PPTHtml.baseHeight - size.h - margin)
+      };
+    });
+    var occupied = occupiedSlideBounds(slide, objectType);
+    var best = candidates[0];
+    var bestScore = Infinity;
+    candidates.forEach(function (candidate, candidateIndex) {
+      var bounds = { x: candidate.x, y: candidate.y, w: size.w, h: size.h };
+      var overlap = occupied.reduce(function (sum, item) {
+        return sum + rectOverlapArea(bounds, item);
+      }, 0);
+      var centerPenalty = Math.abs(candidate.x + size.w / 2 - center.x) * 0.08 + Math.abs(candidate.y + size.h / 2 - center.y) * 0.08;
+      var score = overlap * 12 + centerPenalty + candidateIndex;
+      if (score < bestScore) {
+        bestScore = score;
+        best = candidate;
+      }
+    });
+    return best;
+  }
+
+  function occupiedSlideBounds(slide, objectType) {
+    var bounds = layoutOccupiedBounds(slide || {});
+    (Array.isArray(slide && slide.objects) ? slide.objects : []).forEach(function (object) {
+      bounds.push({
+        x: Number(object.x) || 0,
+        y: Number(object.y) || 0,
+        w: Math.max(0, Number(object.w) || 0),
+        h: Math.max(0, Number(object.h) || 0)
+      });
+    });
+    (Array.isArray(slide && slide.textBoxes) ? slide.textBoxes : []).forEach(function (box) {
+      bounds.push({
+        x: Number(box.x) || 0,
+        y: Number(box.y) || 0,
+        w: Math.max(0, Number(box.w) || 0),
+        h: Math.max(0, Number(box.h) || 0)
+      });
+    });
+    if (objectType === "table") {
+      bounds = bounds.map(function (item) {
+        return {
+          x: item.x - 12,
+          y: item.y - 12,
+          w: item.w + 24,
+          h: item.h + 24
+        };
+      });
+    }
+    return bounds.filter(function (item) {
+      return item.w > 0 && item.h > 0;
+    });
+  }
+
+  function layoutOccupiedBounds(slide) {
+    var layout = slide.layout || "text";
+    var titleHeight = slide.title ? 94 : 0;
+    var subtitleHeight = slide.subtitle ? 54 : 0;
+    var bodyHeight = slide.body ? 170 : 0;
+    if (layout === "hero") {
+      return [{ x: 72, y: 230, w: 770, h: 250 + subtitleHeight }];
+    }
+    if (layout === "imageRight") {
+      return [
+        { x: 72, y: 96, w: 560, h: 500 },
+        { x: 702, y: 120, w: 506, h: 470 }
+      ];
+    }
+    if (layout === "imageLeft") {
+      return [
+        { x: 72, y: 120, w: 506, h: 470 },
+        { x: 652, y: 96, w: 560, h: 500 }
+      ];
+    }
+    if (layout === "compare" || layout === "threeCards" || layout === "chart" || layout === "table" || layout === "timeline" || layout === "data") {
+      return [{ x: 72, y: 72, w: 1136, h: 570 }];
+    }
+    if (layout === "video" || layout === "audio" || layout === "code") {
+      return [{ x: 72, y: 72, w: 1136, h: 560 }];
+    }
+    if (layout === "imageFull" || layout === "imageBackground") {
+      return [{ x: 72, y: 390, w: 780, h: 250 }];
+    }
+    if (layout === "section" || layout === "quote" || layout === "ending") {
+      return [{ x: 72, y: 170, w: 980, h: 360 }];
+    }
+    return [{ x: 72, y: 78, w: 850, h: Math.max(180, titleHeight + subtitleHeight + bodyHeight + 120) }];
+  }
+
+  function rectOverlapArea(a, b) {
+    var left = Math.max(a.x, b.x);
+    var top = Math.max(a.y, b.y);
+    var right = Math.min(a.x + a.w, b.x + b.w);
+    var bottom = Math.min(a.y + a.h, b.y + b.h);
+    return Math.max(0, right - left) * Math.max(0, bottom - top);
   }
 
   function normalizeInsertObjectType(type) {
@@ -2537,19 +3210,19 @@
     return "shape";
   }
 
-  function defaultObjectSize(type, variant) {
+  function defaultObjectSize(type, variant, data) {
+    if (type === "table") return tableObjectSize(data);
+    if (type === "chart") return chartObjectSize(data);
+    if (type === "cards") return groupObjectSize(data && data.cards, 800, 300, 3);
+    if (type === "metrics") return groupObjectSize(data && data.metrics, 800, 270, 3);
+    if (type === "timeline") return timelineObjectSize(data);
+    if (type === "compare") return compareObjectSize(data);
+    if (type === "code") return codeObjectSize(data);
     var sizes = {
       image: { w: 520, h: 300 },
       video: { w: 560, h: 320 },
       audio: { w: 520, h: 150 },
-      chart: { w: 640, h: 360 },
-      table: { w: 600, h: 280 },
-      cards: { w: 620, h: 260 },
-      metrics: { w: 620, h: 240 },
-      timeline: { w: 620, h: 300 },
       quote: { w: 560, h: 220 },
-      code: { w: 600, h: 260 },
-      compare: { w: 620, h: 260 }
     };
     if (type === "shape") {
       if (variant === "line" || variant === "arrow") return { w: 420, h: 72 };
@@ -2557,6 +3230,78 @@
       if (variant === "callout") return { w: 360, h: 180 };
     }
     return sizes[type] || { w: 320, h: 180 };
+  }
+
+  function boundedObjectSize(width, height, minWidth, minHeight) {
+    return {
+      w: Math.round(clamp(width, minWidth || 240, PPTHtml.baseWidth - 96)),
+      h: Math.round(clamp(height, minHeight || 120, PPTHtml.baseHeight - 96))
+    };
+  }
+
+  function tableObjectSize(data) {
+    var source = data && typeof data === "object" ? data : {};
+    var columns = Array.isArray(source.columns) ? source.columns : [];
+    var rows = Array.isArray(source.rows) ? source.rows : [];
+    var colCount = Math.max(1, columns.length);
+    var longest = columns.reduce(function (max, value) {
+      return Math.max(max, String(value || "").length);
+    }, 0);
+    rows.forEach(function (row) {
+      if (!Array.isArray(row)) return;
+      colCount = Math.max(colCount, row.length);
+      row.forEach(function (value) {
+        longest = Math.max(longest, String(value || "").length);
+      });
+    });
+    var rowCount = rows.length + (columns.length ? 1 : 0);
+    var width = 104 + colCount * 150 + Math.min(150, longest * 4);
+    var cellBudget = Math.max(8, Math.floor((width - 48) / colCount / 9));
+    var rowLineCount = 0;
+    if (columns.length) {
+      rowLineCount += columns.reduce(function (max, value) {
+        return Math.max(max, Math.ceil(String(value || "").length / cellBudget) || 1);
+      }, 1);
+    }
+    rows.forEach(function (row) {
+      var cells = Array.isArray(row) ? row : [];
+      rowLineCount += cells.reduce(function (max, value) {
+        return Math.max(max, Math.ceil(String(value || "").length / cellBudget) || 1);
+      }, 1);
+    });
+    var height = 32 + Math.max(2, rowLineCount) * 42 + Math.max(0, rowCount - 1) * 4;
+    return boundedObjectSize(width, height, Math.min(620, 150 + colCount * 135), 190);
+  }
+
+  function chartObjectSize(data) {
+    var kind = data && data.kind === "donut" ? "donut" : data && data.kind === "line" ? "line" : "bar";
+    var labels = data && Array.isArray(data.labels) ? data.labels.length : 0;
+    var series = data && Array.isArray(data.series) ? data.series.length : 0;
+    var legendCount = kind === "donut" ? labels : series;
+    return boundedObjectSize(760 + Math.max(0, legendCount - 3) * 24, kind === "donut" ? 390 : 380, 700, 340);
+  }
+
+  function groupObjectSize(items, baseWidth, baseHeight, expectedCount) {
+    var count = Math.max(expectedCount || 1, Array.isArray(items) ? items.length : 0);
+    return boundedObjectSize(baseWidth + Math.max(0, count - 3) * 120, baseHeight, baseWidth, baseHeight);
+  }
+
+  function timelineObjectSize(data) {
+    var items = data && Array.isArray(data.items) ? data.items : [];
+    var count = Math.max(3, Math.min(5, items.length || 3));
+    return boundedObjectSize(780, 112 + count * 62, 700, 300);
+  }
+
+  function compareObjectSize(data) {
+    var left = data && data.left ? data.left : {};
+    var right = data && data.right ? data.right : {};
+    var textLength = String(left.text || "").length + String(right.text || "").length;
+    return boundedObjectSize(780, 300 + Math.min(90, textLength * 0.8), 700, 300);
+  }
+
+  function codeObjectSize(data) {
+    var lines = String(data && data.code || "").split(/\r?\n/).length;
+    return boundedObjectSize(720, 120 + Math.max(3, lines) * 30, 600, 240);
   }
 
   function defaultObjectCenter(index) {
@@ -2643,14 +3388,14 @@
       slide.layout = "imageRight";
       if (shouldUseSampleTitle(slide)) slide.title = t("sample.imageTitle");
       slide.image = slide.image || {};
-      slide.image.caption = slide.image.caption || t("sample.imageCaption");
+      slide.image.caption = slide.image.caption || "";
       return;
     }
     if (type === "video") {
       slide.layout = "video";
       if (shouldUseSampleTitle(slide)) slide.title = t("sample.videoTitle");
       slide.video = slide.video || {};
-      slide.video.caption = slide.video.caption || t("sample.videoCaption");
+      slide.video.caption = slide.video.caption || "";
       slide.video.fit = slide.video.fit || "cover";
       return;
     }
@@ -2658,7 +3403,7 @@
       slide.layout = "audio";
       if (shouldUseSampleTitle(slide)) slide.title = t("sample.audioTitle");
       slide.audio = slide.audio || {};
-      slide.audio.caption = slide.audio.caption || t("sample.audioCaption");
+      slide.audio.caption = slide.audio.caption || "";
       return;
     }
     if (type === "compare") {
@@ -2840,24 +3585,82 @@
     return !slide.title || slide.title === t("slide.untitled") || slide.title === "Untitled";
   }
 
-  function addTextBoxToSlide(slide, point) {
+  function addTextBoxToSlide(slide, point, variant) {
     slide.textBoxes = Array.isArray(slide.textBoxes) ? slide.textBoxes : [];
     var index = slide.textBoxes.length;
-    var width = 380;
-    var height = 96;
-    var x = point && isFinite(point.x) ? point.x - 190 : 730 + (index % 3) * 28;
-    var y = point && isFinite(point.y) ? point.y - 48 : 430 + (index % 4) * 30;
+    var preset = textBoxPreset(variant);
+    var width = preset.w;
+    var height = preset.h;
+    var x = point && isFinite(point.x) ? point.x - width / 2 : preset.x + (index % 3) * 28;
+    var y = point && isFinite(point.y) ? point.y - height / 2 : preset.y + (index % 4) * 30;
     x = clamp(x, 40, PPTHtml.baseWidth - width - 40);
     y = clamp(y, 40, PPTHtml.baseHeight - height - 40);
     slide.textBoxes.push({
       id: PPTHtml.uid("textbox"),
-      text: t("sample.textBox"),
+      text: preset.text,
       x: Math.round(x),
       y: Math.round(y),
       w: width,
       h: height
     });
-    return "textBoxes." + index + ".text";
+    var path = "textBoxes." + index + ".text";
+    applyPathStyle(slide, path, preset.style);
+    return path;
+  }
+
+  function textBoxPreset(variant) {
+    var kind = ["title", "subtitle", "body", "bullet", "label", "box"].indexOf(variant) !== -1 ? variant : "box";
+    var presets = {
+      title: {
+        text: t("sample.textTitleBox"),
+        x: 160,
+        y: 140,
+        w: 820,
+        h: 120,
+        style: { fontSize: 68, fontWeight: "800", fontFamily: "display", color: "#111827" }
+      },
+      subtitle: {
+        text: t("sample.textSubtitleBox"),
+        x: 180,
+        y: 280,
+        w: 760,
+        h: 92,
+        style: { fontSize: 34, fontWeight: "500", fontFamily: "system", color: "#475569" }
+      },
+      body: {
+        text: t("sample.textBodyBox"),
+        x: 220,
+        y: 340,
+        w: 680,
+        h: 150,
+        style: { fontSize: 28, fontWeight: "400", fontFamily: "system", color: "#1f2937" }
+      },
+      bullet: {
+        text: t("sample.textBulletBox"),
+        x: 230,
+        y: 330,
+        w: 660,
+        h: 170,
+        style: { fontSize: 28, fontWeight: "500", fontFamily: "system", color: "#111827" }
+      },
+      label: {
+        text: t("sample.textLabelBox"),
+        x: 190,
+        y: 150,
+        w: 300,
+        h: 54,
+        style: { fontSize: 20, fontWeight: "800", fontFamily: "system", color: "#0f766e", backgroundColor: "#ccfbf1", borderRadius: 18, textAlign: "center" }
+      },
+      box: {
+        text: t("sample.textBox"),
+        x: 730,
+        y: 430,
+        w: 380,
+        h: 96,
+        style: { fontSize: 28, fontFamily: "system", color: "#111827" }
+      }
+    };
+    return presets[kind];
   }
 
   function insertLabel(type, variant) {
@@ -2892,6 +3695,16 @@
     var lowerKey = key.toLowerCase();
     var commandKey = event.metaKey || event.ctrlKey;
 
+    if (key === "Escape") {
+      hideCanvasContextMenu();
+      hideSlideContextMenu();
+    }
+
+    if (!presenting && isTextEditingTarget(event.target) && key === "F5") {
+      event.preventDefault();
+      return;
+    }
+
     if (key === "F5") {
       event.preventDefault();
       commitActiveCanvasEdit();
@@ -2905,6 +3718,8 @@
       openPresenter(currentIndex);
       return;
     }
+
+    if (!presenting && handleCanvasZoomShortcut(event, commandKey, lowerKey)) return;
 
     if (commandKey && lowerKey === "s") {
       event.preventDefault();
@@ -2923,10 +3738,15 @@
       return;
     }
 
-    if (presenting && handlePresenterShortcut(event)) return;
+    if (presenting) {
+      showPresenterChrome();
+      if (handlePresenterShortcut(event)) return;
+    }
     if (isTextEditingTarget(event.target)) return;
+    if (handleCanvasPanShortcut(event)) return;
     if (handleCanvasClipboardShortcut(event, commandKey, lowerKey)) return;
     if (handleCanvasShortcut(event)) return;
+    if (handleSlideShortcut(event, commandKey, lowerKey)) return;
 
     if (commandKey && lowerKey === "z") {
       event.preventDefault();
@@ -2939,6 +3759,99 @@
     }
   }
 
+  function handleGlobalKeyup(event) {
+    if (event.key === " " && canvasSpacePanning) {
+      event.preventDefault();
+      canvasSpacePanning = false;
+      if (els.stageViewport) els.stageViewport.classList.remove("is-pan-ready");
+    }
+  }
+
+  function handleCanvasZoomShortcut(event, commandKey, lowerKey) {
+    if (!commandKey || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    if (event.key === "+" || event.key === "=") {
+      event.preventDefault();
+      stepCanvasZoom(1);
+      return true;
+    }
+    if (event.key === "-" || event.key === "_") {
+      event.preventDefault();
+      stepCanvasZoom(-1);
+      return true;
+    }
+    if (lowerKey === "0") {
+      event.preventDefault();
+      fitCanvasToViewport();
+      return true;
+    }
+    if (lowerKey === "1") {
+      event.preventDefault();
+      setCanvasZoom(1, { mode: "manual" });
+      return true;
+    }
+    return false;
+  }
+
+  function handleCanvasPanShortcut(event) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    if (event.key !== " ") return false;
+    if (event.target && event.target.closest && event.target.closest("button, [role='button'], input, textarea, select, dialog")) return false;
+    if (event.type === "keydown") {
+      if (canvasSpacePanning) return true;
+      event.preventDefault();
+      canvasSpacePanning = true;
+      els.stageViewport.classList.add("is-pan-ready");
+      return true;
+    }
+    if (event.type === "keyup") {
+      canvasSpacePanning = false;
+      els.stageViewport.classList.remove("is-pan-ready");
+      return true;
+    }
+    return false;
+  }
+
+  function handleSlideShortcut(event, commandKey, lowerKey) {
+    if (!isSlideShortcutTarget(event.target)) return false;
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    if (event.key === "Delete" || event.key === "Backspace") {
+      event.preventDefault();
+      deleteSlideAt(currentIndex, { focusThumb: true });
+      return true;
+    }
+    if (commandKey && lowerKey === "d") {
+      event.preventDefault();
+      duplicateSlideAt(currentIndex, { focusThumb: true });
+      return true;
+    }
+    if (commandKey && lowerKey === "m") {
+      event.preventDefault();
+      addSlideAfter(currentIndex, { focusThumb: true });
+      return true;
+    }
+    if (commandKey && lowerKey === "c") {
+      event.preventDefault();
+      copySlideAt(currentIndex);
+      return true;
+    }
+    if (commandKey && lowerKey === "v") {
+      if (!slideClipboard) return false;
+      event.preventDefault();
+      pasteSlideAfter(currentIndex, { focusThumb: true });
+      return true;
+    }
+    if (event.altKey && (event.key === "ArrowUp" || event.key === "ArrowDown")) {
+      event.preventDefault();
+      moveSlideRelative(currentIndex, event.key === "ArrowUp" ? -1 : 1, { focusThumb: true });
+      return true;
+    }
+    return false;
+  }
+
+  function isSlideShortcutTarget(target) {
+    return Boolean(target && target.closest && target.closest(".slide-rail"));
+  }
+
   function handlePresenterShortcut(event) {
     var key = event.key;
     var nextKeys = ["ArrowRight", "ArrowDown", " ", "Enter", "PageDown", "n", "N"];
@@ -2949,23 +3862,56 @@
       closePresenter();
       return true;
     }
+    if (/^\d$/.test(key)) {
+      event.preventDefault();
+      appendPresenterJumpDigit(key);
+      return true;
+    }
+    if (presenterJumpBuffer && key === "Backspace") {
+      event.preventDefault();
+      presenterJumpBuffer = presenterJumpBuffer.slice(0, -1);
+      return true;
+    }
+    if (presenterJumpBuffer && key === "Enter") {
+      event.preventDefault();
+      return jumpPresenterFromBuffer();
+    }
+    if (key === "b" || key === "B" || key === ".") {
+      event.preventDefault();
+      setPresenterBlankMode("black");
+      return true;
+    }
+    if (key === "w" || key === "W" || key === ",") {
+      event.preventDefault();
+      setPresenterBlankMode("white");
+      return true;
+    }
+    if (key === "f" || key === "F") {
+      event.preventDefault();
+      togglePresenterFullscreen();
+      return true;
+    }
     if (nextKeys.indexOf(key) !== -1) {
       event.preventDefault();
+      clearPresenterJumpBuffer();
       showPresentationSlide(presentIndex + 1);
       return true;
     }
     if (previousKeys.indexOf(key) !== -1) {
       event.preventDefault();
+      clearPresenterJumpBuffer();
       showPresentationSlide(presentIndex - 1);
       return true;
     }
     if (key === "Home") {
       event.preventDefault();
+      clearPresenterJumpBuffer();
       showPresentationSlide(0);
       return true;
     }
     if (key === "End") {
       event.preventDefault();
+      clearPresenterJumpBuffer();
       showPresentationSlide(deck.slides.length - 1);
       return true;
     }
@@ -3177,6 +4123,7 @@
   }
 
   function normalizeStyleInputValue(prop, rawValue, options) {
+    if (prop === "fontFamily") return normalizeFontFamilyToken(rawValue);
     if (prop === "textAlign") return ["left", "center", "right", "justify"].indexOf(rawValue) !== -1 ? rawValue : "";
     if (options.number) {
       if (rawValue === "") return null;
@@ -3185,6 +4132,59 @@
       return Math.round(clamp(number, options.min, options.max) * 100) / 100;
     }
     return normalizeStyleColor(rawValue);
+  }
+
+  function normalizeFontFamilyToken(value) {
+    return [
+      "system", "display", "arial", "helvetica", "aptos", "calibri", "verdana", "tahoma", "avenir",
+      "serif", "georgia", "times", "cambria",
+      "cjk-sans", "pingfang", "yahei", "dengxian", "simhei", "stheiti", "hiragino-sans", "noto-sans-cjk",
+      "cjk-serif", "songti", "simsun", "fangsong", "kaiti", "yu-mincho", "noto-serif-cjk",
+      "yu-gothic", "meiryo", "malgun",
+      "mono", "menlo", "consolas", "courier", "handwriting"
+    ].indexOf(value) !== -1 ? value : "";
+  }
+
+  function fontFamilyStack(token) {
+    var stacks = {
+      system: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+      display: "\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif",
+      arial: "Arial, Helvetica, ui-sans-serif, sans-serif",
+      helvetica: "\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif",
+      aptos: "Aptos, Calibri, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
+      calibri: "Calibri, Aptos, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
+      verdana: "Verdana, Geneva, Tahoma, Arial, ui-sans-serif, sans-serif",
+      tahoma: "Tahoma, Verdana, \"Segoe UI\", Arial, ui-sans-serif, sans-serif",
+      avenir: "\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif",
+      serif: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      georgia: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      times: "\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      cambria: "Cambria, Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      "cjk-sans": "\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, SimHei, \"Noto Sans CJK SC\", sans-serif",
+      pingfang: "\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif",
+      yahei: "\"Microsoft YaHei\", \"Microsoft JhengHei\", DengXian, \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      dengxian: "DengXian, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      simhei: "SimHei, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      stheiti: "\"STHeiti\", \"Heiti SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+      "hiragino-sans": "\"Hiragino Sans\", \"Hiragino Kaku Gothic ProN\", \"Yu Gothic\", \"Meiryo\", sans-serif",
+      "noto-sans-cjk": "\"Noto Sans CJK SC\", \"Noto Sans CJK JP\", \"Noto Sans CJK KR\", \"Source Han Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", sans-serif",
+      "cjk-serif": "\"Songti SC\", SimSun, FangSong, \"Noto Serif CJK SC\", \"Yu Mincho\", serif",
+      songti: "\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif",
+      simsun: "SimSun, \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      fangsong: "FangSong, STFangsong, \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      kaiti: "\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive",
+      "yu-mincho": "\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      "noto-serif-cjk": "\"Noto Serif CJK SC\", \"Noto Serif CJK JP\", \"Noto Serif CJK KR\", \"Source Han Serif SC\", \"Songti SC\", SimSun, serif",
+      "yu-gothic": "\"Yu Gothic\", \"Yu Gothic UI\", \"Hiragino Sans\", Meiryo, sans-serif",
+      meiryo: "Meiryo, \"Yu Gothic\", \"Hiragino Sans\", sans-serif",
+      malgun: "\"Malgun Gothic\", \"Apple SD Gothic Neo\", \"Noto Sans CJK KR\", sans-serif",
+      mono: "\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace",
+      menlo: "Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace",
+      consolas: "Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace",
+      courier: "\"Courier New\", Courier, Consolas, Menlo, monospace",
+      handwriting: "\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive"
+    };
+    return stacks[token] || "";
   }
 
   function captureEditStart() {
@@ -3284,17 +4284,43 @@
       var button = document.createElement("button");
       button.type = "button";
       button.className = "slide-thumb" + (index === currentIndex ? " active" : "");
-      button.innerHTML = "<span>" + (index + 1) + "</span><strong></strong><small></small>";
       button.draggable = true;
-      button.querySelector("strong").textContent = slide.title || t("slide.untitled");
-      button.querySelector("small").textContent = layoutLabel(slide.layout);
+      button.dataset.slideIndex = String(index);
+      button.setAttribute("aria-current", index === currentIndex ? "true" : "false");
+
+      var number = document.createElement("span");
+      number.className = "slide-thumb-number";
+      number.textContent = String(index + 1);
+      button.appendChild(number);
+
+      button.appendChild(createSlideThumbPreview(slide, index));
+
+      var meta = document.createElement("div");
+      meta.className = "slide-thumb-meta";
+      var title = document.createElement("strong");
+      title.textContent = slide.title || t("slide.untitled");
+      var layout = document.createElement("small");
+      layout.textContent = layoutLabel(slide.layout);
+      meta.appendChild(title);
+      meta.appendChild(layout);
+      button.appendChild(meta);
+
       setTooltip(button, formatText(t("tooltip.slideThumb"), {
         number: index + 1,
         title: slide.title || t("slide.untitled"),
         layout: layoutLabel(slide.layout)
       }));
       button.addEventListener("click", function () {
-        selectSlide(index);
+        selectSlide(index, { focusThumb: true });
+      });
+      button.addEventListener("keydown", function (event) {
+        if (handleSlideThumbKeydown(event, index)) return;
+      });
+      button.addEventListener("contextmenu", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        selectSlide(index, { focusThumb: true });
+        showSlideContextMenu(event.clientX, event.clientY, index);
       });
       button.addEventListener("dragstart", function (event) {
         event.dataTransfer.effectAllowed = "move";
@@ -3325,16 +4351,298 @@
     });
   }
 
-  function selectSlide(index) {
-    if (index === currentIndex) return;
+  function createSlideThumbPreview(slide, index) {
+    var preview = document.createElement("div");
+    preview.className = "slide-thumb-preview";
+    preview.setAttribute("aria-hidden", "true");
+    var frame = document.createElement("div");
+    frame.className = "slide-thumb-frame";
+    var thumbDeck = {
+      version: deck.version,
+      title: deck.title,
+      theme: deck.theme,
+      transition: deck.transition,
+      slides: [slide]
+    };
+    var slideNode = PPTHtml.renderSlide(slide, thumbDeck, { index: 0 });
+    slideNode.removeAttribute("data-ppt-path");
+    prepareSlideThumbnailMedia(slideNode);
+    frame.appendChild(slideNode);
+    preview.appendChild(frame);
+    window.requestAnimationFrame(function () {
+      fitSlideThumbPreview(preview, frame);
+    });
+    return preview;
+  }
+
+  function fitSlideThumbPreview(preview, frame) {
+    if (!preview || !frame) return;
+    var width = Math.max(1, preview.clientWidth);
+    frame.style.setProperty("--thumb-scale", String(width / PPTHtml.baseWidth));
+  }
+
+  function fitSlideThumbPreviews() {
+    if (!els.slideList) return;
+    els.slideList.querySelectorAll(".slide-thumb-preview").forEach(function (preview) {
+      fitSlideThumbPreview(preview, preview.querySelector(".slide-thumb-frame"));
+    });
+  }
+
+  function prepareSlideThumbnailMedia(slideNode) {
+    slideNode.querySelectorAll("img").forEach(function (image) {
+      image.loading = "lazy";
+      image.decoding = "async";
+      image.draggable = false;
+    });
+    slideNode.querySelectorAll("video, audio").forEach(function (media) {
+      media.autoplay = false;
+      media.controls = false;
+      media.muted = true;
+      media.preload = "none";
+    });
+  }
+
+  function selectSlide(index, options) {
+    if (index === currentIndex) {
+      if (options && options.focusThumb) focusCurrentSlideThumb();
+      return;
+    }
     clearCanvasSelection();
     currentIndex = index;
     renderAll();
+    if (options && options.focusThumb) focusCurrentSlideThumb();
+  }
+
+  function focusCurrentSlideThumb() {
+    var thumb = els.slideList && els.slideList.querySelector("[data-slide-index=\"" + currentIndex + "\"]");
+    if (thumb && document.contains(thumb)) thumb.focus();
+    window.setTimeout(function () {
+      var nextThumb = els.slideList && els.slideList.querySelector("[data-slide-index=\"" + currentIndex + "\"]");
+      if (nextThumb && document.contains(nextThumb)) nextThumb.focus();
+    }, 0);
+  }
+
+  function handleSlideThumbKeydown(event, index) {
+    var key = event.key;
+    var nextIndex = index;
+    if (key === "ArrowUp" || key === "ArrowLeft" || key === "PageUp") nextIndex = Math.max(0, index - 1);
+    else if (key === "ArrowDown" || key === "ArrowRight" || key === "PageDown") nextIndex = Math.min(deck.slides.length - 1, index + 1);
+    else if (key === "Home") nextIndex = 0;
+    else if (key === "End") nextIndex = deck.slides.length - 1;
+    else if (key === "Delete" || key === "Backspace") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (index !== currentIndex) currentIndex = index;
+      deleteSlideAt(index, { focusThumb: true });
+      return true;
+    } else {
+      return false;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    selectSlide(nextIndex, { focusThumb: true });
+    return true;
+  }
+
+  function addSlideAfter(index, options) {
+    commitActiveCanvasEdit();
+    var insertIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1) + 1;
+    commit(function () {
+      deck.slides.splice(insertIndex, 0, PPTHtml.normalizeSlide({
+        id: PPTHtml.uid("slide"),
+        layout: "text",
+        kicker: "New Slide",
+        title: t("sample.newSlideTitle"),
+        subtitle: t("sample.newSlideSubtitle")
+      }, insertIndex));
+      currentIndex = insertIndex;
+      clearCanvasSelection();
+    });
+    if (options && options.focusThumb) focusCurrentSlideThumb();
+  }
+
+  function duplicateSlideAt(index, options) {
+    commitActiveCanvasEdit();
+    var sourceIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    commit(function () {
+      var copy = cloneSlideForInsert(deck.slides[sourceIndex]);
+      copy.title = [copy.title || t("slide.untitled"), t("slide.copySuffix")].join(" ");
+      deck.slides.splice(sourceIndex + 1, 0, copy);
+      currentIndex = sourceIndex + 1;
+      clearCanvasSelection();
+    });
+    if (options && options.focusThumb) focusCurrentSlideThumb();
+  }
+
+  function copySlideAt(index) {
+    var sourceIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    slideClipboard = JSON.parse(JSON.stringify(deck.slides[sourceIndex]));
+    toast(t("context.copy"));
+    updateSlideContextMenuState();
+    return true;
+  }
+
+  function pasteSlideAfter(index, options) {
+    if (!slideClipboard) return false;
+    commitActiveCanvasEdit();
+    var targetIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    commit(function () {
+      var copy = cloneSlideForInsert(slideClipboard);
+      copy.title = [copy.title || t("slide.untitled"), t("slide.copySuffix")].join(" ");
+      deck.slides.splice(targetIndex + 1, 0, copy);
+      currentIndex = targetIndex + 1;
+      clearCanvasSelection();
+    });
+    if (options && options.focusThumb) focusCurrentSlideThumb();
+    return true;
+  }
+
+  function cloneSlideForInsert(slide) {
+    var copy = JSON.parse(JSON.stringify(slide || {}));
+    copy.id = PPTHtml.uid("slide");
+    if (Array.isArray(copy.textBoxes)) {
+      copy.textBoxes.forEach(function (box) { box.id = PPTHtml.uid("textbox"); });
+    }
+    if (Array.isArray(copy.objects)) {
+      copy.objects.forEach(function (object) { object.id = PPTHtml.uid("object"); });
+    }
+    return copy;
+  }
+
+  function moveSlideRelative(index, delta, options) {
+    var fromIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    var toIndex = fromIndex + delta;
+    if (toIndex < 0 || toIndex >= deck.slides.length) return false;
+    moveSlideByDrag(fromIndex, toIndex);
+    if (options && options.focusThumb) focusCurrentSlideThumb();
+    return true;
+  }
+
+  function deleteSlideAt(index, options) {
+    var settings = options || {};
+    if (deck.slides.length <= 1) {
+      alert(t("confirm.keepOneSlide"));
+      return false;
+    }
+    var targetIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    if (settings.confirm && !confirm(t("confirm.deleteSlide"))) return false;
+    commitActiveCanvasEdit();
+    commit(function () {
+      deck.slides.splice(targetIndex, 1);
+      if (currentIndex > targetIndex) currentIndex -= 1;
+      else if (currentIndex >= deck.slides.length) currentIndex = deck.slides.length - 1;
+      currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
+      clearCanvasSelection();
+    });
+    if (settings.focusThumb) focusCurrentSlideThumb();
+    return true;
+  }
+
+  function handleCanvasWheel(event) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return;
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      var delta = event.deltaY < 0 ? 1 : -1;
+      var factor = delta > 0 ? 1.08 : 1 / 1.08;
+      setCanvasZoom(canvasZoom * factor, {
+        mode: "manual",
+        clientX: event.clientX,
+        clientY: event.clientY
+      });
+      return;
+    }
+    if (canvasZoomMode !== "fit") {
+      event.preventDefault();
+      panCanvasBy(-event.deltaX, -event.deltaY);
+    }
+  }
+
+  function stepCanvasZoom(direction) {
+    setCanvasZoom(canvasZoom * (direction > 0 ? 1.18 : 1 / 1.18), { mode: "manual" });
+  }
+
+  function fitCanvasToViewport() {
+    canvasZoomMode = "fit";
+    canvasPanX = 0;
+    canvasPanY = 0;
+    fitFrame(els.stageFrame, els.stageViewport);
+    renderCanvasControls();
+  }
+
+  function setCanvasZoom(nextZoom, options) {
+    var settings = options || {};
+    var previousZoom = canvasZoom || canvasFitScale || 1;
+    nextZoom = clamp(Number(nextZoom) || previousZoom, 0.18, 2.5);
+    if (Math.abs(nextZoom - previousZoom) < 0.001 && settings.mode !== "manual") return;
+
+    if (settings.clientX != null && settings.clientY != null && previousZoom) {
+      var rect = els.stageViewport.getBoundingClientRect();
+      var beforeX = (settings.clientX - rect.left - rect.width / 2 - canvasPanX) / previousZoom;
+      var beforeY = (settings.clientY - rect.top - rect.height / 2 - canvasPanY) / previousZoom;
+      canvasPanX += beforeX * previousZoom - beforeX * nextZoom;
+      canvasPanY += beforeY * previousZoom - beforeY * nextZoom;
+    }
+
+    canvasZoomMode = settings.mode || "manual";
+    canvasZoom = nextZoom;
+    clampCanvasPan();
+    applyCanvasFrameTransform();
+    renderCanvasControls();
+  }
+
+  function panCanvasBy(dx, dy) {
+    canvasPanX += Number(dx) || 0;
+    canvasPanY += Number(dy) || 0;
+    clampCanvasPan();
+    applyCanvasFrameTransform();
+    renderCanvasControls();
+  }
+
+  function clampCanvasPan() {
+    if (!els.stageViewport) return;
+    var scale = canvasZoom || canvasFitScale || 1;
+    var extraX = Math.max(0, PPTHtml.baseWidth * scale - els.stageViewport.clientWidth) / 2 + 160;
+    var extraY = Math.max(0, PPTHtml.baseHeight * scale - els.stageViewport.clientHeight) / 2 + 120;
+    canvasPanX = clamp(canvasPanX, -extraX, extraX);
+    canvasPanY = clamp(canvasPanY, -extraY, extraY);
+  }
+
+  function shouldTopAlignCanvas() {
+    return canvasZoomMode === "fit"
+      && window.matchMedia
+      && window.matchMedia("(max-width: 720px)").matches;
+  }
+
+  function applyCanvasFrameTransform() {
+    if (!els.stageFrame) return;
+    var scale = canvasZoom || canvasFitScale || 1;
+    var topAligned = shouldTopAlignCanvas();
+    els.stageFrame.style.width = PPTHtml.baseWidth + "px";
+    els.stageFrame.style.height = PPTHtml.baseHeight + "px";
+    els.stageFrame.style.left = "50%";
+    els.stageFrame.style.top = topAligned ? "10px" : "50%";
+    els.stageFrame.style.transformOrigin = topAligned ? "top center" : "center center";
+    var originTransform = topAligned ? "translate(-50%, 0)" : "translate(-50%, -50%)";
+    els.stageFrame.style.transform = originTransform + " translate(" + Math.round(canvasPanX) + "px, " + Math.round(canvasPanY) + "px) scale(" + scale + ")";
+    updateZoomLabel();
+  }
+
+  function updateZoomLabel() {
+    if (!els.zoomLabel) return;
+    setButtonUnavailable(els.zoomOutBtn, (canvasZoom || 1) <= 0.181);
+    setButtonUnavailable(els.zoomInBtn, (canvasZoom || 1) >= 2.49);
+    if (canvasZoomMode === "fit") {
+      els.zoomLabel.textContent = t("zoom.fitLabel");
+      setTooltip(els.zoomFitBtn, formatText(t("zoom.level"), { percent: Math.round((canvasFitScale || 1) * 100) }) + " · " + t("zoom.fit"));
+      return;
+    }
+    els.zoomLabel.textContent = formatText(t("zoom.level"), { percent: Math.round((canvasZoom || 1) * 100) });
+    setTooltip(els.zoomFitBtn, t("zoom.fit"));
   }
 
   function renderCanvas() {
     els.stageFrame.innerHTML = "";
-    els.stageFrame.appendChild(PPTHtml.renderSlide(currentSlide(), deck, { index: currentIndex }));
+    els.stageFrame.appendChild(PPTHtml.renderSlide(currentSlide(), deck, { index: currentIndex, editable: true }));
     enhanceCanvasEditing();
     els.currentSlideLabel.textContent = formatText(t("slide.current"), { number: currentIndex + 1 });
     els.currentSlideTitle.textContent = currentSlide().title || t("slide.untitled");
@@ -3354,7 +4662,7 @@
     bindCanvasComponent(".ppt-media", "image", { labelKey: "canvas.image", fileAction: "image" });
     bindCanvasComponent(".ppt-video", "video", { labelKey: "canvas.video", fileAction: "video" });
     bindCanvasComponent(".ppt-audio", "audio", { labelKey: "canvas.audio", fileAction: "audio" });
-    bindCanvasComponent(".ppt-chart-wrap", "chart", { labelKey: "canvas.chart" });
+    bindCanvasComponent(".ppt-chart-wrap, .ppt-chart-empty", "chart", { labelKey: "canvas.chart" });
     bindCanvasComponent(".ppt-table", "table", { labelKey: "canvas.table" });
     bindCanvasComponent(".ppt-card-grid", "cards", { labelKey: "canvas.cards" });
     bindCanvasComponent(".ppt-metric-grid", "metrics", { labelKey: "canvas.metrics" });
@@ -3440,11 +4748,11 @@
 
   function bindCanvasTable() {
     editableNodes(".ppt-table th").forEach(function (cell, index) {
-      registerCanvasEdit(cell, "table.columns." + index, { singleLine: true });
+      registerCanvasEdit(cell, "table.columns." + index, { singleLine: true, noDrag: true, labelKey: "canvas.tableCell" });
     });
     editableNodes(".ppt-table tbody tr").forEach(function (row, rowIndex) {
       row.querySelectorAll("td").forEach(function (cell, cellIndex) {
-        registerCanvasEdit(cell, "table.rows." + rowIndex + "." + cellIndex, { singleLine: true });
+        registerCanvasEdit(cell, "table.rows." + rowIndex + "." + cellIndex, { singleLine: true, noDrag: true, labelKey: "canvas.tableCell" });
       });
     });
   }
@@ -3490,6 +4798,26 @@
       };
       if (type === "image" || type === "video" || type === "audio") options.fileAction = type;
       registerCanvasEdit(node, "objects." + index, options);
+      if (type === "table") bindObjectTableCells(node, index);
+    });
+  }
+
+  function bindObjectTableCells(objectNode, objectIndex) {
+    objectNode.querySelectorAll(".ppt-table th").forEach(function (cell, columnIndex) {
+      registerCanvasEdit(cell, "objects." + objectIndex + ".data.columns." + columnIndex, {
+        singleLine: true,
+        noDrag: true,
+        labelKey: "canvas.tableCell"
+      });
+    });
+    objectNode.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+      row.querySelectorAll("td").forEach(function (cell, columnIndex) {
+        registerCanvasEdit(cell, "objects." + objectIndex + ".data.rows." + rowIndex + "." + columnIndex, {
+          singleLine: true,
+          noDrag: true,
+          labelKey: "canvas.tableCell"
+        });
+      });
     });
   }
 
@@ -3504,30 +4832,51 @@
     node.setAttribute("data-canvas-edit", path);
     node.setAttribute("tabindex", "0");
     node.dataset.canvasOptions = JSON.stringify(options || {});
+    node.draggable = false;
+    node.querySelectorAll("img, video, audio").forEach(function (child) {
+      child.draggable = false;
+    });
     setTooltip(node, canvasLabel(options || {}, path));
   }
 
   function handleCanvasPointerDown(event) {
-    if (presenting || activeCanvasEdit || event.button !== 0) return;
+    if (presenting || event.button !== 0) return;
     if (event.target.closest(".canvas-selection-box")) return;
     var target = event.target.closest("[data-canvas-edit]");
     if (!target || !els.stageFrame.contains(target)) return;
+    if (activeCanvasEdit) {
+      if (target === activeCanvasEdit.node || activeCanvasEdit.node.contains(event.target)) return;
+      var nextTargetPath = target.getAttribute("data-canvas-edit");
+      finishCanvasEdit(true);
+      target = canvasNodeByPath(nextTargetPath);
+      if (!target) return;
+    }
+    var targetOptions = parseCanvasOptions(target);
     selectCanvasTarget(target, { toggle: event.shiftKey });
+    if (targetOptions.noDrag) return;
     if (!selectedCanvasPath) return;
     var dragPaths = currentCanvasSelectionPaths();
     var targetPath = target.getAttribute("data-canvas-edit");
     if (dragPaths.indexOf(targetPath) === -1) dragPaths = [targetPath];
+    var dragNodes = dragPaths.map(canvasNodeByPath);
+    var dragOrigins = dragPaths.map(function (path) { return getCanvasOffset(path); });
+    var dragObjectFlags = dragPaths.map(function (path) { return Boolean(getObjectByPath(path)); });
     activeCanvasDrag = {
       node: target,
       path: targetPath,
       paths: dragPaths,
-      nodes: dragPaths.map(canvasNodeByPath),
-      origins: dragPaths.map(function (path) { return getCanvasOffset(path); }),
+      nodes: dragNodes,
+      origins: dragOrigins,
+      objectFlags: dragObjectFlags,
+      previewOffsets: dragOrigins.map(function (origin) { return Object.assign({}, origin); }),
       before: JSON.stringify(deck),
       startX: event.clientX,
       startY: event.clientY,
       origin: getCanvasOffset(target.getAttribute("data-canvas-edit")),
       startBox: getNodeFrameBounds(target),
+      startSelectionBounds: dragPaths.length > 1 ? getSelectionBounds(dragPaths) : null,
+      selectionBox: els.stageFrame.querySelector(".canvas-selection-box"),
+      isObject: Boolean(getObjectByPath(targetPath)),
       scale: currentFrameScale(),
       pointerId: event.pointerId,
       frame: 0,
@@ -3547,6 +4896,10 @@
     window.addEventListener("pointercancel", handleCanvasPointerEnd);
   }
 
+  function handleCanvasNativeDragStart(event) {
+    if (event.target.closest("[data-canvas-edit]")) event.preventDefault();
+  }
+
   function handleCanvasPointerMove(event) {
     if (!activeCanvasDrag) return;
     var drag = activeCanvasDrag;
@@ -3555,8 +4908,7 @@
     if (!drag.moved && Math.hypot(dx, dy) < 4) return;
     if (!drag.moved) {
       drag.moved = true;
-      drag.node.classList.add("is-canvas-dragging");
-      els.stageFrame.classList.add("is-canvas-moving");
+      startCanvasDragPreview(drag);
     }
     event.preventDefault();
     drag.pendingDx = dx;
@@ -3581,34 +4933,26 @@
       w: drag.origin.w,
       h: drag.origin.h
     };
-    if (getObjectByPath(drag.path)) {
+    if (drag.isObject) {
       nextOffset = clampObjectGeometry({
         x: drag.origin.x + drag.pendingDx,
         y: drag.origin.y + drag.pendingDy,
         w: drag.origin.w,
         h: drag.origin.h
       });
+      drag.previewOffset = nextOffset;
       setObjectDragPreviewStyle(drag.node, drag.origin, nextOffset);
-      positionCanvasSelectionBoxFromBounds(nextOffset);
+      previewCanvasSelectionBox(drag.selectionBox, nextOffset.x - drag.origin.x, nextOffset.y - drag.origin.y);
       return;
     }
+    drag.previewOffset = nextOffset;
     setCanvasOffsetStyle(drag.node, nextOffset);
-    positionCanvasSelectionBoxFromBounds({
-      x: drag.startBox.x + nextOffset.x - drag.origin.x,
-      y: drag.startBox.y + nextOffset.y - drag.origin.y,
-      w: drag.startBox.w,
-      h: drag.startBox.h
-    });
+    previewCanvasSelectionBox(drag.selectionBox, nextOffset.x - drag.origin.x, nextOffset.y - drag.origin.y);
   }
 
   function setObjectDragPreviewStyle(node, origin, nextOffset) {
     var dx = Math.round((Number(nextOffset.x) || 0) - (Number(origin.x) || 0));
     var dy = Math.round((Number(nextOffset.y) || 0) - (Number(origin.y) || 0));
-    node.dataset.canvasX = String(nextOffset.x);
-    node.dataset.canvasY = String(nextOffset.y);
-    node.dataset.canvasW = String(nextOffset.w);
-    node.dataset.canvasH = String(nextOffset.h);
-    node.style.willChange = "transform";
     node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0)";
   }
 
@@ -3619,21 +4963,42 @@
       var node = drag.nodes[index];
       var origin = drag.origins[index];
       if (!node || !origin) return;
-      var nextOffset = getObjectByPath(path)
+      var nextOffset = drag.objectFlags[index]
         ? clampObjectGeometry({ x: origin.x + dx, y: origin.y + dy, w: origin.w, h: origin.h })
         : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h };
-      if (getObjectByPath(path)) setObjectDragPreviewStyle(node, origin, nextOffset);
+      drag.previewOffsets[index] = nextOffset;
+      if (drag.objectFlags[index]) setObjectDragPreviewStyle(node, origin, nextOffset);
       else setCanvasOffsetStyle(node, nextOffset);
     });
-    var bounds = getSelectionBounds(drag.paths);
+    var bounds = drag.startSelectionBounds;
     if (bounds) {
-      positionCanvasSelectionBoxFromBounds({
-        x: bounds.x + dx,
-        y: bounds.y + dy,
-        w: bounds.w,
-        h: bounds.h
-      });
+      previewCanvasSelectionBox(drag.selectionBox, dx, dy);
     }
+  }
+
+  function previewCanvasSelectionBox(box, dx, dy, width, height) {
+    if (!box) return;
+    box.style.transform = "translate3d(" + Math.round(Number(dx) || 0) + "px, " + Math.round(Number(dy) || 0) + "px, 0)";
+    if (width != null) box.style.width = Math.max(8, Number(width) || 8) + "px";
+    if (height != null) box.style.height = Math.max(8, Number(height) || 8) + "px";
+  }
+
+  function startCanvasDragPreview(drag) {
+    els.stageFrame.classList.add("is-canvas-moving");
+    (drag.nodes || [drag.node]).forEach(function (node) {
+      if (!node) return;
+      node.classList.add("is-canvas-dragging");
+      node.style.willChange = "transform";
+    });
+  }
+
+  function finishCanvasDragPreview(drag) {
+    (drag.nodes || [drag.node]).forEach(function (node) {
+      if (!node) return;
+      node.classList.remove("is-canvas-dragging");
+      node.style.willChange = "";
+    });
+    els.stageFrame.classList.remove("is-canvas-moving");
   }
 
   function flushCanvasDragPreview(drag) {
@@ -3653,9 +5018,7 @@
     window.removeEventListener("pointermove", handleCanvasPointerMove);
     window.removeEventListener("pointerup", handleCanvasPointerEnd);
     window.removeEventListener("pointercancel", handleCanvasPointerEnd);
-    drag.node.classList.remove("is-canvas-dragging");
-    els.stageFrame.classList.remove("is-canvas-moving");
-    drag.node.style.willChange = "";
+    finishCanvasDragPreview(drag);
     if (drag.node.releasePointerCapture && drag.pointerId != null) {
       try {
         drag.node.releasePointerCapture(drag.pointerId);
@@ -3671,8 +5034,12 @@
       return;
     }
 
-    var offset = parseCanvasOffsetStyle(drag.node);
-    if (sameOffset(drag.origin, offset)) return;
+    var offset = drag.previewOffset || parseCanvasOffsetStyle(drag.node);
+    if (sameOffset(drag.origin, offset)) {
+      setCanvasOffsetStyle(drag.node, drag.origin);
+      renderCanvasControls();
+      return;
+    }
     history.push(drag.before);
     if (history.length > 80) history.shift();
     future = [];
@@ -3699,10 +5066,10 @@
     drag.paths.forEach(function (path, index) {
       var origin = drag.origins[index];
       if (!origin) return;
-      if (foldTextBoxGeometry(path, { x: dx, y: dy })) return;
-      var next = getObjectByPath(path)
+      var next = drag.previewOffsets[index] || (drag.objectFlags[index]
         ? clampObjectGeometry({ x: origin.x + dx, y: origin.y + dy, w: origin.w, h: origin.h })
-        : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h };
+        : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h });
+      if (foldTextBoxGeometry(path, drag.objectFlags[index] ? next : { x: dx, y: dy, w: next.w, h: next.h })) return;
       setCanvasOffset(path, next);
     });
     deck = PPTHtml.normalizeDeck(deck);
@@ -3714,10 +5081,70 @@
   }
 
   function handleCanvasViewportPointerDown(event) {
+    if (shouldStartCanvasPan(event)) {
+      startCanvasPan(event);
+      return;
+    }
     if (event.target.closest("[data-canvas-edit]") || event.target.closest(".canvas-selection-box")) return;
     if (!selectedCanvasPath) return;
     clearCanvasSelection();
     renderCanvasControls();
+  }
+
+  function shouldStartCanvasPan(event) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    if (event.target.closest("button, input, textarea, select, dialog, .canvas-selection-box")) return false;
+    return event.button === 1 || (event.button === 0 && canvasSpacePanning);
+  }
+
+  function startCanvasPan(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    hideTooltip();
+    activeCanvasPan = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      panX: canvasPanX,
+      panY: canvasPanY
+    };
+    els.stageViewport.classList.add("is-panning");
+    if (els.stageViewport.setPointerCapture && event.pointerId != null) {
+      try {
+        els.stageViewport.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // Window listeners below keep panning available if capture is refused.
+      }
+    }
+    window.addEventListener("pointermove", handleCanvasPanPointerMove);
+    window.addEventListener("pointerup", handleCanvasPanPointerEnd);
+    window.addEventListener("pointercancel", handleCanvasPanPointerEnd);
+  }
+
+  function handleCanvasPanPointerMove(event) {
+    if (!activeCanvasPan) return;
+    event.preventDefault();
+    canvasPanX = activeCanvasPan.panX + event.clientX - activeCanvasPan.startX;
+    canvasPanY = activeCanvasPan.panY + event.clientY - activeCanvasPan.startY;
+    clampCanvasPan();
+    applyCanvasFrameTransform();
+    renderCanvasControls();
+  }
+
+  function handleCanvasPanPointerEnd(event) {
+    if (!activeCanvasPan) return;
+    window.removeEventListener("pointermove", handleCanvasPanPointerMove);
+    window.removeEventListener("pointerup", handleCanvasPanPointerEnd);
+    window.removeEventListener("pointercancel", handleCanvasPanPointerEnd);
+    if (els.stageViewport.releasePointerCapture && activeCanvasPan.pointerId != null) {
+      try {
+        els.stageViewport.releasePointerCapture(activeCanvasPan.pointerId);
+      } catch (error) {
+        // The pointer may already be released.
+      }
+    }
+    activeCanvasPan = null;
+    els.stageViewport.classList.remove("is-panning");
   }
 
   function selectCanvasTarget(node, options) {
@@ -3776,6 +5203,23 @@
     return null;
   }
 
+  function createCanvasDeleteButton() {
+    var remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "canvas-delete-button";
+    setTooltip(remove, t("canvas.deleteTitle"));
+    remove.textContent = t("canvas.delete");
+    remove.addEventListener("pointerdown", function (event) {
+      event.stopPropagation();
+    });
+    remove.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      deleteSelectedCanvasContent();
+    });
+    return remove;
+  }
+
   function renderCanvasControls() {
     els.stageFrame.querySelectorAll(".canvas-selection-box").forEach(function (box) {
       box.remove();
@@ -3798,6 +5242,7 @@
     var box = document.createElement("div");
     box.className = "canvas-selection-box";
     box.setAttribute("data-canvas-selection", selectedCanvasPath);
+    var selectionOptions = parseCanvasOptions(node);
 
     var label = document.createElement("span");
     label.className = "canvas-selection-label";
@@ -3807,7 +5252,7 @@
     var reset = document.createElement("button");
     reset.type = "button";
     reset.className = "canvas-reset-button";
-    reset.hidden = Boolean(getObjectByPath(selectedCanvasPath));
+    reset.hidden = Boolean(getObjectByPath(selectedCanvasPath) || selectionOptions.noDrag);
     setTooltip(reset, t("canvas.resetTitle"));
     reset.textContent = t("canvas.reset");
     reset.addEventListener("pointerdown", function (event) {
@@ -3819,15 +5264,18 @@
       resetSelectedCanvasOffset();
     });
     box.appendChild(reset);
+    box.appendChild(createCanvasDeleteButton());
 
-    ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach(function (handle) {
-      var control = document.createElement("span");
-      control.className = "canvas-resize-handle canvas-resize-" + handle;
-      control.setAttribute("data-canvas-handle", handle);
-      setTooltip(control, t("canvas.resize"));
-      control.addEventListener("pointerdown", handleCanvasResizePointerDown);
-      box.appendChild(control);
-    });
+    if (!selectionOptions.noDrag) {
+      ["nw", "n", "ne", "e", "se", "s", "sw", "w"].forEach(function (handle) {
+        var control = document.createElement("span");
+        control.className = "canvas-resize-handle canvas-resize-" + handle;
+        control.setAttribute("data-canvas-handle", handle);
+        setTooltip(control, t("canvas.resize"));
+        control.addEventListener("pointerdown", handleCanvasResizePointerDown);
+        box.appendChild(control);
+      });
+    }
 
     els.stageFrame.appendChild(box);
     positionCanvasSelectionBox(node, box);
@@ -3845,6 +5293,7 @@
     label.className = "canvas-selection-label";
     label.textContent = formatText(t("selection.multiple"), { count: paths.length });
     box.appendChild(label);
+    box.appendChild(createCanvasDeleteButton());
 
     els.stageFrame.appendChild(box);
     positionCanvasSelectionBoxFromBounds(bounds, box);
@@ -3876,7 +5325,7 @@
   function syncStylePanel() {
     if (!els.stylePanel) return;
     var node = canvasNodeByPath(selectedCanvasPath);
-    var hasSelection = Boolean(node && !activeCanvasEdit);
+    var hasSelection = Boolean(node);
     var previousSyncing = syncing;
     syncing = true;
 
@@ -3887,6 +5336,7 @@
 
     if (!hasSelection) {
       els.styleTargetLabel.textContent = t("style.noSelection");
+      els.styleFontFamilyInput.value = "";
       els.styleFontSizeInput.value = "";
       els.styleAlignInput.value = "";
       els.styleColorInput.value = "#111827";
@@ -3907,6 +5357,7 @@
     els.styleTargetLabel.textContent = formatText(t("style.target"), {
       name: canvasSelectionLabel(node, selectedCanvasPath)
     });
+    els.styleFontFamilyInput.value = style.fontFamily || "";
     els.styleFontSizeInput.value = style.fontSize != null ? style.fontSize : "";
     els.styleAlignInput.value = style.textAlign || "";
     els.styleColorInput.value = colorInputValue(style.color, computed.color, "#111827");
@@ -3926,14 +5377,23 @@
     var info = selectedObjectInfo();
     var object = info && info.object;
     var hasObject = Boolean(object && !activeCanvasEdit);
-    els.objectPanel.classList.toggle("is-disabled", !hasObject);
+    var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
+    var hasTableContext = Boolean(tableInfo && tableInfo.kind === "object" && !activeCanvasEdit);
+    els.objectPanel.classList.toggle("is-disabled", !hasObject && !hasTableContext);
     els.objectPanel.querySelectorAll("[data-object-control]").forEach(function (control) {
       control.disabled = !hasObject;
     });
+    if (els.objectTableTools) {
+      var showTableTools = hasTableContext;
+      els.objectTableTools.hidden = !showTableTools;
+      els.objectTableTools.querySelectorAll("button").forEach(function (control) {
+        control.disabled = !showTableTools;
+      });
+    }
     updateObjectCommandControlState();
 
     if (!hasObject) {
-      els.objectTargetLabel.textContent = t("object.noSelection");
+      els.objectTargetLabel.textContent = hasTableContext ? tableContextLabel(tableInfo) : t("object.noSelection");
       els.objectXInput.value = "";
       els.objectYInput.value = "";
       els.objectWInput.value = "";
@@ -3960,6 +5420,13 @@
     els.objectZInput.value = Math.round(Number(object.zIndex) || 0);
     els.objectDataInput.value = JSON.stringify(object.data || {}, null, 2);
     updateObjectCommandControlState();
+  }
+
+  function tableContextLabel(info) {
+    if (!info) return t("canvas.table");
+    if (info.rowIndex < 0 && info.columnIndex >= 0) return t("canvas.tableHeader");
+    if (info.rowIndex >= 0 && info.columnIndex >= 0) return t("canvas.tableCell");
+    return t("canvas.table");
   }
 
   function updateObjectCommandControlState() {
@@ -4007,6 +5474,7 @@
   function applyStyleOverrideToElement(node, style) {
     clearElementStyleOverride(node);
     if (!style || typeof style !== "object") return;
+    if (style.fontFamily) node.style.fontFamily = fontFamilyStack(style.fontFamily);
     if (style.fontSize) node.style.fontSize = style.fontSize + "px";
     if (style.color) node.style.color = style.color;
     if (style.backgroundColor) node.style.backgroundColor = style.backgroundColor;
@@ -4028,7 +5496,7 @@
 
   function clearElementStyleOverride(node) {
     [
-      "fontSize", "color", "backgroundColor", "textAlign", "fontWeight", "fontStyle",
+      "fontFamily", "fontSize", "color", "backgroundColor", "textAlign", "fontWeight", "fontStyle",
       "borderColor", "borderStyle", "borderWidth", "borderRadius", "opacity"
     ].forEach(function (prop) {
       node.style[prop] = "";
@@ -4108,6 +5576,8 @@
       scale: currentFrameScale(),
       origin: getCanvasOffset(path),
       startBox: getNodeFrameBounds(node),
+      selectionBox: els.stageFrame.querySelector(".canvas-selection-box"),
+      isObject: Boolean(getObjectByPath(path)),
       pointerId: event.pointerId,
       frame: 0,
       pendingDx: 0,
@@ -4116,6 +5586,7 @@
     };
     node.classList.add("is-canvas-dragging");
     els.stageFrame.classList.add("is-canvas-moving");
+    node.style.willChange = "transform";
     if (node.setPointerCapture && event.pointerId != null) {
       try {
         node.setPointerCapture(event.pointerId);
@@ -4171,22 +5642,31 @@
       next.y = resize.origin.y + resize.startBox.h - next.h;
     }
 
-    if (getObjectByPath(resize.path)) {
+    if (resize.isObject) {
       next = clampObjectGeometry(next);
+      resize.previewOffset = next;
       setObjectResizePreviewStyle(resize.node, resize.origin, resize.startBox, next);
-      positionCanvasSelectionBoxFromBounds(next);
+      previewCanvasSelectionBox(
+        resize.selectionBox,
+        next.x - resize.origin.x,
+        next.y - resize.origin.y,
+        next.w,
+        next.h
+      );
       return;
     } else {
       next.x = clamp(next.x, -420, 420);
       next.y = clamp(next.y, -240, 240);
     }
+    resize.previewOffset = next;
     setCanvasOffsetStyle(resize.node, next);
-    positionCanvasSelectionBoxFromBounds({
-      x: resize.startBox.x + next.x - resize.origin.x,
-      y: resize.startBox.y + next.y - resize.origin.y,
-      w: next.w || resize.startBox.w,
-      h: next.h || resize.startBox.h
-    });
+    previewCanvasSelectionBox(
+      resize.selectionBox,
+      next.x - resize.origin.x,
+      next.y - resize.origin.y,
+      next.w || resize.startBox.w,
+      next.h || resize.startBox.h
+    );
   }
 
   function setObjectResizePreviewStyle(node, origin, startBox, nextOffset) {
@@ -4196,11 +5676,6 @@
     var dy = Math.round((Number(nextOffset.y) || 0) - (Number(origin.y) || 0));
     var sx = Math.max(0.01, (Number(nextOffset.w) || baseW) / baseW);
     var sy = Math.max(0.01, (Number(nextOffset.h) || baseH) / baseH);
-    node.dataset.canvasX = String(nextOffset.x);
-    node.dataset.canvasY = String(nextOffset.y);
-    node.dataset.canvasW = String(nextOffset.w);
-    node.dataset.canvasH = String(nextOffset.h);
-    node.style.willChange = "transform";
     node.style.transformOrigin = "0 0";
     node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0) scale(" + sx + ", " + sy + ")";
   }
@@ -4236,8 +5711,12 @@
     if (!resize.moved) return;
     event.preventDefault();
 
-    var offset = parseCanvasOffsetStyle(resize.node);
-    if (sameOffset(resize.origin, offset)) return;
+    var offset = resize.previewOffset || parseCanvasOffsetStyle(resize.node);
+    if (sameOffset(resize.origin, offset)) {
+      setCanvasOffsetStyle(resize.node, resize.origin);
+      renderCanvasControls();
+      return;
+    }
     history.push(resize.before);
     if (history.length > 80) history.shift();
     future = [];
@@ -4294,11 +5773,7 @@
 
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
-      if (selectedPaths.length > 1) {
-        deleteSelectedCanvasTargets(selectedPaths);
-        return true;
-      }
-      if (!deleteSelectedObject() && !deleteSelectedTextBox()) resetSelectedCanvasOffset();
+      deleteSelectedCanvasContent(selectedPaths);
       return true;
     }
 
@@ -4374,43 +5849,296 @@
   }
 
   function deleteSelectedCanvasTargets(paths) {
+    return deleteSelectedCanvasContent(paths);
+  }
+
+  function deleteSelectedCanvasContent(paths) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    var targets = uniqueStrings((paths && paths.length ? paths : currentCanvasSelectionPaths()).filter(Boolean));
+    if (!targets.length) return false;
+
     var slide = currentSlide();
-    history.push(JSON.stringify(deck));
+    var before = JSON.stringify(deck);
+    var changed = deleteCanvasPathsFromSlide(slide, targets);
+    if (!changed) return false;
+
+    history.push(before);
     if (history.length > 80) history.shift();
     future = [];
+    clearCanvasSelection();
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    updateFileStatus();
+    schedulePersist();
+    toast(t("toast.deleted"));
+    return true;
+  }
 
-    uniqueNumbers(paths.map(objectIndexFromPath)).sort(function (a, b) { return b - a; }).forEach(function (index) {
+  function deleteCanvasPathsFromSlide(slide, paths) {
+    var changed = false;
+    var removedObjectIndexes = uniqueNumbers(paths.map(objectIndexFromPath)).sort(function (a, b) { return b - a; });
+    var removedTextBoxIndexes = uniqueNumbers(paths.map(textBoxIndexFromPath)).sort(function (a, b) { return b - a; });
+
+    removedObjectIndexes.forEach(function (index) {
       if (Array.isArray(slide.objects) && slide.objects[index]) {
         slide.objects.splice(index, 1);
         remapObjectCanvasPaths(slide, index);
+        changed = true;
       }
     });
 
-    uniqueNumbers(paths.map(textBoxIndexFromPath)).sort(function (a, b) { return b - a; }).forEach(function (index) {
+    removedTextBoxIndexes.forEach(function (index) {
       if (Array.isArray(slide.textBoxes) && slide.textBoxes[index]) {
         slide.textBoxes.splice(index, 1);
         remapTextBoxCanvasPaths(slide, index);
+        changed = true;
       }
     });
 
     paths.forEach(function (path) {
       if (objectIndexFromPath(path) >= 0 || textBoxIndexFromPath(path) >= 0) return;
-      clearCanvasOffset(path);
-      if (slide.styles && slide.styles[path]) delete slide.styles[path];
+      if (removedObjectIndexes.length && objectIndexFromAnyPath(path) >= 0) return;
+      if (removedTextBoxIndexes.length && String(path).indexOf("textBoxes.") === 0) return;
+      if (deleteSlideValueByPath(slide, path)) changed = true;
     });
-    if (slide.styles && !Object.keys(slide.styles).length) delete slide.styles;
 
-    clearCanvasSelection();
-    deck = PPTHtml.normalizeDeck(deck);
-    markDirty();
-    renderAll();
-    schedulePersist();
+    cleanupPathMap(slide, "canvas");
+    cleanupPathMap(slide, "styles");
+    return changed;
+  }
+
+  function deleteSlideValueByPath(slide, path) {
+    var before = JSON.stringify(slide);
+    var objectIndex = objectIndexFromAnyPath(path);
+    if (objectIndex >= 0) {
+      deleteNestedPathValue(slide, path);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "image" || path === "image.caption") {
+      if (path === "image.caption") setPath(slide, "image.caption", "");
+      else {
+        slide.image = {};
+        fallbackLayout(slide, ["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"]);
+        clearPathDecorationPrefix(slide, "image");
+      }
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "video" || path === "video.caption") {
+      if (path === "video.caption") setPath(slide, "video.caption", "");
+      else {
+        slide.video = {};
+        fallbackLayout(slide, ["video"]);
+        clearPathDecorationPrefix(slide, "video");
+      }
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "audio" || path === "audio.caption") {
+      if (path === "audio.caption") setPath(slide, "audio.caption", "");
+      else {
+        slide.audio = {};
+        fallbackLayout(slide, ["audio"]);
+        clearPathDecorationPrefix(slide, "audio");
+      }
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "chart" || path.indexOf("chart.") === 0) {
+      deleteChartPath(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "table" || path.indexOf("table.") === 0) {
+      deleteTablePath(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "cards") {
+      slide.cards = [];
+      fallbackLayout(slide, ["threeCards"]);
+      clearPathDecorationPrefix(slide, "cards");
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path.indexOf("cards.") === 0) {
+      deleteNestedPathValue(slide, path);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "metrics") {
+      slide.metrics = [];
+      fallbackLayout(slide, ["data"]);
+      clearPathDecorationPrefix(slide, "metrics");
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path.indexOf("metrics.") === 0) {
+      deleteNestedPathValue(slide, path);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "timeline") {
+      slide.items = [];
+      fallbackLayout(slide, ["timeline"]);
+      clearPathDecorationPrefix(slide, "timeline");
+      clearPathDecorationPrefix(slide, "items");
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path.indexOf("items.") === 0) {
+      deleteNestedPathValue(slide, path);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (["kicker", "title", "subtitle", "body", "quote", "author", "code"].indexOf(path) !== -1) {
+      slide[path] = "";
+      if (path === "code") fallbackLayout(slide, ["code"]);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    if (path === "left.title" || path === "left.text" || path === "right.title" || path === "right.text") {
+      deleteNestedPathValue(slide, path);
+      clearPathDecoration(slide, path);
+      return JSON.stringify(slide) !== before;
+    }
+
+    deleteNestedPathValue(slide, path);
+    clearPathDecoration(slide, path);
+    return JSON.stringify(slide) !== before;
+  }
+
+  function deleteChartPath(slide, path) {
+    slide.chart = slide.chart && typeof slide.chart === "object" ? slide.chart : {};
+    var chart = slide.chart;
+    if (path === "chart") {
+      slide.chart = { labels: [], series: [], unit: "" };
+      fallbackLayout(slide, ["chart"]);
+      clearPathDecorationPrefix(slide, "chart");
+      return;
+    }
+
+    var labelMatch = path.match(/^chart\.labels\.(\d+)$/);
+    if (labelMatch) {
+      var labelIndex = Number(labelMatch[1]);
+      if (Array.isArray(chart.labels)) chart.labels.splice(labelIndex, 1);
+      if (Array.isArray(chart.series)) {
+        chart.series.forEach(function (series) {
+          if (Array.isArray(series.values)) series.values.splice(labelIndex, 1);
+        });
+      }
+      clearPathDecorationPrefix(slide, "chart");
+      return;
+    }
+
+    var seriesMatch = path.match(/^chart\.series\.(\d+)(?:\.name)?$/);
+    if (seriesMatch && Array.isArray(chart.series)) {
+      chart.series.splice(Number(seriesMatch[1]), 1);
+      clearPathDecorationPrefix(slide, "chart");
+      return;
+    }
+
+    var valueMatch = path.match(/^chart\.series\.(\d+)\.values\.(\d+)$/);
+    if (valueMatch) {
+      var valueIndex = Number(valueMatch[2]);
+      if (Array.isArray(chart.labels)) chart.labels.splice(valueIndex, 1);
+      if (Array.isArray(chart.series)) {
+        chart.series.forEach(function (series) {
+          if (Array.isArray(series.values)) series.values.splice(valueIndex, 1);
+        });
+      }
+      clearPathDecorationPrefix(slide, "chart");
+      return;
+    }
+
+    deleteNestedPathValue(slide, path);
+    clearPathDecoration(slide, path);
+  }
+
+  function deleteTablePath(slide, path) {
+    slide.table = slide.table && typeof slide.table === "object" ? slide.table : {};
+    var table = slide.table;
+    if (path === "table") {
+      slide.table = { columns: [], rows: [] };
+      fallbackLayout(slide, ["table"]);
+      clearPathDecorationPrefix(slide, "table");
+      return;
+    }
+    deleteNestedPathValue(slide, path);
+    clearPathDecoration(slide, path);
+    if (Array.isArray(table.columns) && table.columns.every(function (column) { return !String(column || "").trim(); })) {
+      table.columns = [];
+    }
+    if (Array.isArray(table.rows) && table.rows.every(function (row) {
+      return Array.isArray(row) && row.every(function (cell) { return !String(cell || "").trim(); });
+    })) {
+      table.rows = [];
+    }
+  }
+
+  function deleteNestedPathValue(root, path) {
+    setPath(root, path, "");
+  }
+
+  function fallbackLayout(slide, layouts) {
+    if (layouts.indexOf(slide.layout) !== -1) slide.layout = "text";
+  }
+
+  function clearPathDecoration(slide, path) {
+    var changed = false;
+    ["canvas", "styles"].forEach(function (key) {
+      var map = slide[key] && typeof slide[key] === "object" ? slide[key] : {};
+      if (Object.prototype.hasOwnProperty.call(map, path)) {
+        delete map[path];
+        changed = true;
+      }
+      if (!Object.keys(map).length) delete slide[key];
+    });
+    return changed;
+  }
+
+  function clearPathDecorationPrefix(slide, prefix) {
+    var changed = false;
+    ["canvas", "styles"].forEach(function (key) {
+      var map = slide[key] && typeof slide[key] === "object" ? slide[key] : {};
+      Object.keys(map).forEach(function (path) {
+        if (path === prefix || path.indexOf(prefix + ".") === 0) {
+          delete map[path];
+          changed = true;
+        }
+      });
+      if (!Object.keys(map).length) delete slide[key];
+    });
+    return changed;
+  }
+
+  function cleanupPathMap(slide, key) {
+    if (slide[key] && typeof slide[key] === "object" && !Object.keys(slide[key]).length) delete slide[key];
   }
 
   function uniqueNumbers(values) {
     var unique = [];
     values.forEach(function (value) {
       if (value >= 0 && unique.indexOf(value) === -1) unique.push(value);
+    });
+    return unique;
+  }
+
+  function uniqueStrings(values) {
+    var unique = [];
+    values.forEach(function (value) {
+      var text = String(value || "");
+      if (text && unique.indexOf(text) === -1) unique.push(text);
     });
     return unique;
   }
@@ -4738,7 +6466,274 @@
     }
     commitSelectedObjectMutation(function (object) {
       object.data = parsed && typeof parsed === "object" ? parsed : {};
+      if (object.type === "table") fitTableObjectToData(object, { growOnly: true });
     });
+  }
+
+  function selectedTableInfo() {
+    var slide = currentSlide();
+    var parsed = parseTablePath(selectedCanvasPath);
+
+    if (parsed && parsed.kind === "object") {
+      var objects = Array.isArray(slide.objects) ? slide.objects : [];
+      var object = objects[parsed.objectIndex];
+      if (object && object.type === "table") {
+        object.data = object.data && typeof object.data === "object" ? object.data : {};
+        return Object.assign(parsed, {
+          table: object.data,
+          object: object,
+          path: "objects." + parsed.objectIndex + ".data"
+        });
+      }
+    }
+
+    var objectInfo = selectedObjectInfo();
+    if (objectInfo && objectInfo.object && objectInfo.object.type === "table") {
+      objectInfo.object.data = objectInfo.object.data && typeof objectInfo.object.data === "object" ? objectInfo.object.data : {};
+      return {
+        kind: "object",
+        objectIndex: objectInfo.index,
+        rowIndex: -1,
+        columnIndex: -1,
+        table: objectInfo.object.data,
+        object: objectInfo.object,
+        path: objectInfo.path + ".data"
+      };
+    }
+
+    if ((parsed && parsed.kind === "slide") || slide.layout === "table") {
+      slide.table = slide.table && typeof slide.table === "object" ? slide.table : { columns: [], rows: [] };
+      return Object.assign(parsed || {
+        kind: "slide",
+        rowIndex: -1,
+        columnIndex: -1
+      }, {
+        table: slide.table,
+        path: "table"
+      });
+    }
+
+    return null;
+  }
+
+  function selectedExplicitTableInfo() {
+    var parsed = parseTablePath(selectedCanvasPath);
+    if (parsed) return selectedTableInfo();
+    var objectInfo = selectedObjectInfo();
+    if (objectInfo && objectInfo.object && objectInfo.object.type === "table") return selectedTableInfo();
+    return null;
+  }
+
+  function parseTablePath(path) {
+    var value = String(path || "");
+    var objectColumn = value.match(/^objects\.(\d+)\.data\.columns\.(\d+)$/);
+    if (objectColumn) {
+      return {
+        kind: "object",
+        objectIndex: Number(objectColumn[1]),
+        rowIndex: -1,
+        columnIndex: Number(objectColumn[2])
+      };
+    }
+    var objectCell = value.match(/^objects\.(\d+)\.data\.rows\.(\d+)\.(\d+)$/);
+    if (objectCell) {
+      return {
+        kind: "object",
+        objectIndex: Number(objectCell[1]),
+        rowIndex: Number(objectCell[2]),
+        columnIndex: Number(objectCell[3])
+      };
+    }
+    var slideColumn = value.match(/^table\.columns\.(\d+)$/);
+    if (slideColumn) {
+      return {
+        kind: "slide",
+        rowIndex: -1,
+        columnIndex: Number(slideColumn[1])
+      };
+    }
+    var slideCell = value.match(/^table\.rows\.(\d+)\.(\d+)$/);
+    if (slideCell) {
+      return {
+        kind: "slide",
+        rowIndex: Number(slideCell[1]),
+        columnIndex: Number(slideCell[2])
+      };
+    }
+    if (value === "table") {
+      return {
+        kind: "slide",
+        rowIndex: -1,
+        columnIndex: -1
+      };
+    }
+    return null;
+  }
+
+  function isTableCellPath(path) {
+    return /^(?:table\.(?:columns\.\d+|rows\.\d+\.\d+)|objects\.\d+\.data\.(?:columns\.\d+|rows\.\d+\.\d+))$/.test(String(path || ""));
+  }
+
+  function tableScopeKey(info) {
+    if (!info) return "";
+    return info.kind === "object" ? "object:" + info.objectIndex : "slide";
+  }
+
+  function sameTableScope(path, candidatePath) {
+    var source = parseTablePath(path);
+    var candidate = parseTablePath(candidatePath);
+    return Boolean(source && candidate && tableScopeKey(source) === tableScopeKey(candidate));
+  }
+
+  function normalizeEditableTable(table) {
+    table.columns = Array.isArray(table.columns) ? table.columns.map(function (cell) {
+      return String(cell == null ? "" : cell);
+    }) : [];
+    table.rows = Array.isArray(table.rows) ? table.rows.map(function (row) {
+      return Array.isArray(row) ? row.map(function (cell) {
+        return String(cell == null ? "" : cell);
+      }) : [];
+    }) : [];
+
+    var columnCount = table.columns.length;
+    table.rows.forEach(function (row) {
+      columnCount = Math.max(columnCount, row.length);
+    });
+    columnCount = Math.max(1, columnCount);
+
+    while (table.columns.length < columnCount) table.columns.push("");
+    table.rows.forEach(function (row) {
+      while (row.length < columnCount) row.push("");
+      if (row.length > columnCount) row.length = columnCount;
+    });
+    if (!table.rows.length) table.rows.push(new Array(columnCount).fill(""));
+    return columnCount;
+  }
+
+  function mutateSelectedTable(action) {
+    var info = selectedTableInfo();
+    if (!info) return false;
+    var before = JSON.stringify(deck);
+    var table = info.table;
+    var columnCount = normalizeEditableTable(table);
+    var rowIndex = info.rowIndex >= 0 ? info.rowIndex : (info.columnIndex >= 0 ? 0 : table.rows.length - 1);
+    var columnIndex = info.columnIndex >= 0 ? info.columnIndex : (info.rowIndex >= 0 ? 0 : columnCount - 1);
+    var nextPath = "";
+
+    if (action === "addRow" || action === "addRowAfter" || action === "addRowBefore") {
+      var insertRow = action === "addRowBefore" ? rowIndex : rowIndex + 1;
+      if (info.rowIndex < 0 && info.columnIndex >= 0 && action !== "addRowBefore") insertRow = 0;
+      insertRow = clamp(insertRow, 0, table.rows.length);
+      table.rows.splice(insertRow, 0, new Array(columnCount).fill(""));
+      nextPath = tableCellPath(info, insertRow, Math.max(0, columnIndex));
+    }
+
+    if (action === "deleteRow") {
+      if (table.rows.length <= 1) {
+        table.rows[0] = new Array(columnCount).fill("");
+        nextPath = tableCellPath(info, 0, Math.max(0, columnIndex));
+      } else {
+        var removeRow = clamp(rowIndex, 0, table.rows.length - 1);
+        table.rows.splice(removeRow, 1);
+        nextPath = tableCellPath(info, Math.min(removeRow, table.rows.length - 1), Math.max(0, columnIndex));
+      }
+    }
+
+    if (action === "addColumn" || action === "addColumnAfter" || action === "addColumnBefore") {
+      var insertColumn = action === "addColumnBefore" ? columnIndex : columnIndex + 1;
+      insertColumn = clamp(insertColumn, 0, columnCount);
+      table.columns.splice(insertColumn, 0, "");
+      table.rows.forEach(function (row) {
+        row.splice(insertColumn, 0, "");
+      });
+      nextPath = tableCellPath(info, Math.max(0, rowIndex), insertColumn);
+    }
+
+    if (action === "deleteColumn") {
+      if (columnCount <= 1) {
+        table.columns[0] = "";
+        table.rows.forEach(function (row) { row[0] = ""; });
+        nextPath = tableCellPath(info, Math.max(0, rowIndex), 0);
+      } else {
+        var removeColumn = clamp(columnIndex, 0, columnCount - 1);
+        table.columns.splice(removeColumn, 1);
+        table.rows.forEach(function (row) {
+          row.splice(removeColumn, 1);
+        });
+        nextPath = tableCellPath(info, Math.max(0, rowIndex), Math.min(removeColumn, columnCount - 2));
+      }
+    }
+
+    if (action === "clearCell" && isTableCellPath(selectedCanvasPath)) {
+      setPath(currentSlide(), selectedCanvasPath, "");
+      nextPath = selectedCanvasPath;
+    }
+
+    normalizeEditableTable(table);
+    if (info.kind === "object" && info.object) {
+      fitTableObjectToData(info.object, { growOnly: action.indexOf("delete") !== 0 });
+    }
+    if (before === JSON.stringify(deck)) return false;
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    if (nextPath) setCanvasSelection([nextPath]);
+    markDirty();
+    renderAll();
+    updateFileStatus();
+    persist();
+    toast(t("toast.tableChanged"));
+    return true;
+  }
+
+  function tableCellPath(info, rowIndex, columnIndex) {
+    var prefix = info.kind === "object" ? "objects." + info.objectIndex + ".data." : "table.";
+    if (rowIndex < 0) return prefix + "columns." + Math.max(0, columnIndex);
+    return prefix + "rows." + Math.max(0, rowIndex) + "." + Math.max(0, columnIndex);
+  }
+
+  function fitTableObjectToData(object, options) {
+    if (!object || object.type !== "table") return false;
+    var size = tableObjectSize(object.data);
+    var growOnly = !options || options.growOnly !== false;
+    var next = clampObjectInsideSlide({
+      x: Number(object.x) || 0,
+      y: Number(object.y) || 0,
+      w: growOnly ? Math.max(Number(object.w) || 0, size.w) : size.w,
+      h: growOnly ? Math.max(Number(object.h) || 0, size.h) : size.h
+    });
+    var changed = Math.round(object.x) !== Math.round(next.x)
+      || Math.round(object.y) !== Math.round(next.y)
+      || Math.round(object.w) !== Math.round(next.w)
+      || Math.round(object.h) !== Math.round(next.h);
+    object.x = Math.round(next.x);
+    object.y = Math.round(next.y);
+    object.w = Math.round(next.w);
+    object.h = Math.round(next.h);
+    return changed;
+  }
+
+  function fitTableObjectForPath(path, options) {
+    var index = objectIndexFromAnyPath(path);
+    if (index < 0) return false;
+    var object = (currentSlide().objects || [])[index];
+    return fitTableObjectToData(object, options);
+  }
+
+  function clearSelectedTableCell() {
+    if (!isTableCellPath(selectedCanvasPath)) return false;
+    var before = JSON.stringify(deck);
+    setPath(currentSlide(), selectedCanvasPath, "");
+    if (before === JSON.stringify(deck)) return false;
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+    return true;
   }
 
   function moveSelectedObjectLayer(action) {
@@ -4783,6 +6778,69 @@
     return changed;
   }
 
+  function handleSlideListContextMenu(event) {
+    var thumb = event.target.closest(".slide-thumb");
+    if (!thumb || !els.slideList.contains(thumb)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    hideTooltip();
+    var index = Number(thumb.dataset.slideIndex);
+    if (!isFinite(index)) return;
+    selectSlide(index, { focusThumb: true });
+    showSlideContextMenu(event.clientX, event.clientY, index);
+  }
+
+  function showSlideContextMenu(x, y, index) {
+    if (!els.slideContextMenu) return;
+    hideCanvasContextMenu();
+    slideContextIndex = clamp(Number(index), 0, deck.slides.length - 1);
+    updateSlideContextMenuState();
+    els.slideContextMenu.hidden = false;
+    els.slideContextMenu.style.left = "0px";
+    els.slideContextMenu.style.top = "0px";
+    var rect = els.slideContextMenu.getBoundingClientRect();
+    var left = clamp(x, 8, Math.max(8, window.innerWidth - rect.width - 8));
+    var top = clamp(y, 8, Math.max(8, window.innerHeight - rect.height - 8));
+    els.slideContextMenu.style.left = Math.round(left) + "px";
+    els.slideContextMenu.style.top = Math.round(top) + "px";
+  }
+
+  function hideSlideContextMenu() {
+    slideContextIndex = -1;
+    if (els.slideContextMenu) els.slideContextMenu.hidden = true;
+  }
+
+  function updateSlideContextMenuState() {
+    if (!els.slideContextMenu) return;
+    var index = slideContextIndex >= 0 ? slideContextIndex : currentIndex;
+    Array.prototype.forEach.call(els.slideContextMenu.querySelectorAll("[data-slide-action]"), function (button) {
+      var action = button.getAttribute("data-slide-action");
+      var enabled = true;
+      if (action === "paste") enabled = Boolean(slideClipboard);
+      if (action === "moveUp") enabled = index > 0;
+      if (action === "moveDown") enabled = index < deck.slides.length - 1;
+      if (action === "delete") enabled = deck.slides.length > 1;
+      button.disabled = !enabled;
+    });
+  }
+
+  function handleSlideContextMenuAction(event) {
+    var button = event.target.closest("[data-slide-action]");
+    if (!button || button.disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var action = button.getAttribute("data-slide-action");
+    var index = slideContextIndex >= 0 ? slideContextIndex : currentIndex;
+    if (action === "new") addSlideAfter(index, { focusThumb: true });
+    if (action === "duplicate") duplicateSlideAt(index, { focusThumb: true });
+    if (action === "copy") copySlideAt(index);
+    if (action === "paste") pasteSlideAfter(index, { focusThumb: true });
+    if (action === "moveUp") moveSlideRelative(index, -1, { focusThumb: true });
+    if (action === "moveDown") moveSlideRelative(index, 1, { focusThumb: true });
+    if (action === "delete") deleteSlideAt(index, { focusThumb: true });
+    hideSlideContextMenu();
+  }
+
   function handleCanvasContextMenu(event) {
     if (presenting || activeCanvasEdit) return;
     event.preventDefault();
@@ -4802,6 +6860,7 @@
 
   function showCanvasContextMenu(x, y) {
     if (!els.canvasContextMenu) return;
+    hideSlideContextMenu();
     updateCanvasContextMenuState();
     els.canvasContextMenu.hidden = false;
     els.canvasContextMenu.style.left = "0px";
@@ -4822,12 +6881,30 @@
     if (!els.canvasContextMenu) return;
     var hasSelection = Boolean(selectedCanvasPath);
     var hasObject = Boolean(selectedObjectInfo());
+    var hasClipboardSource = Boolean(selectedObjectInfo() || selectedTextBoxInfo());
+    var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
+    var hasTable = Boolean(tableInfo);
+    var tableActions = [
+      "tableInsertRowAbove",
+      "tableInsertRowBelow",
+      "tableInsertColumnLeft",
+      "tableInsertColumnRight",
+      "tableDeleteRow",
+      "tableDeleteColumn",
+      "tableClearCell"
+    ];
+    Array.prototype.forEach.call(els.canvasContextMenu.querySelectorAll("[data-context-table]"), function (item) {
+      item.hidden = !hasTable;
+    });
     Array.prototype.forEach.call(els.canvasContextMenu.querySelectorAll("[data-context-action]"), function (button) {
       var action = button.getAttribute("data-context-action");
       var enabled = true;
       if (action === "paste") enabled = Boolean(canvasClipboard);
-      if (action === "copy" || action === "duplicate" || action === "delete") enabled = hasSelection;
+      if (action === "copy" || action === "duplicate") enabled = hasClipboardSource;
+      if (action === "delete") enabled = hasSelection;
       if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject;
+      if (tableActions.indexOf(action) !== -1) enabled = hasTable;
+      if (action === "tableClearCell") enabled = hasTable && isTableCellPath(selectedCanvasPath);
       button.disabled = !enabled;
     });
   }
@@ -4845,8 +6922,15 @@
     if (action === "sendBackward") moveSelectedObjectLayer("backward");
     if (action === "bringFront") moveSelectedObjectLayer("front");
     if (action === "sendBack") moveSelectedObjectLayer("back");
+    if (action === "tableInsertRowAbove") mutateSelectedTable("addRowBefore");
+    if (action === "tableInsertRowBelow") mutateSelectedTable("addRowAfter");
+    if (action === "tableInsertColumnLeft") mutateSelectedTable("addColumnBefore");
+    if (action === "tableInsertColumnRight") mutateSelectedTable("addColumnAfter");
+    if (action === "tableDeleteRow") mutateSelectedTable("deleteRow");
+    if (action === "tableDeleteColumn") mutateSelectedTable("deleteColumn");
+    if (action === "tableClearCell") mutateSelectedTable("clearCell");
     if (action === "delete") {
-      deleteSelectedObject() || deleteSelectedTextBox() || resetSelectedCanvasOffset();
+      deleteSelectedCanvasContent();
     }
     hideCanvasContextMenu();
   }
@@ -4923,14 +7007,15 @@
     var map = slide[key] && typeof slide[key] === "object" ? slide[key] : {};
     var nextMap = {};
     Object.keys(map).forEach(function (path) {
-      var match = path.match(/^objects\.(\d+)$/);
+      var match = path.match(/^objects\.(\d+)(.*)$/);
       if (!match) {
         nextMap[path] = map[path];
         return;
       }
       var index = Number(match[1]);
       if (index === removedIndex) return;
-      var nextPath = index > removedIndex ? "objects." + (index - 1) : path;
+      var suffix = match[2] || "";
+      var nextPath = index > removedIndex ? "objects." + (index - 1) + suffix : path;
       nextMap[nextPath] = map[path];
     });
     if (Object.keys(nextMap).length) slide[key] = nextMap;
@@ -4961,6 +7046,7 @@
   }
 
   function currentFrameScale() {
+    if (els.stageFrame) return canvasZoom || canvasFitScale || 1;
     var transform = window.getComputedStyle(els.stageFrame).transform;
     if (!transform || transform === "none") return 1;
     try {
@@ -5038,6 +7124,17 @@
     };
   }
 
+  function clampObjectInsideSlide(geometry) {
+    var w = Math.min(PPTHtml.baseWidth - 64, Math.max(44, Number(geometry.w) || 44));
+    var h = Math.min(PPTHtml.baseHeight - 72, Math.max(24, Number(geometry.h) || 24));
+    return {
+      x: clamp(Number(geometry.x) || 0, 32, PPTHtml.baseWidth - w - 32),
+      y: clamp(Number(geometry.y) || 0, 36, PPTHtml.baseHeight - h - 36),
+      w: w,
+      h: h
+    };
+  }
+
   function textBoxIndexFromPath(path) {
     var match = String(path || "").match(/^textBoxes\.(\d+)\.text$/);
     return match ? Number(match[1]) : -1;
@@ -5045,6 +7142,11 @@
 
   function objectIndexFromPath(path) {
     var match = String(path || "").match(/^objects\.(\d+)$/);
+    return match ? Number(match[1]) : -1;
+  }
+
+  function objectIndexFromAnyPath(path) {
+    var match = String(path || "").match(/^objects\.(\d+)(?:\.|$)/);
     return match ? Number(match[1]) : -1;
   }
 
@@ -5264,6 +7366,24 @@
 
   function handleCanvasEditKeydown(event) {
     if (!activeCanvasEdit) return;
+    if (isTableCellPath(activeCanvasEdit.path)) {
+      if (event.key === "Tab") {
+        var tabPath = activeCanvasEdit.path;
+        event.preventDefault();
+        event.stopPropagation();
+        finishCanvasEdit(true);
+        focusAdjacentTableCell(tabPath, event.shiftKey ? -1 : 1);
+        return;
+      }
+      if (event.key === "Enter" && !event.metaKey && !event.ctrlKey) {
+        var enterPath = activeCanvasEdit.path;
+        event.preventDefault();
+        event.stopPropagation();
+        finishCanvasEdit(true);
+        focusVerticalTableCell(enterPath, event.shiftKey ? -1 : 1);
+        return;
+      }
+    }
     if (event.key === "Escape") {
       event.preventDefault();
       event.stopPropagation();
@@ -5275,6 +7395,45 @@
       event.stopPropagation();
       finishCanvasEdit(true);
     }
+  }
+
+  function focusAdjacentTableCell(path, step) {
+    focusTableCellAfterRender(function () {
+      var nodes = tableCellEditNodes(path);
+      var index = nodes.findIndex(function (node) {
+        return node.getAttribute("data-canvas-edit") === path;
+      });
+      if (index === -1 || !nodes.length) return null;
+      return nodes[clamp(index + step, 0, nodes.length - 1)];
+    });
+  }
+
+  function focusVerticalTableCell(path, rowStep) {
+    var parsed = parseTablePath(path);
+    if (!parsed || parsed.rowIndex < 0) {
+      focusAdjacentTableCell(path, rowStep > 0 ? 1 : -1);
+      return;
+    }
+    var nextPath = tableCellPath(parsed, parsed.rowIndex + rowStep, parsed.columnIndex);
+    focusTableCellAfterRender(function () {
+      return canvasNodeByPath(nextPath) || canvasNodeByPath(path);
+    });
+  }
+
+  function focusTableCellAfterRender(resolver) {
+    window.setTimeout(function () {
+      var node = resolver();
+      if (!node) return;
+      selectCanvasTarget(node);
+      startCanvasEdit(node);
+    }, 0);
+  }
+
+  function tableCellEditNodes(scopePath) {
+    return Array.prototype.filter.call(els.stageFrame.querySelectorAll("[data-canvas-edit]"), function (node) {
+      var path = node.getAttribute("data-canvas-edit");
+      return isTableCellPath(path) && (!scopePath || sameTableScope(scopePath, path));
+    });
   }
 
   function handleCanvasEditBlur() {
@@ -5315,6 +7474,7 @@
     if (history.length > 80) history.shift();
     future = [];
     setPath(currentSlide(), edit.path, value);
+    if (isTableCellPath(edit.path)) fitTableObjectForPath(edit.path, { growOnly: true });
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderAll();
@@ -5531,7 +7691,7 @@
   function createNewDeck() {
     commitActiveCanvasEdit();
     if (!confirmDiscard()) return;
-    replaceDeck(PPTHtml.createDemoDeck(), { filePath: "", dirty: true, keepHistory: false });
+    replaceDeck(PPTHtml.createBlankDeck(), { filePath: "", dirty: true, keepHistory: false });
     toast(t("toast.newDeck"));
   }
 
@@ -5784,9 +7944,16 @@
     var availableHeight = viewport.clientHeight - 16;
     var scale = Math.min(availableWidth / PPTHtml.baseWidth, availableHeight / PPTHtml.baseHeight);
     scale = Math.max(0.1, Math.min(scale, 1.3));
-    frame.style.width = PPTHtml.baseWidth + "px";
-    frame.style.height = PPTHtml.baseHeight + "px";
-    frame.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
+    canvasFitScale = scale;
+    if (canvasZoomMode === "fit") {
+      canvasZoom = scale;
+      canvasPanX = 0;
+      canvasPanY = 0;
+    } else {
+      canvasZoom = clamp(canvasZoom || scale, 0.18, 2.5);
+      clampCanvasPan();
+    }
+    applyCanvasFrameTransform();
   }
 
   function fitPresentationFrame(frame, viewport) {
@@ -5850,6 +8017,7 @@
 
   function togglePresenterFullscreen(event) {
     if (!presenting) return;
+    window.clearTimeout(presenterClickTimer);
     if (event && event.target && event.target.closest(".presenter-controls")) return;
     showPresenterChrome();
 
@@ -5867,6 +8035,53 @@
     exitPresenterFullscreen();
   }
 
+  function handlePresenterPointerMove(event) {
+    if (isTouchPortraitPresenterEvent(event)) return;
+    showPresenterChrome();
+  }
+
+  function handlePresenterPointerDown(event) {
+    if (!presenting) return;
+    if (event && event.target && event.target.closest(".presenter-controls")) {
+      showPresenterChrome();
+      return;
+    }
+    if (isTouchPortraitPresenterEvent(event)) {
+      togglePresenterChrome();
+      return;
+    }
+    showPresenterChrome();
+  }
+
+  function handlePresenterClick(event) {
+    if (!presenting) return;
+    if (event.target.closest(".presenter-controls, video, audio, a, button")) return;
+    window.clearTimeout(presenterClickTimer);
+    presenterClickTimer = window.setTimeout(function () {
+      if (presenting) showPresentationSlide(presentIndex + 1);
+    }, 180);
+  }
+
+  function isTouchPortraitPresenterEvent(event) {
+    return event
+      && event.pointerType === "touch"
+      && (window.matchMedia
+        ? window.matchMedia("(orientation: portrait)").matches
+        : window.innerHeight >= window.innerWidth);
+  }
+
+  function togglePresenterChrome() {
+    if (!presenting) return;
+    if (els.presenter.classList.contains("is-ui-hidden")) showPresenterChrome();
+    else hidePresenterChrome();
+  }
+
+  function hidePresenterChrome() {
+    if (!presenting) return;
+    window.clearTimeout(presenterUiTimer);
+    els.presenter.classList.add("is-ui-hidden");
+  }
+
   function showPresenterChrome() {
     if (!presenting) return;
     window.clearTimeout(presenterUiTimer);
@@ -5874,6 +8089,31 @@
     presenterUiTimer = window.setTimeout(function () {
       if (presenting) els.presenter.classList.add("is-ui-hidden");
     }, 1800);
+  }
+
+  function setPresenterBlankMode(mode) {
+    presenterBlankMode = presenterBlankMode === mode ? "" : mode;
+    els.presenter.classList.toggle("is-blank-black", presenterBlankMode === "black");
+    els.presenter.classList.toggle("is-blank-white", presenterBlankMode === "white");
+  }
+
+  function clearPresenterJumpBuffer() {
+    presenterJumpBuffer = "";
+    window.clearTimeout(presenterJumpTimer);
+  }
+
+  function appendPresenterJumpDigit(digit) {
+    presenterJumpBuffer = (presenterJumpBuffer + digit).slice(-3);
+    window.clearTimeout(presenterJumpTimer);
+    presenterJumpTimer = window.setTimeout(clearPresenterJumpBuffer, 1800);
+  }
+
+  function jumpPresenterFromBuffer() {
+    var page = Number(presenterJumpBuffer);
+    clearPresenterJumpBuffer();
+    if (!isFinite(page) || page < 1) return false;
+    showPresentationSlide(page - 1);
+    return true;
   }
 
   function handleDocumentFullscreenChange() {
@@ -5887,10 +8127,13 @@
     commitActiveCanvasEdit();
     presenting = true;
     presentIndex = index || 0;
+    presenterBlankMode = "";
+    clearPresenterJumpBuffer();
+    els.presenter.classList.remove("is-blank-black", "is-blank-white");
     els.presenter.hidden = false;
     showPresentationSlide(presentIndex, { instant: true });
     document.body.classList.add("is-presenting");
-    showPresenterChrome();
+    hidePresenterChrome();
     requestPresenterFullscreen();
   }
 
@@ -5956,8 +8199,11 @@
     presenting = false;
     window.clearTimeout(presenterUiTimer);
     window.clearTimeout(presenterTransitionTimer);
+    window.clearTimeout(presenterClickTimer);
+    clearPresenterJumpBuffer();
     els.presenter.hidden = true;
-    els.presenter.classList.remove("is-ui-hidden");
+    presenterBlankMode = "";
+    els.presenter.classList.remove("is-ui-hidden", "is-blank-black", "is-blank-white");
     els.presenterStage.classList.remove("is-transitioning", "is-animating");
     els.presenterStage.innerHTML = "";
     els.presenter.style.background = "";
@@ -5974,7 +8220,7 @@
     } catch (error) {
       localStorage.removeItem(STORAGE_KEY);
     }
-    return PPTHtml.normalizeDeck(PPTHtml.createDemoDeck());
+    return PPTHtml.normalizeDeck(PPTHtml.createBlankDeck());
   }
 
   function persist() {
@@ -6058,8 +8304,8 @@
   }
 
   function parseTableRows(text) {
-    return String(text || "").split(/\n+/).map(splitCells).filter(function (row) {
-      return row.length;
+    return String(text || "").split(/\n+/).map(splitTableCells).filter(function (row) {
+      return row.some(function (cell) { return cell !== ""; });
     });
   }
 
@@ -6073,6 +8319,14 @@
     return String(line || "").split("|").map(function (cell) {
       return cell.trim();
     }).filter(Boolean);
+  }
+
+  function splitTableCells(line) {
+    var value = String(line || "");
+    var delimiter = value.indexOf("\t") !== -1 ? "\t" : "|";
+    return value.split(delimiter).map(function (cell) {
+      return cell.trim();
+    });
   }
 
   function layoutLabel(value) {

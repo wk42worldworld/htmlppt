@@ -288,7 +288,7 @@ Element styles:
 }
 ```
 
-`styles` stores visual overrides for individual elements, using the same structured field paths. Allowed fields are `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, and `fontStyle`. Do not output free CSS, selectors, class names, or scripts. When repairing copy, preserve existing `styles` unless the user asks to clear styling or restore the default theme.
+`styles` stores visual overrides for individual elements, using the same structured field paths. Allowed fields are `fontFamily`, `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, and `fontStyle`. `fontFamily` must use one of `system`, `display`, `arial`, `helvetica`, `avenir`, `serif`, `georgia`, `times`, `cjk-sans`, `pingfang`, `yahei`, `cjk-serif`, `songti`, `kaiti`, `yu-mincho`, `mono`, `menlo`, `consolas`, or `handwriting`. Do not output free CSS, selectors, class names, or scripts. When repairing copy, preserve existing `styles` unless the user asks to clear styling or restore the default theme.
 
 ## 6. Recommended Generation Workflow
 

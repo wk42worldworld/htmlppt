@@ -234,6 +234,16 @@ assert.ok(slideNode.querySelector(".ppt-object-chart .ppt-chart-wrap"), "chart o
 assert.ok(slideNode.querySelector(".ppt-object-chart .ppt-chart"), "chart object should include svg chart output");
 assert.ok(slideNode.querySelector(".ppt-object-table .ppt-table"), "table object should render a table DOM subtree");
 assert.equal(slideNode.querySelector(".ppt-object-table td").textContent, "Alpha");
+assert.equal(
+  slideNode.querySelector(".ppt-object-table th").getAttribute("data-ppt-path"),
+  "objects.1.data.columns.0",
+  "object table header should use an object-scoped edit path"
+);
+assert.equal(
+  slideNode.querySelector(".ppt-object-table td").getAttribute("data-ppt-path"),
+  "objects.1.data.rows.0.0",
+  "object table cell should use an object-scoped edit path"
+);
 assert.ok(slideNode.querySelector(".ppt-object-image .ppt-media img"), "image object should render an img in media DOM");
 assert.equal(slideNode.querySelector(".ppt-object-image .ppt-caption").textContent, "Image object");
 assert.ok(slideNode.querySelector(".ppt-object-shape .ppt-shape"), "shape object should render a shape DOM subtree");
@@ -250,5 +260,154 @@ assert.match(standaloneHtml, /ty==='table'/);
 assert.match(standaloneHtml, /function shape\(d,j\)/);
 assert.match(standaloneHtml, /ty==='shape'/);
 assert.match(standaloneHtml, /else n\.appendChild\(e\('div','ppt-image-placeholder'/);
+
+const emptyTextBoxDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Empty text box deck",
+  slides: [
+    {
+      layout: "text",
+      title: "",
+      textBoxes: [
+        { id: "empty-textbox", text: "", x: 80, y: 120, w: 220, h: 72 }
+      ]
+    }
+  ]
+});
+assert.equal(emptyTextBoxDeck.slides[0].title, "", "explicitly empty titles should stay empty after normalizeDeck");
+
+const editableEmptySlide = ppt.renderSlide(emptyTextBoxDeck.slides[0], emptyTextBoxDeck, { index: 0, editable: true });
+const editableEmptyBox = editableEmptySlide.querySelector(".ppt-textbox");
+assert.ok(editableEmptyBox, "editable render should keep an empty textbox selectable");
+assert.equal(editableEmptyBox.textContent, "");
+assert.equal(editableEmptyBox.getAttribute("data-placeholder"), "Text");
+assert.equal(editableEmptyBox.getAttribute("data-ppt-path"), "textBoxes.0.text");
+assert.ok(editableEmptyBox.classList.contains("is-empty-textbox"));
+
+const readonlyEmptySlide = ppt.renderSlide(emptyTextBoxDeck.slides[0], emptyTextBoxDeck, { index: 0 });
+assert.equal(readonlyEmptySlide.querySelectorAll(".ppt-textbox").length, 0, "export/player render should still hide empty textboxes");
+
+const emptyChartDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Empty chart deck",
+  slides: [
+    {
+      layout: "chart",
+      title: "Chart placeholder",
+      chart: { kind: "bar", labels: [], series: [] }
+    }
+  ]
+});
+const emptyChartNode = ppt.renderSlide(emptyChartDeck.slides[0], emptyChartDeck, { index: 0 }).querySelector(".ppt-chart-empty");
+assert.ok(emptyChartNode, "empty chart should render a selectable placeholder");
+assert.equal(emptyChartNode.getAttribute("data-ppt-path"), "chart");
+
+const largeTableRows = Array.from({ length: 10 }, (_item, index) => [`Row ${index + 1}`, `Value ${index + 1}`]);
+const largeTableDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Large table deck",
+  slides: [
+    {
+      layout: "table",
+      title: "Full table",
+      table: {
+        columns: ["Name", "Value"],
+        rows: largeTableRows
+      },
+      objects: [
+        {
+          id: "large-object-table",
+          type: "table",
+          x: 80,
+          y: 100,
+          w: 520,
+          h: 360,
+          data: {
+            columns: ["Name", "Value"],
+            rows: largeTableRows
+          }
+        }
+      ]
+    }
+  ]
+});
+const largeTableNode = ppt.renderSlide(largeTableDeck.slides[0], largeTableDeck, { index: 0 });
+assert.equal(
+  largeTableNode.querySelectorAll(".ppt-object-table tbody tr").length,
+  10,
+  "object table rendering should not truncate rows"
+);
+assert.equal(
+  largeTableNode.querySelectorAll(".ppt-table tbody tr").length,
+  20,
+  "page and object table rendering should keep all rows"
+);
+assert.ok(largeTableNode.textContent.includes("Row 10"), "page table rendering should include the last row");
+const largeTableStandalone = ppt.exportStandalone(largeTableDeck);
+assert.match(largeTableStandalone, /arr\(t\.rows\)\.forEach/);
+assert.match(largeTableStandalone, /arr\(\(s\.table\|\|\{\}\)\.rows\)\.forEach/);
+assert.doesNotMatch(largeTableStandalone, /arr\(t\.rows\)\.slice\(0,8\)/);
+assert.doesNotMatch(largeTableStandalone, /arr\(\(s\.table\|\|\{\}\)\.rows\)\.slice\(0,6\)/);
+
+const defaultSizedTableDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Default object sizing",
+  slides: [
+    {
+      layout: "text",
+      title: "Object table",
+      objects: [
+        {
+          id: "default-table",
+          type: "table",
+          data: {
+            columns: ["Dimension", "Option A", "Option B", "Recommendation"],
+            rows: [
+              ["Cost", "Low", "Medium", "Option A"],
+              ["Speed", "Fast", "Medium", "Option A"],
+              ["Scale", "Medium", "High", "Option B"]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+});
+const defaultSizedTableNode = ppt.renderSlide(defaultSizedTableDeck.slides[0], defaultSizedTableDeck, { index: 0 })
+  .querySelector(".ppt-object-table");
+const defaultTableWidth = Number.parseInt(defaultSizedTableNode.style.width, 10);
+const defaultTableHeight = Number.parseInt(defaultSizedTableNode.style.height, 10);
+assert.ok(defaultTableWidth >= 720, "default table object should be wide enough for four columns");
+assert.ok(defaultTableHeight >= 200, "default table object should be tall enough for header and rows");
+assert.ok(defaultTableHeight <= 260, "default table object should not reserve a large empty box for a short table");
+
+const longTextTableDeck = ppt.normalizeDeck({
+  version: "0.1",
+  title: "Long cell sizing",
+  slides: [
+    {
+      layout: "text",
+      title: "Long table",
+      objects: [
+        {
+          id: "long-table",
+          type: "table",
+          data: {
+            columns: ["Decision", "Owner"],
+            rows: [
+              ["A deliberately long table cell should make the default object taller instead of clipping content", "Product"]
+            ]
+          }
+        }
+      ]
+    }
+  ]
+});
+const longTextTableNode = ppt.renderSlide(longTextTableDeck.slides[0], longTextTableDeck, { index: 0 })
+  .querySelector(".ppt-object-table");
+assert.ok(
+  Number.parseInt(longTextTableNode.style.height, 10) > defaultTableHeight,
+  "long table content should increase the default object height"
+);
 
 console.log("object smoke tests passed");

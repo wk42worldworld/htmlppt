@@ -8,7 +8,7 @@
   var CHART_KINDS = ["bar", "line", "donut"];
   var SHAPE_KINDS = ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"];
   var TRANSITIONS = ["none", "fade", "slide", "push", "zoom"];
-  var STANDALONE_FAVICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><defs><linearGradient id=\"g\" x1=\"8\" y1=\"6\" x2=\"56\" y2=\"58\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#121a23\"/><stop offset=\".62\" stop-color=\"#0f8b8d\"/><stop offset=\"1\" stop-color=\"#356dff\"/></linearGradient></defs><rect width=\"64\" height=\"64\" rx=\"14\" fill=\"url(#g)\"/><rect x=\"12\" y=\"12\" width=\"40\" height=\"38\" rx=\"7\" fill=\"#f8fbff\"/><rect x=\"16\" y=\"16\" width=\"32\" height=\"7\" rx=\"3\" fill=\"#0f8b8d\"/><path d=\"m27 29-6 6 6 6m10-12 6 6-6 6\" fill=\"none\" stroke=\"#17202a\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M42 29 51 35 42 41z\" fill=\"#ffb000\"/></svg>";
+  var STANDALONE_FAVICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><rect width=\"64\" height=\"64\" rx=\"15\" fill=\"#0b1117\"/><path d=\"M18 11h21l9 9v33H18z\" fill=\"#f4fbfa\"/><path d=\"M39 11l9 9h-9z\" fill=\"#20d6c7\"/><rect x=\"23\" y=\"24\" width=\"30\" height=\"18\" rx=\"3\" fill=\"#111a22\"/><rect x=\"26\" y=\"28\" width=\"12\" height=\"2\" rx=\"1\" fill=\"#ffb000\"/><rect x=\"26\" y=\"33\" width=\"14\" height=\"1.7\" rx=\".85\" fill=\"#8da4ad\"/><rect x=\"26\" y=\"37\" width=\"10\" height=\"1.7\" rx=\".85\" fill=\"#8da4ad\"/><path d=\"M43 29l8 4.5-8 4.5z\" fill=\"#20d6c7\"/><rect x=\"23\" y=\"46\" width=\"15\" height=\"2.2\" rx=\"1.1\" fill=\"#20d6c7\"/></svg>";
   var STANDALONE_FAVICON = "data:image/svg+xml," + encodeURIComponent(STANDALONE_FAVICON_SVG);
 
   var LAYOUTS = [
@@ -49,20 +49,26 @@
     ".ppt-list li:before{content:'';position:absolute;left:0;top:14px;width:12px;height:12px;border-radius:50%;background:var(--ppt-accent)}",
     ".ppt-textbox{position:absolute;z-index:7;padding:14px 16px;border:1px solid var(--ppt-line);border-radius:8px;background:rgba(255,255,255,.88);color:var(--ppt-text);font-size:28px;line-height:1.26;font-weight:650;white-space:pre-wrap;box-shadow:0 14px 34px rgba(18,24,38,.14);backdrop-filter:blur(8px)}",
     ".ppt-theme-launch .ppt-textbox{background:rgba(35,35,35,.86);color:var(--ppt-text);box-shadow:0 14px 34px rgba(0,0,0,.28)}",
-    ".ppt-object{position:absolute;z-index:8;display:grid;overflow:hidden;border-radius:8px;color:var(--ppt-text)}",
+    ".ppt-object{position:absolute;z-index:8;display:grid;overflow:hidden;border-radius:8px;color:var(--ppt-text);contain:layout paint}",
     ".ppt-object>*{min-width:0;min-height:0}",
     ".ppt-object .ppt-media,.ppt-object .ppt-video,.ppt-object .ppt-audio{width:100%;height:100%;min-height:0;margin:0}",
     ".ppt-object .ppt-media img,.ppt-object .ppt-video video{height:100%;min-height:0}",
     ".ppt-object .ppt-chart-wrap{width:100%;height:100%;min-height:0;grid-template-columns:minmax(0,1fr) 178px;gap:14px}",
     ".ppt-object .ppt-chart{height:100%;min-height:0}",
     ".ppt-object .ppt-chart-legend{gap:8px}",
+    ".ppt-object .ppt-chart-legend-item{min-height:28px}",
     ".ppt-object .ppt-chart-legend-item strong{font-size:16px}",
     ".ppt-object .ppt-chart-legend-item small{font-size:13px}",
-    ".ppt-object .ppt-table{width:100%;height:100%;font-size:20px}",
-    ".ppt-object .ppt-card-grid,.ppt-object .ppt-metric-grid{height:100%;gap:12px}",
-    ".ppt-object .ppt-card,.ppt-object .ppt-metric{min-height:0;padding:20px}",
-    ".ppt-object .ppt-timeline{height:100%;gap:10px}",
-    ".ppt-object .ppt-code{width:100%;height:100%;margin:0;overflow:auto}",
+    ".ppt-object-table{align-content:start;overflow:visible;contain:layout}",
+    ".ppt-object .ppt-table{width:100%;height:auto;margin:0;table-layout:fixed;font-size:18px;line-height:1.22}",
+    ".ppt-object .ppt-table th,.ppt-object .ppt-table td{padding:10px 12px;overflow-wrap:anywhere;word-break:break-word}",
+    ".ppt-object .ppt-card-grid,.ppt-object .ppt-metric-grid{height:100%;gap:12px;margin:0}",
+    ".ppt-object .ppt-card,.ppt-object .ppt-metric{min-height:0;padding:18px}",
+    ".ppt-object .ppt-card h2{font-size:24px;line-height:1.15}.ppt-object .ppt-card p{font-size:17px;line-height:1.32}",
+    ".ppt-object .ppt-metric strong{font-size:42px}.ppt-object .ppt-metric span{font-size:19px}.ppt-object .ppt-metric p{font-size:15px;line-height:1.3}",
+    ".ppt-object .ppt-timeline{height:100%;gap:8px;margin:0}",
+    ".ppt-object .ppt-time-item{grid-template-columns:150px 1fr;gap:14px;padding:10px 0}.ppt-object .ppt-time-item h2{font-size:20px}.ppt-object .ppt-time-item p{font-size:17px;line-height:1.3}",
+    ".ppt-object .ppt-code{width:100%;height:100%;margin:0;padding:18px;font-size:17px;line-height:1.42;overflow:auto}",
     ".ppt-object-shape{overflow:visible;border-radius:0;font-size:24px;font-weight:700;text-align:center}",
     ".ppt-shape{position:relative;width:100%;height:100%;min-width:0;min-height:0;color:inherit}",
     ".ppt-shape svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}",
@@ -70,7 +76,7 @@
     ".ppt-shape-line .ppt-shape-text,.ppt-shape-arrow .ppt-shape-text{inset:0 12px;font-size:20px}",
     ".ppt-object-quote{align-content:center;padding:28px 34px;border:1px solid var(--ppt-line);background:var(--ppt-surface);box-shadow:0 14px 34px rgba(18,24,38,.12)}",
     ".ppt-object-quote .ppt-quote{font-size:30px;line-height:1.28}.ppt-object-quote .ppt-author{margin-top:18px;color:var(--ppt-muted);font-size:18px}",
-    ".ppt-object-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ppt-object-compare .ppt-compare-card{min-height:0;padding:20px}",
+    ".ppt-object-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ppt-object-compare .ppt-compare-card{min-height:0;padding:20px}.ppt-object-compare .ppt-compare-card h2{font-size:24px;line-height:1.15}.ppt-object-compare .ppt-compare-card p{font-size:18px;line-height:1.32}",
     ".ppt-media{position:relative;overflow:hidden;margin:0;border-radius:8px;background:var(--ppt-surface);border:1px solid var(--ppt-line);min-height:260px}",
     ".ppt-media img{display:block;width:100%;height:100%;object-fit:cover}",
     ".ppt-media[data-fit='contain'] img{object-fit:contain;background:var(--ppt-surface)}",
@@ -185,6 +191,32 @@
     return value == null ? "" : String(value);
   }
 
+  function stripEditorInstructionText(value) {
+    var text = safeText(value);
+    var normalized = text.replace(/\s+/g, " ").trim().toLowerCase();
+    if (!normalized) return "";
+    var hints = [
+      "双击文字可以直接编辑；拖拽文字块可以移动位置。",
+      "双击图片可替换本地文件",
+      "双击视频可替换本地文件",
+      "双击音频可替换本地文件",
+      "double-click to edit",
+      "double-click text to edit it directly; drag text blocks to move them.",
+      "double-click the image to replace it",
+      "double-click the video to replace it",
+      "double-click the audio block to replace it",
+      "文字をダブルクリックして編集し、ドラッグして位置を調整できます。",
+      "画像をダブルクリックして差し替え",
+      "動画をダブルクリックして差し替え",
+      "音声をダブルクリックして差し替え",
+      "텍스트를 더블 클릭해 직접 편집하고 드래그해 위치를 옮길 수 있습니다.",
+      "이미지를 더블 클릭해 교체",
+      "비디오를 더블 클릭해 교체",
+      "오디오 블록을 더블 클릭해 교체"
+    ];
+    return hints.indexOf(normalized) === -1 ? text : "";
+  }
+
   function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
   }
@@ -193,7 +225,7 @@
     var image = rawImage && typeof rawImage === "object" ? clone(rawImage) : {};
     image.src = safeText(image.src);
     image.alt = safeText(image.alt);
-    image.caption = safeText(image.caption);
+    image.caption = stripEditorInstructionText(image.caption);
     image.fit = image.fit === "contain" ? "contain" : "cover";
     return image;
   }
@@ -202,7 +234,7 @@
     var video = rawVideo && typeof rawVideo === "object" ? clone(rawVideo) : {};
     video.src = safeText(video.src);
     video.poster = safeText(video.poster);
-    video.caption = safeText(video.caption);
+    video.caption = stripEditorInstructionText(video.caption);
     video.fit = video.fit === "contain" ? "contain" : "cover";
     video.controls = video.controls !== false;
     video.autoplay = Boolean(video.autoplay);
@@ -214,7 +246,7 @@
   function normalizeAudio(rawAudio) {
     var audio = rawAudio && typeof rawAudio === "object" ? clone(rawAudio) : {};
     audio.src = safeText(audio.src);
-    audio.caption = safeText(audio.caption);
+    audio.caption = stripEditorInstructionText(audio.caption);
     audio.controls = audio.controls !== false;
     audio.autoplay = Boolean(audio.autoplay);
     audio.loop = Boolean(audio.loop);
@@ -230,7 +262,7 @@
     var h = Number(box.h);
     return {
       id: safeText(box.id || "textbox-" + (index + 1)),
-      text: safeText(box.text == null ? "Double-click to edit" : box.text),
+      text: stripEditorInstructionText(box.text),
       x: isFinite(x) ? x : 730 + index * 28,
       y: isFinite(y) ? y : 430 + index * 30,
       w: isFinite(w) && w > 0 ? w : 380,
@@ -257,7 +289,7 @@
     var z = Number(object.zIndex);
     var rotation = Number(object.rotation);
     var data = normalizeObjectData(type, object.data);
-    var defaultSize = defaultObjectSize(type, data.kind);
+    var defaultSize = defaultObjectSize(type, data);
 
     return {
       id: safeText(object.id || "object-" + (index + 1)),
@@ -273,25 +305,98 @@
     };
   }
 
-  function defaultObjectSize(type, shapeKind) {
+  function defaultObjectSize(type, dataOrKind) {
+    var data = dataOrKind && typeof dataOrKind === "object" ? dataOrKind : {};
+    var shapeKind = typeof dataOrKind === "string" ? dataOrKind : data.kind;
+    if (type === "table") return tableObjectSize(data);
+    if (type === "chart") return chartObjectSize(data);
+    if (type === "cards") return groupObjectSize(data.cards, 800, 300, 3);
+    if (type === "metrics") return groupObjectSize(data.metrics, 800, 270, 3);
+    if (type === "timeline") return timelineObjectSize(data);
+    if (type === "compare") return compareObjectSize(data);
+    if (type === "code") return codeObjectSize(data);
     var sizes = {
       image: { w: 520, h: 300 },
       video: { w: 560, h: 320 },
       audio: { w: 520, h: 150 },
-      chart: { w: 640, h: 360 },
-      table: { w: 600, h: 280 },
-      cards: { w: 620, h: 260 },
-      metrics: { w: 620, h: 240 },
-      timeline: { w: 620, h: 300 },
       quote: { w: 560, h: 220 },
-      code: { w: 600, h: 260 },
-      compare: { w: 620, h: 260 }
     };
     if (type === "shape") {
       if (shapeKind === "line" || shapeKind === "arrow") return { w: 360, h: 64 };
       if (shapeKind === "callout") return { w: 360, h: 180 };
     }
     return sizes[type] || { w: 320, h: 180 };
+  }
+
+  function boundedObjectSize(width, height, minWidth, minHeight) {
+    return {
+      w: Math.round(clamp(width, minWidth || 240, BASE_WIDTH - 96)),
+      h: Math.round(clamp(height, minHeight || 120, BASE_HEIGHT - 96))
+    };
+  }
+
+  function tableObjectSize(data) {
+    var source = data && typeof data === "object" ? data : {};
+    var columns = asArray(source.columns);
+    var rows = asArray(source.rows);
+    var colCount = Math.max(1, columns.length);
+    var longest = columns.reduce(function (max, value) {
+      return Math.max(max, String(value || "").length);
+    }, 0);
+    rows.forEach(function (row) {
+      var cells = asArray(row);
+      colCount = Math.max(colCount, cells.length);
+      cells.forEach(function (value) {
+        longest = Math.max(longest, String(value || "").length);
+      });
+    });
+    var rowCount = rows.length + (columns.length ? 1 : 0);
+    var width = 104 + colCount * 150 + Math.min(150, longest * 4);
+    var cellBudget = Math.max(8, Math.floor((width - 48) / colCount / 9));
+    var rowLineCount = 0;
+    if (columns.length) {
+      rowLineCount += columns.reduce(function (max, value) {
+        return Math.max(max, Math.ceil(String(value || "").length / cellBudget) || 1);
+      }, 1);
+    }
+    rows.forEach(function (row) {
+      var cells = asArray(row);
+      rowLineCount += cells.reduce(function (max, value) {
+        return Math.max(max, Math.ceil(String(value || "").length / cellBudget) || 1);
+      }, 1);
+    });
+    return boundedObjectSize(width, 32 + Math.max(2, rowLineCount) * 42 + Math.max(0, rowCount - 1) * 4, Math.min(620, 150 + colCount * 135), 190);
+  }
+
+  function chartObjectSize(data) {
+    var kind = data && data.kind === "donut" ? "donut" : data && data.kind === "line" ? "line" : "bar";
+    var labels = data && Array.isArray(data.labels) ? data.labels.length : 0;
+    var series = data && Array.isArray(data.series) ? data.series.length : 0;
+    var legendCount = kind === "donut" ? labels : series;
+    return boundedObjectSize(760 + Math.max(0, legendCount - 3) * 24, kind === "donut" ? 390 : 380, 700, 340);
+  }
+
+  function groupObjectSize(items, baseWidth, baseHeight, expectedCount) {
+    var count = Math.max(expectedCount || 1, Array.isArray(items) ? items.length : 0);
+    return boundedObjectSize(baseWidth + Math.max(0, count - 3) * 120, baseHeight, baseWidth, baseHeight);
+  }
+
+  function timelineObjectSize(data) {
+    var items = data && Array.isArray(data.items) ? data.items : [];
+    var count = Math.max(3, Math.min(5, items.length || 3));
+    return boundedObjectSize(780, 112 + count * 62, 700, 300);
+  }
+
+  function compareObjectSize(data) {
+    var left = data && data.left ? data.left : {};
+    var right = data && data.right ? data.right : {};
+    var textLength = String(left.text || "").length + String(right.text || "").length;
+    return boundedObjectSize(780, 300 + Math.min(90, textLength * 0.8), 700, 300);
+  }
+
+  function codeObjectSize(data) {
+    var lines = String(data && data.code || "").split(/\r?\n/).length;
+    return boundedObjectSize(720, 120 + Math.max(3, lines) * 30, 600, 240);
   }
 
   function normalizeObjectData(type, rawData) {
@@ -519,15 +624,22 @@
     return stack;
   }
 
-  function appendTextBoxes(article, slide) {
+  function appendTextBoxes(article, slide, options) {
+    var editable = Boolean(options && options.editable);
     asArray(slide.textBoxes).forEach(function (item, index) {
       var box = normalizeTextBox(item, index);
+      if (!box.text.trim() && !editable) return;
       var node = el("div", "ppt-textbox", box.text);
+      if (!box.text.trim()) {
+        node.classList.add("is-empty-textbox");
+        node.setAttribute("data-placeholder", "Text");
+      }
       node.style.left = box.x + "px";
       node.style.top = box.y + "px";
       node.style.width = box.w + "px";
       node.style.minHeight = box.h + "px";
       node.setAttribute("data-textbox-id", box.id);
+      node.setAttribute("data-ppt-path", "textBoxes." + index + ".text");
       article.appendChild(node);
     });
   }
@@ -824,7 +936,9 @@
   function createChart(rawChart) {
     var chart = normalizeChart(rawChart);
     if (!chart.labels.length || !chart.series.length) {
-      return el("div", "ppt-chart-empty", "添加图表标签和数据后预览");
+      var empty = el("div", "ppt-chart-empty", "添加图表标签和数据后预览");
+      empty.setAttribute("data-ppt-path", "chart");
+      return empty;
     }
 
     var wrap = el("div", "ppt-chart-wrap ppt-chart-kind-" + chart.kind);
@@ -847,7 +961,7 @@
     table.appendChild(thead);
 
     var tbody = document.createElement("tbody");
-    asArray(source.rows).slice(0, 8).forEach(function (row) {
+    asArray(source.rows).forEach(function (row) {
       var tableRow = document.createElement("tr");
       asArray(row).forEach(function (cell) {
         tableRow.appendChild(el("td", "", cell));
@@ -944,6 +1058,21 @@
     if (node) node.setAttribute("data-ppt-path", path);
   }
 
+  function insidePptObject(node) {
+    var cursor = node;
+    while (cursor) {
+      if (cursor.classList && cursor.classList.contains("ppt-object")) return true;
+      cursor = cursor.parentNode;
+    }
+    return false;
+  }
+
+  function nonObjectNodes(article, selector) {
+    return Array.prototype.filter.call(article.querySelectorAll(selector), function (node) {
+      return !insidePptObject(node);
+    });
+  }
+
   function tagCanvasPaths(article, slide) {
     tagPath(article.querySelector(".ppt-kicker"), "kicker");
     tagPath(article.querySelector(".ppt-title"), "title");
@@ -960,7 +1089,7 @@
       tagPath(article.querySelector(".ppt-audio .ppt-caption"), "audio.caption");
     }
     tagPath(article.querySelector(".ppt-chart-wrap"), "chart");
-    tagPath(article.querySelector(".ppt-table"), "table");
+    tagPath(nonObjectNodes(article, ".ppt-table")[0], "table");
     tagPath(article.querySelector(".ppt-card-grid"), "cards");
     tagPath(article.querySelector(".ppt-metric-grid"), "metrics");
     tagPath(article.querySelector(".ppt-timeline"), "timeline");
@@ -969,6 +1098,16 @@
     });
     article.querySelectorAll(".ppt-object").forEach(function (node, index) {
       tagPath(node, "objects." + index);
+      if (node.getAttribute("data-object-type") === "table") {
+        node.querySelectorAll(".ppt-table th").forEach(function (cell, columnIndex) {
+          tagPath(cell, "objects." + index + ".data.columns." + columnIndex);
+        });
+        node.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+          row.querySelectorAll("td").forEach(function (cell, columnIndex) {
+            tagPath(cell, "objects." + index + ".data.rows." + rowIndex + "." + columnIndex);
+          });
+        });
+      }
     });
 
     if (slide.layout === "quote") {
@@ -998,10 +1137,10 @@
       tagPath(metric.querySelector("span"), "metrics." + index + ".label");
       tagPath(metric.querySelector("p"), "metrics." + index + ".detail");
     });
-    article.querySelectorAll(".ppt-table th").forEach(function (cell, index) {
+    nonObjectNodes(article, ".ppt-table th").forEach(function (cell, index) {
       tagPath(cell, "table.columns." + index);
     });
-    article.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+    nonObjectNodes(article, ".ppt-table tbody tr").forEach(function (row, rowIndex) {
       row.querySelectorAll("td").forEach(function (cell, cellIndex) {
         tagPath(cell, "table.rows." + rowIndex + "." + cellIndex);
       });
@@ -1040,7 +1179,9 @@
     var align = normalizeStyleAlign(value.textAlign || value.align);
     var weight = normalizeStyleWeight(value.fontWeight || (value.bold === true ? "800" : ""));
     var fontStyle = value.fontStyle === "italic" || value.italic === true ? "italic" : "";
+    var fontFamily = normalizeStyleFontFamily(value.fontFamily);
 
+    if (fontFamily) style.fontFamily = fontFamily;
     if (isFinite(fontSize) && fontSize > 0) style.fontSize = clamp(Math.round(fontSize), 8, 180);
     if (color) style.color = color;
     if (backgroundColor) style.backgroundColor = backgroundColor;
@@ -1072,6 +1213,39 @@
     return ["400", "500", "600", "700", "800", "900"].indexOf(weight) !== -1 ? weight : "";
   }
 
+  function normalizeStyleFontFamily(value) {
+    return [
+      "system", "display", "arial", "helvetica", "avenir", "serif", "georgia", "times",
+      "cjk-sans", "pingfang", "yahei", "cjk-serif", "songti", "kaiti", "yu-mincho",
+      "mono", "menlo", "consolas", "handwriting"
+    ].indexOf(value) !== -1 ? value : "";
+  }
+
+  function fontFamilyStack(token) {
+    var stacks = {
+      system: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+      display: "\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif",
+      arial: "Arial, Helvetica, ui-sans-serif, sans-serif",
+      helvetica: "\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif",
+      avenir: "\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif",
+      serif: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      georgia: "Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      times: "\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      "cjk-sans": "\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif",
+      pingfang: "\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif",
+      yahei: "\"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif",
+      "cjk-serif": "\"Songti SC\", \"SimSun\", \"Noto Serif CJK SC\", \"Yu Mincho\", serif",
+      songti: "\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif",
+      kaiti: "\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive",
+      "yu-mincho": "\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif",
+      mono: "\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace",
+      menlo: "Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace",
+      consolas: "Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace",
+      handwriting: "\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive"
+    };
+    return stacks[token] || "";
+  }
+
   function applyElementStyles(article, slide) {
     var styles = slide.styles && typeof slide.styles === "object" ? slide.styles : {};
     article.querySelectorAll("[data-ppt-path]").forEach(function (node) {
@@ -1081,6 +1255,7 @@
 
   function applyElementStyle(node, style) {
     if (!node || !style || typeof style !== "object") return;
+    if (style.fontFamily) node.style.fontFamily = fontFamilyStack(style.fontFamily);
     if (style.fontSize) node.style.fontSize = style.fontSize + "px";
     if (style.color) node.style.color = style.color;
     if (style.backgroundColor) node.style.backgroundColor = style.backgroundColor;
@@ -1122,8 +1297,8 @@
     });
   }
 
-  function finalizeSlide(article, slide) {
-    appendTextBoxes(article, slide);
+  function finalizeSlide(article, slide, options) {
+    appendTextBoxes(article, slide, options);
     appendObjects(article, slide);
     tagCanvasPaths(article, slide);
     applyElementStyles(article, slide);
@@ -1135,7 +1310,705 @@
     return createTemplateDeck("ai-camera");
   }
 
+  function createBlankDeck() {
+    return normalizeDeck({
+      version: FORMAT_VERSION,
+      title: "未命名演示",
+      theme: "paper",
+      transition: "fade",
+      aspectRatio: "16:9",
+      slides: [
+        {
+          id: "slide-1",
+          layout: "text",
+          title: "",
+          subtitle: "",
+          body: "",
+          items: [],
+          textBoxes: [],
+          objects: []
+        }
+      ]
+    });
+  }
+
+  function modernTemplateDeck(templateId) {
+    var templates = {
+      "ai-camera": {
+        version: FORMAT_VERSION,
+        title: "AI 导演相机发布会",
+        theme: "launch",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "camera-1",
+            layout: "hero",
+            kicker: "Product Launch",
+            title: "AI 导演相机",
+            subtitle: "让普通人像导演一样设计镜头",
+            image: { src: "", alt: "产品示意图" },
+            notes: "开场用一句话讲清楚产品。"
+          },
+          {
+            id: "camera-2",
+            layout: "compare",
+            kicker: "Problem",
+            title: "传统拍摄 vs AI 导演",
+            left: { title: "传统拍摄", text: "不知道怎么构图\n不知道怎么安排镜头\n拍完才发现故事不连贯" },
+            right: { title: "AI 导演", text: "实时给出构图建议\n自动生成镜头脚本\n把拍摄过程变成清晰流程" }
+          },
+          {
+            id: "camera-3",
+            layout: "threeCards",
+            kicker: "Workflow",
+            title: "三步完成一次专业拍摄",
+            cards: [
+              { title: "输入目标", text: "告诉 AI 你要拍什么、给谁看、希望什么风格。" },
+              { title: "获得分镜", text: "系统生成镜头顺序、景别、角度和时长建议。" },
+              { title: "边拍边改", text: "现场根据画面反馈调整构图和节奏。" }
+            ]
+          },
+          {
+            id: "camera-4",
+            layout: "chart",
+            kicker: "Demo Signal",
+            title: "从灵感到成片的时间被压缩",
+            chart: {
+              kind: "bar",
+              labels: ["脚本", "分镜", "拍摄", "复盘"],
+              series: [
+                { name: "传统流程", values: [45, 60, 120, 40] },
+                { name: "AI 导演", values: [8, 15, 90, 10] }
+              ],
+              unit: "分钟"
+            }
+          },
+          {
+            id: "camera-5",
+            layout: "ending",
+            title: "让每个人都能讲好画面故事",
+            subtitle: "从想法到镜头脚本，只需要一次清晰表达"
+          }
+        ]
+      },
+      "product-pitch": {
+        version: FORMAT_VERSION,
+        title: "产品发布：团队知识库 AI 助手",
+        theme: "studio",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "pitch-1",
+            layout: "hero",
+            kicker: "Product Launch",
+            title: "团队知识库 AI 助手",
+            subtitle: "让新同事 3 天内找到答案，而不是等人回复"
+          },
+          {
+            id: "pitch-2",
+            layout: "compare",
+            kicker: "Pain",
+            title: "知识存在，但员工找不到",
+            left: { title: "今天", text: "文档散在 5 个系统\n老员工被重复打断\n新人不知道该问谁" },
+            right: { title: "发布后", text: "一个入口搜索所有知识\n答案带来源和负责人\n缺口自动变成待补文档" }
+          },
+          {
+            id: "pitch-3",
+            layout: "threeCards",
+            kicker: "Product",
+            title: "产品不是聊天框，而是知识闭环",
+            cards: [
+              { title: "可信回答", text: "每个回答绑定来源文档、更新时间和负责人。" },
+              { title: "缺口发现", text: "回答失败的问题自动归类，推动知识库补全。" },
+              { title: "权限继承", text: "沿用现有文档权限，不把内部信息暴露给无权限用户。" }
+            ]
+          },
+          {
+            id: "pitch-4",
+            layout: "chart",
+            kicker: "Evidence",
+            title: "试点团队每周重复提问下降",
+            chart: {
+              kind: "line",
+              labels: ["第1周", "第2周", "第3周", "第4周"],
+              series: [
+                { name: "重复提问", values: [126, 88, 57, 39] },
+                { name: "自助解决", values: [18, 44, 76, 103] }
+              ],
+              unit: "次"
+            }
+          },
+          {
+            id: "pitch-5",
+            layout: "table",
+            kicker: "Launch Plan",
+            title: "发布节奏",
+            table: {
+              columns: ["阶段", "目标人群", "成功标准", "负责人"],
+              rows: [
+                ["内测", "HR + IT", "命中率超过 65%", "产品"],
+                ["试点", "销售新人", "重复提问下降 40%", "客户成功"],
+                ["全员", "总部员工", "周活超过 60%", "运营"]
+              ]
+            }
+          },
+          {
+            id: "pitch-6",
+            layout: "ending",
+            title: "本次发布需要确认",
+            subtitle: "是否按 3 阶段发布，并把缺口文档补全纳入团队 OKR"
+          }
+        ]
+      },
+      "investor-pitch": {
+        version: FORMAT_VERSION,
+        title: "融资路演：AI 客服质检平台",
+        theme: "boardroom",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "investor-1",
+            layout: "hero",
+            kicker: "Seed Round",
+            title: "AI 客服质检平台",
+            subtitle: "把 2% 抽检变成 100% 质检，并直接生成改进动作"
+          },
+          {
+            id: "investor-2",
+            layout: "data",
+            kicker: "Why Now",
+            title: "客服团队正在被成本和体验同时挤压",
+            metrics: [
+              { value: "18%", label: "坐席流失", detail: "培训成本持续升高。" },
+              { value: "2%", label: "传统抽检覆盖", detail: "大多数风险对话被漏掉。" },
+              { value: "24h", label: "质检反馈延迟", detail: "问题无法当天闭环。" }
+            ]
+          },
+          {
+            id: "investor-3",
+            layout: "compare",
+            kicker: "Wedge",
+            title: "从质检切入，再扩展到培训和运营",
+            left: { title: "旧质检", text: "人工抽样\n只给分数\n反馈晚且不可追踪" },
+            right: { title: "AI 质检", text: "全量覆盖\n定位具体话术\n生成教练任务和复盘看板" }
+          },
+          {
+            id: "investor-4",
+            layout: "chart",
+            kicker: "Traction",
+            title: "试点客户付费意愿在提升",
+            chart: {
+              kind: "bar",
+              labels: ["1月", "2月", "3月", "4月"],
+              series: [
+                { name: "试点客户", values: [3, 5, 8, 12] },
+                { name: "付费客户", values: [0, 1, 3, 6] }
+              ],
+              unit: "家"
+            }
+          },
+          {
+            id: "investor-5",
+            layout: "table",
+            kicker: "Business",
+            title: "商业模型和资金用途",
+            table: {
+              columns: ["项目", "当前假设", "下一步验证"],
+              rows: [
+                ["定价", "每坐席每月 49 元", "A/B 测试企业包"],
+                ["毛利", "推理成本低于收入 18%", "缓存常见规则"],
+                ["资金用途", "产品 45% / 销售 35% / 运营 20%", "招 2 名行业销售"]
+              ]
+            }
+          },
+          {
+            id: "investor-6",
+            layout: "ending",
+            title: "融资诉求",
+            subtitle: "融资 300 万，用 12 个月验证 50 家付费客户和可复制销售流程"
+          }
+        ]
+      },
+      "enterprise-proposal": {
+        version: FORMAT_VERSION,
+        title: "企业销售方案：门店排班优化",
+        theme: "boardroom",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "sales-1",
+            layout: "hero",
+            kicker: "Client Proposal",
+            title: "门店排班优化方案",
+            subtitle: "为 120 家门店降低缺岗风险，并减少店长手工排班时间"
+          },
+          {
+            id: "sales-2",
+            layout: "text",
+            kicker: "Situation",
+            title: "我们理解的当前压力",
+            body: "高峰时段缺岗导致转化下降，低峰时段冗余排班拉高成本；店长每周花大量时间手工调整，且总部难以及时发现异常。",
+            items: [
+              { title: "运营压力", text: "促销日、天气、商圈活动都会改变客流。" },
+              { title: "管理压力", text: "总部只能看结果，无法提前看见排班风险。" },
+              { title: "员工体验", text: "临时调班频繁，满意度和稳定性受影响。" }
+            ]
+          },
+          {
+            id: "sales-3",
+            layout: "threeCards",
+            kicker: "Solution",
+            title: "方案由预测、排班、预警组成",
+            cards: [
+              { title: "客流预测", text: "融合历史销售、天气、节假日和活动日历。" },
+              { title: "自动排班", text: "按技能、工时、偏好和合规约束生成建议。" },
+              { title: "异常预警", text: "缺岗、超时、低效班次提前推送给区域经理。" }
+            ]
+          },
+          {
+            id: "sales-4",
+            layout: "data",
+            kicker: "ROI",
+            title: "三个月试点目标",
+            metrics: [
+              { value: "-22%", label: "手工排班时间", detail: "店长每周减少重复调整。" },
+              { value: "-15%", label: "缺岗时段", detail: "高峰班次覆盖更稳定。" },
+              { value: "+3.8%", label: "人效提升", detail: "销售额 / 人时提升。" }
+            ]
+          },
+          {
+            id: "sales-5",
+            layout: "timeline",
+            kicker: "Success Plan",
+            title: "从试点到推广",
+            items: [
+              { title: "第 1-2 周", text: "接入 POS、排班、员工基础数据。" },
+              { title: "第 3-6 周", text: "20 家门店试点，校准预测模型。" },
+              { title: "第 7-10 周", text: "区域经理看板上线，建立周复盘机制。" },
+              { title: "第 11-12 周", text: "出具 ROI 报告，决策是否扩到 120 家门店。" }
+            ]
+          },
+          {
+            id: "sales-6",
+            layout: "ending",
+            title: "今天需要达成的共识",
+            subtitle: "确认试点门店名单、数据接口负责人和 12 周成功标准"
+          }
+        ]
+      },
+      "research-brief": {
+        version: FORMAT_VERSION,
+        title: "研究简报：是否推出专业版定价",
+        theme: "paper",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "research-1",
+            layout: "hero",
+            kicker: "Decision Brief",
+            title: "是否推出专业版定价",
+            subtitle: "基于访谈、漏斗数据和竞品价格的决策建议"
+          },
+          {
+            id: "research-2",
+            layout: "text",
+            kicker: "Question",
+            title: "我们要回答的不是价格，而是分层边界",
+            body: "免费版已经能覆盖轻量用户，但重度团队愿意为协作、权限和审计付费。关键问题是：哪些能力应该进入专业版，避免伤害免费增长。",
+            items: [
+              { title: "目标", text: "提升 ARPA，同时保持新用户激活。" },
+              { title: "风险", text: "过早收费会降低团队扩散。" },
+              { title: "判断标准", text: "付费能力必须和组织管理直接相关。" }
+            ]
+          },
+          {
+            id: "research-3",
+            layout: "table",
+            kicker: "Evidence",
+            title: "研究样本",
+            table: {
+              columns: ["来源", "样本", "发现"],
+              rows: [
+                ["用户访谈", "18 个团队", "权限和审计是最强付费信号"],
+                ["行为数据", "12 周漏斗", "3 人以上团队留存高 2.1x"],
+                ["竞品分析", "6 个产品", "专业版常绑定协作治理能力"]
+              ]
+            }
+          },
+          {
+            id: "research-4",
+            layout: "chart",
+            kicker: "Signal",
+            title: "团队规模越大，付费意愿越明显",
+            chart: {
+              kind: "bar",
+              labels: ["1人", "2-3人", "4-10人", "10人+"],
+              series: [
+                { name: "愿意付费", values: [8, 19, 43, 68] },
+                { name: "需要权限", values: [3, 14, 52, 81] }
+              ],
+              unit: "%"
+            }
+          },
+          {
+            id: "research-5",
+            layout: "compare",
+            kicker: "Recommendation",
+            title: "建议：把专业版定义为团队治理包",
+            left: { title: "不要收费", text: "基础创建\n个人导出\n小团队评论" },
+            right: { title: "专业版收费", text: "角色权限\n审计日志\n共享模板库\n管理员看板" }
+          },
+          {
+            id: "research-6",
+            layout: "ending",
+            title: "决策建议",
+            subtitle: "下月灰度专业版，定价 29 元/席/月，先面向 4 人以上团队"
+          }
+        ]
+      },
+      "product-review": {
+        version: FORMAT_VERSION,
+        title: "产品评审：移动端支付改版",
+        theme: "studio",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "review-1",
+            layout: "hero",
+            kicker: "Product Review",
+            title: "移动端支付改版",
+            subtitle: "把 4 步支付流程压缩为 2 步，并降低支付失败后的流失"
+          },
+          {
+            id: "review-2",
+            layout: "data",
+            kicker: "Problem",
+            title: "当前支付页的损失点",
+            metrics: [
+              { value: "31%", label: "支付页退出", detail: "主要发生在选择支付方式前。" },
+              { value: "14%", label: "失败后不重试", detail: "失败原因没有被解释。" },
+              { value: "6s", label: "平均犹豫时间", detail: "用户在优惠和方式间反复切换。" }
+            ]
+          },
+          {
+            id: "review-3",
+            layout: "timeline",
+            kicker: "Journey",
+            title: "改版后的关键路径",
+            items: [
+              { title: "确认订单", text: "展示最终金额、优惠和默认支付方式。" },
+              { title: "一键支付", text: "用户只做一个主动作，弱化次要入口。" },
+              { title: "失败恢复", text: "解释失败原因，并给出可执行的下一步。" }
+            ]
+          },
+          {
+            id: "review-4",
+            layout: "table",
+            kicker: "Decision",
+            title: "需要评审的取舍",
+            table: {
+              columns: ["问题", "方案 A", "方案 B", "建议"],
+              rows: [
+                ["优惠展示", "展开全部", "只展示已选", "B，减少干扰"],
+                ["支付方式", "用户选择", "智能默认", "B，但保留切换"],
+                ["失败提示", "错误码", "原因 + 行动", "B，提升重试"]
+              ]
+            }
+          },
+          {
+            id: "review-5",
+            layout: "chart",
+            kicker: "Experiment",
+            title: "A/B 实验指标",
+            chart: {
+              kind: "line",
+              labels: ["曝光", "确认", "支付", "成功"],
+              series: [
+                { name: "旧版", values: [100, 72, 61, 54] },
+                { name: "新版目标", values: [100, 81, 73, 66] }
+              ],
+              unit: "%"
+            }
+          },
+          {
+            id: "review-6",
+            layout: "ending",
+            title: "评审结论",
+            subtitle: "确认默认支付方式、失败恢复文案和灰度实验窗口"
+          }
+        ]
+      },
+      "project-update": {
+        version: FORMAT_VERSION,
+        title: "QBR 业务复盘：自助转化增长",
+        theme: "boardroom",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "qbr-1",
+            layout: "hero",
+            kicker: "Quarterly Business Review",
+            title: "自助转化增长复盘",
+            subtitle: "从流量、转化、留存和下一季度下注看业务质量"
+          },
+          {
+            id: "qbr-2",
+            layout: "data",
+            kicker: "Snapshot",
+            title: "本季度关键变化",
+            metrics: [
+              { value: "+28%", label: "注册到激活", detail: "新手任务缩短后提升明显。" },
+              { value: "+11%", label: "付费转化", detail: "团队版入口贡献主要增量。" },
+              { value: "-7%", label: "7 日留存", detail: "低质量渠道占比上升。" }
+            ]
+          },
+          {
+            id: "qbr-3",
+            layout: "chart",
+            kicker: "Funnel",
+            title: "漏斗改善集中在中段",
+            chart: {
+              kind: "bar",
+              labels: ["访问", "注册", "激活", "创建团队", "付费"],
+              series: [
+                { name: "上季度", values: [100, 36, 18, 8, 3] },
+                { name: "本季度", values: [100, 41, 23, 13, 6] }
+              ],
+              unit: "%"
+            }
+          },
+          {
+            id: "qbr-4",
+            layout: "compare",
+            kicker: "Learning",
+            title: "我们学到的和没解决的",
+            left: { title: "有效动作", text: "新手任务前置\n团队模板推荐\n支付页减少表单" },
+            right: { title: "仍未解决", text: "渠道质量波动\n团队邀请转化低\n高级功能价值表达弱" }
+          },
+          {
+            id: "qbr-5",
+            layout: "table",
+            kicker: "Next Bets",
+            title: "下季度下注",
+            table: {
+              columns: ["下注", "目标", "指标", "负责人"],
+              rows: [
+                ["渠道质量分层", "砍掉低留存流量", "7 日留存 +5%", "增长"],
+                ["团队邀请优化", "提升多人协作体验", "邀请转化 +20%", "产品"],
+                ["专业版价值页", "讲清治理能力", "付费转化 +3%", "设计"]
+              ]
+            }
+          },
+          {
+            id: "qbr-6",
+            layout: "ending",
+            title: "需要管理层决策",
+            subtitle: "是否把下季度资源从获客转向团队转化和留存质量"
+          }
+        ]
+      },
+      lesson: {
+        version: FORMAT_VERSION,
+        title: "实战工作坊：用 AI 做用户访谈分析",
+        theme: "paper",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "lesson-1",
+            layout: "hero",
+            kicker: "Workshop",
+            title: "用 AI 做用户访谈分析",
+            subtitle: "90 分钟把 12 份访谈整理成机会地图"
+          },
+          {
+            id: "lesson-2",
+            layout: "section",
+            kicker: "Outcomes",
+            title: "完成工作坊后，你应该能做到",
+            body: "把访谈记录拆成事实、情绪、需求和机会；用 AI 生成初步聚类，再由人类校正证据和判断。"
+          },
+          {
+            id: "lesson-3",
+            layout: "timeline",
+            kicker: "Agenda",
+            title: "90 分钟流程",
+            items: [
+              { title: "15 min", text: "讲解分析框架和数据清洗规则。" },
+              { title: "25 min", text: "小组用 AI 提取观点和原话证据。" },
+              { title: "30 min", text: "合并相似主题，标记高频痛点。" },
+              { title: "20 min", text: "输出机会地图和下一步验证计划。" }
+            ]
+          },
+          {
+            id: "lesson-4",
+            layout: "table",
+            kicker: "Exercise",
+            title: "练习材料",
+            table: {
+              columns: ["材料", "任务", "产出"],
+              rows: [
+                ["访谈原文", "提取事实和原话", "证据卡片"],
+                ["用户画像", "按角色分组", "细分人群"],
+                ["产品日志", "验证行为是否存在", "机会优先级"]
+              ]
+            }
+          },
+          {
+            id: "lesson-5",
+            layout: "quote",
+            kicker: "Principle",
+            title: "人类负责判断，AI 负责铺开材料",
+            quote: "不要让 AI 替你下结论；让它帮你更快看到证据。",
+            author: "Workshop rule"
+          },
+          {
+            id: "lesson-6",
+            layout: "ending",
+            title: "课后作业",
+            subtitle: "用同一框架分析自己的 5 份访谈，并带来一页机会地图"
+          }
+        ]
+      },
+      "incident-review": {
+        version: FORMAT_VERSION,
+        title: "事故复盘：支付回调延迟",
+        theme: "boardroom",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "incident-1",
+            layout: "hero",
+            kicker: "Incident Review",
+            title: "支付回调延迟复盘",
+            subtitle: "影响、时间线、根因和防再发动作"
+          },
+          {
+            id: "incident-2",
+            layout: "data",
+            kicker: "Impact",
+            title: "影响范围",
+            metrics: [
+              { value: "37min", label: "异常窗口", detail: "20:14 到 20:51。" },
+              { value: "1,284", label: "受影响订单", detail: "支付成功但状态延迟更新。" },
+              { value: "0", label: "资金损失", detail: "支付链路未发生错账。" }
+            ]
+          },
+          {
+            id: "incident-3",
+            layout: "timeline",
+            kicker: "Timeline",
+            title: "关键时间线",
+            items: [
+              { title: "20:14", text: "队列消费延迟开始上升。" },
+              { title: "20:23", text: "客服反馈用户订单状态未更新。" },
+              { title: "20:31", text: "值班同学扩容消费者并清理积压。" },
+              { title: "20:51", text: "回调延迟恢复到正常范围。" }
+            ]
+          },
+          {
+            id: "incident-4",
+            layout: "compare",
+            kicker: "Root Cause",
+            title: "根因不是单点故障，而是保护不足",
+            left: { title: "触发因素", text: "大促流量峰值\n第三方回调集中到达\n消费者自动扩容阈值过高" },
+            right: { title: "系统缺口", text: "队列延迟告警太晚\n订单状态缺少兜底轮询\n客服后台没有异常说明" }
+          },
+          {
+            id: "incident-5",
+            layout: "table",
+            kicker: "Actions",
+            title: "防再发动作",
+            table: {
+              columns: ["动作", "负责人", "截止", "验证方式"],
+              rows: [
+                ["队列延迟 3 分钟告警", "SRE", "本周五", "压测触发告警"],
+                ["订单状态兜底轮询", "支付组", "下周三", "模拟回调丢失"],
+                ["客服异常提示", "运营工具", "下周五", "客服演练通过"]
+              ]
+            }
+          },
+          {
+            id: "incident-6",
+            layout: "ending",
+            title: "复盘结论",
+            subtitle: "这次没有资金损失，但暴露了高峰期状态同步和告警策略不足"
+          }
+        ]
+      },
+      "marketing-campaign": {
+        version: FORMAT_VERSION,
+        title: "营销战役：夏季会员增长",
+        theme: "launch",
+        aspectRatio: "16:9",
+        slides: [
+          {
+            id: "campaign-1",
+            layout: "hero",
+            kicker: "Campaign Brief",
+            title: "夏季会员增长战役",
+            subtitle: "用 21 天主题挑战拉动新会员首购和老会员复购"
+          },
+          {
+            id: "campaign-2",
+            layout: "text",
+            kicker: "Audience",
+            title: "核心人群和洞察",
+            body: "目标人群不是泛泛的年轻用户，而是已经关注健康饮食、但缺少持续行动机制的人。",
+            items: [
+              { title: "新会员", text: "愿意尝试，但不知道第一单买什么。" },
+              { title: "沉睡会员", text: "过去买过一次，缺少复购提醒和理由。" },
+              { title: "高价值会员", text: "愿意分享，但需要更有身份感的权益。" }
+            ]
+          },
+          {
+            id: "campaign-3",
+            layout: "threeCards",
+            kicker: "Message",
+            title: "三层传播信息",
+            cards: [
+              { title: "行动口号", text: "21 天，让健康饮食变成默认选择。" },
+              { title: "首购理由", text: "新人组合包降低第一次选择成本。" },
+              { title: "复购机制", text: "连续打卡解锁会员专属权益。" }
+            ]
+          },
+          {
+            id: "campaign-4",
+            layout: "chart",
+            kicker: "Channel Mix",
+            title: "渠道预算分配",
+            chart: {
+              kind: "donut",
+              labels: ["短视频", "达人", "私域", "门店"],
+              series: [{ name: "预算", values: [35, 25, 25, 15] }],
+              unit: "%"
+            }
+          },
+          {
+            id: "campaign-5",
+            layout: "timeline",
+            kicker: "Calendar",
+            title: "21 天节奏",
+            items: [
+              { title: "预热", text: "达人种草、预约提醒、门店物料上架。" },
+              { title: "爆发", text: "新人组合包限时权益和打卡挑战启动。" },
+              { title: "留存", text: "复购券、会员故事和排行榜持续推送。" }
+            ]
+          },
+          {
+            id: "campaign-6",
+            layout: "ending",
+            title: "战役目标",
+            subtitle: "新增会员 30,000，首购转化 9%，复购率提升 6 个百分点"
+          }
+        ]
+      }
+    };
+    return templates[templateId] || null;
+  }
+
   function createTemplateDeck(templateId) {
+    var modern = modernTemplateDeck(templateId);
+    if (modern) return normalizeDeck(modern);
     if (templateId === "product-pitch") {
       return normalizeDeck({
         version: FORMAT_VERSION,
@@ -1350,7 +2223,7 @@
           id: "slide-5",
           layout: "ending",
           title: "让每个人都能讲好画面故事",
-          subtitle: "PPT.html demo · 可被 AI 生成，也可被人类继续编辑"
+          subtitle: "从想法到镜头脚本，只需要一次清晰表达"
         }
       ]
     });
@@ -1361,10 +2234,10 @@
     slide.id = slide.id || "slide-" + (index + 1);
     slide.layout = slide.layout || "text";
     slide.transition = normalizeSlideTransition(slide.transition);
-    slide.title = safeText(slide.title || "未命名页面");
+    slide.title = safeText(slide.title == null ? "未命名页面" : slide.title);
     slide.subtitle = safeText(slide.subtitle);
     slide.kicker = safeText(slide.kicker);
-    slide.body = safeText(slide.body);
+    slide.body = stripEditorInstructionText(slide.body);
     slide.image = normalizeImage(slide.image);
     slide.video = normalizeVideo(slide.video);
     slide.audio = normalizeAudio(slide.audio);
@@ -1635,13 +2508,13 @@
         heroImage.classList.add("ppt-hero-image");
         article.appendChild(heroImage);
       }
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "section") {
       article.appendChild(el("div", "ppt-section-number", String(index + 1).padStart(2, "0")));
       article.appendChild(createContentStack(slide, false));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "imageRight" || slide.layout === "imageLeft") {
@@ -1654,7 +2527,7 @@
         article.appendChild(content);
         article.appendChild(media);
       }
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "imageFull") {
@@ -1667,7 +2540,7 @@
         appendText(imageOverlay, "p", "ppt-subtitle", slide.subtitle);
         article.appendChild(imageOverlay);
       }
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "imageBackground") {
@@ -1675,7 +2548,7 @@
       backgroundMedia.classList.add("ppt-background-media");
       article.appendChild(backgroundMedia);
       article.appendChild(createContentStack(slide, true));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "compare") {
@@ -1688,7 +2561,7 @@
         grid.appendChild(card);
       });
       article.appendChild(grid);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "threeCards") {
@@ -1701,14 +2574,14 @@
         cardGrid.appendChild(card);
       });
       article.appendChild(cardGrid);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "quote") {
       article.appendChild(el("div", "ppt-quote-mark", "“"));
       appendText(article, "p", "ppt-quote", slide.quote || slide.title);
       appendText(article, "p", "ppt-author", slide.author || slide.subtitle);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "timeline") {
@@ -1721,7 +2594,7 @@
         timeline.appendChild(row);
       });
       article.appendChild(timeline);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "data") {
@@ -1735,48 +2608,48 @@
         metrics.appendChild(box);
       });
       article.appendChild(metrics);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "chart") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(createChart(slide.chart));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "video") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(createVideo(slide.video));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "audio") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(createAudio(slide.audio));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "table") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(createTable(slide.table));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "code") {
       article.appendChild(createContentStack(slide, false));
       article.appendChild(el("pre", "ppt-code", slide.code || "const deck = await createPptHtml();"));
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     if (slide.layout === "ending") {
       article.appendChild(el("div", "ppt-ending-line"));
       appendText(article, "h1", "ppt-title", slide.title);
       appendText(article, "p", "ppt-subtitle", slide.subtitle);
-      return finalizeSlide(article, slide);
+      return finalizeSlide(article, slide, options);
     }
 
     article.appendChild(createContentStack(slide, true));
-    return finalizeSlide(article, slide);
+    return finalizeSlide(article, slide, options);
   }
 
   function parseFileText(text) {
@@ -1849,14 +2722,15 @@
 
   function standaloneSource() {
     return "(function(){'use strict';" +
-      "var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0,anim=0;" +
+      "var d=JSON.parse(document.getElementById('ppt-html-data').textContent),i=0,w=1280,h=720,t=0,anim=0,blank='',jump='',jt=0,ct=0;" +
       "function e(t,c,x){var n=document.createElement(t);if(c)n.className=c;if(x)n.textContent=x;return n}" +
       "function a(p,t,c,x){if(x==null||x==='')return;var n=e(t,c,x);p.appendChild(n);return n}" +
       "function arr(v){return Array.isArray(v)?v:[]}" +
-      "function media(m){m=m||{};var b=e('figure','ppt-media');b.setAttribute('data-fit',m.fit==='contain'?'contain':'cover');if(m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));a(b,'figcaption','ppt-caption',m.caption);return b}" +
-      "function vid(v){v=v||{};var b=e('figure','ppt-video');b.setAttribute('data-fit',v.fit==='contain'?'contain':'cover');if(v.src){var n=document.createElement('video');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);n.playsInline=true;if(v.poster)n.poster=v.poster;b.appendChild(n)}else b.appendChild(e('div','ppt-video-placeholder','Video'));a(b,'figcaption','ppt-caption',v.caption);return b}" +
-      "function aud(v){v=v||{};var b=e('figure','ppt-audio');if(v.src){var n=document.createElement('audio');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);b.appendChild(n)}else b.appendChild(e('div','ppt-audio-placeholder','Audio'));a(b,'figcaption','ppt-caption',v.caption);return b}" +
-      "function tbs(n,s){arr(s.textBoxes).forEach(function(o,j){o=o||{};var b=e('div','ppt-textbox',o.text==null?'Double-click to edit':o.text);b.style.left=num(o.x==null?730+j*28:o.x)+'px';b.style.top=num(o.y==null?430+j*30:o.y)+'px';b.style.width=Math.max(80,num(o.w)||380)+'px';b.style.minHeight=Math.max(32,num(o.h)||96)+'px';n.appendChild(b)})}" +
+      "function hint(x){x=String(x==null?'':x);var s=x.replace(/\\s+/g,' ').trim().toLowerCase();return /double-click|双击|ダブルクリック|더블 클릭/.test(s)?'':x}" +
+      "function media(m){m=m||{};var b=e('figure','ppt-media');b.setAttribute('data-fit',m.fit==='contain'?'contain':'cover');if(m.src){var im=document.createElement('img');im.src=m.src;im.alt=m.alt||'';b.appendChild(im)}else b.appendChild(e('div','ppt-image-placeholder','Image'));a(b,'figcaption','ppt-caption',hint(m.caption));return b}" +
+      "function vid(v){v=v||{};var b=e('figure','ppt-video');b.setAttribute('data-fit',v.fit==='contain'?'contain':'cover');if(v.src){var n=document.createElement('video');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);n.playsInline=true;if(v.poster)n.poster=v.poster;b.appendChild(n)}else b.appendChild(e('div','ppt-video-placeholder','Video'));a(b,'figcaption','ppt-caption',hint(v.caption));return b}" +
+      "function aud(v){v=v||{};var b=e('figure','ppt-audio');if(v.src){var n=document.createElement('audio');n.src=v.src;n.controls=v.controls!==false;n.autoplay=!!v.autoplay;n.loop=!!v.loop;n.muted=!!(v.muted||v.autoplay);b.appendChild(n)}else b.appendChild(e('div','ppt-audio-placeholder','Audio'));a(b,'figcaption','ppt-caption',hint(v.caption));return b}" +
+      "function tbs(n,s){arr(s.textBoxes).forEach(function(o,j){o=o||{};var tx=hint(o.text);if(!String(tx).trim())return;var b=e('div','ppt-textbox',tx);b.style.left=num(o.x==null?730+j*28:o.x)+'px';b.style.top=num(o.y==null?430+j*30:o.y)+'px';b.style.width=Math.max(80,num(o.w)||380)+'px';b.style.minHeight=Math.max(32,num(o.h)||96)+'px';n.appendChild(b)})}" +
       "function list(items){var u=e('ul','ppt-list');arr(items).slice(0,6).forEach(function(it){var x=typeof it==='string'?it:(it.text||it.title||'');if(x)u.appendChild(e('li','',x))});return u}" +
       "function stack(s,li){var x=e('div','ppt-content-stack');a(x,'div','ppt-kicker',s.kicker);a(x,'h1','ppt-title',s.title);a(x,'p','ppt-subtitle',s.subtitle);a(x,'p','ppt-body',s.body);if(li&&arr(s.items).length)x.appendChild(list(s.items));return x}" +
       "function se(t,o){var n=document.createElementNS('http://www.w3.org/2000/svg',t);Object.keys(o||{}).forEach(function(k){if(o[k]!=null)n.setAttribute(k,o[k])});return n}" +
@@ -1873,31 +2747,36 @@
       "function li(l,j,t,v,u){var it=e('div','ppt-chart-legend-item'),sw=e('span','ppt-chart-swatch '+cc(j)),b=e('div','');it.appendChild(sw);a(b,'strong','',t);if(v!=null)a(b,'small','',v+(u?' '+u:''));it.appendChild(b);l.appendChild(it)}" +
       "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
       "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
-      "function sty(x,s){if(!s||typeof s!=='object')return;if(s.fontSize)x.style.fontSize=num(s.fontSize)+'px';if(s.color)x.style.color=s.color;if(s.backgroundColor)x.style.backgroundColor=s.backgroundColor;if(s.textAlign)x.style.textAlign=s.textAlign;if(s.fontWeight)x.style.fontWeight=s.fontWeight;if(s.fontStyle)x.style.fontStyle=s.fontStyle;if(s.borderColor){x.style.borderColor=s.borderColor;x.style.borderStyle='solid';if(s.borderWidth==null)x.style.borderWidth='1px'}if(s.borderWidth!=null){x.style.borderWidth=num(s.borderWidth)+'px';x.style.borderStyle=num(s.borderWidth)?'solid':''}if(s.borderRadius!=null)x.style.borderRadius=num(s.borderRadius)+'px';if(s.opacity!=null)x.style.opacity=s.opacity}" +
+      "function ff(v){return{system:'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif',display:'\"Avenir Next\", \"SF Pro Display\", Inter, ui-sans-serif, system-ui, sans-serif',arial:'Arial, Helvetica, ui-sans-serif, sans-serif',helvetica:'\"Helvetica Neue\", Helvetica, Arial, ui-sans-serif, sans-serif',avenir:'\"Avenir Next\", Avenir, \"SF Pro Display\", Inter, ui-sans-serif, sans-serif',serif:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',georgia:'Georgia, \"Times New Roman\", \"Songti SC\", \"Noto Serif CJK SC\", serif',times:'\"Times New Roman\", Times, \"Songti SC\", \"Noto Serif CJK SC\", serif','cjk-sans':'\"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif',pingfang:'\"PingFang SC\", \"Hiragino Sans\", \"Hiragino Sans GB\", \"Microsoft YaHei\", \"Noto Sans CJK SC\", sans-serif',yahei:'\"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", sans-serif','cjk-serif':'\"Songti SC\", \"SimSun\", \"Noto Serif CJK SC\", \"Yu Mincho\", serif',songti:'\"Songti SC\", SimSun, \"Noto Serif CJK SC\", serif',kaiti:'\"Kaiti SC\", KaiTi, \"STKaiti\", \"Yu Kyokasho\", cursive','yu-mincho':'\"Yu Mincho\", \"Hiragino Mincho ProN\", \"Songti SC\", \"Noto Serif CJK SC\", serif',mono:'\"SFMono-Regular\", Consolas, \"Liberation Mono\", Menlo, monospace',menlo:'Menlo, \"SFMono-Regular\", Consolas, \"Liberation Mono\", monospace',consolas:'Consolas, \"SFMono-Regular\", Menlo, \"Liberation Mono\", monospace',handwriting:'\"Comic Sans MS\", \"Segoe Print\", \"Kaiti SC\", cursive'}[v]||''}" +
+      "function sty(x,s){if(!s||typeof s!=='object')return;if(s.fontFamily&&ff(s.fontFamily))x.style.fontFamily=ff(s.fontFamily);if(s.fontSize)x.style.fontSize=num(s.fontSize)+'px';if(s.color)x.style.color=s.color;if(s.backgroundColor)x.style.backgroundColor=s.backgroundColor;if(s.textAlign)x.style.textAlign=s.textAlign;if(s.fontWeight)x.style.fontWeight=s.fontWeight;if(s.fontStyle)x.style.fontStyle=s.fontStyle;if(s.borderColor){x.style.borderColor=s.borderColor;x.style.borderStyle='solid';if(s.borderWidth==null)x.style.borderWidth='1px'}if(s.borderWidth!=null){x.style.borderWidth=num(s.borderWidth)+'px';x.style.borderStyle=num(s.borderWidth)?'solid':''}if(s.borderRadius!=null)x.style.borderRadius=num(s.borderRadius)+'px';if(s.opacity!=null)x.style.opacity=s.opacity}" +
       "function sk(k){k=String(k||'rectangle');if(k==='rect')return'rectangle';if(k==='roundRect'||k==='rounded'||k==='rounded-rectangle')return'roundedRectangle';if(k==='ellipse'||k==='oval'||k==='circle')return'ellipse';if(k==='line'||k==='arrow'||k==='callout')return k;if(k==='speechBubble'||k==='speech-bubble')return'callout';return'rectangle'}" +
       "function pt(v,f){v=String(v==null?'':v).trim();return v||f}" +
       "function sa(b,x){var o={},k;for(k in b)o[k]=b[k];for(k in x)o[k]=x[k];return o}" +
       "function shape(d,j){d=d||{};var k=sk(d.kind||d.shape||d.type),tx=d.text==null?(d.label==null?'':String(d.label)):String(d.text),ln=k==='line'||k==='arrow',sw=d.strokeWidth==null?(ln?4:3):Math.max(0,Math.min(48,Math.round(num(d.strokeWidth)))),fl=pt(d.fill,ln?'none':'rgba(15,139,141,.14)'),st=pt(d.stroke,'var(--ppt-accent)'),bx=e('div','ppt-shape ppt-shape-'+k),s=se('svg',{class:'ppt-shape-svg',viewBox:'0 0 100 100',preserveAspectRatio:'none'}),at={fill:ln?'none':fl,stroke:st,'stroke-width':sw,'stroke-linecap':'round','stroke-linejoin':'round','vector-effect':'non-scaling-stroke'};if(tx){s.setAttribute('role','img');s.setAttribute('aria-label',tx)}else s.setAttribute('aria-hidden','true');if(k==='ellipse')s.appendChild(se('ellipse',sa(at,{cx:50,cy:50,rx:47,ry:47})));else if(k==='line'||k==='arrow'){if(k==='arrow'){var id='ppt-arrow-'+j+'-'+Math.random().toString(36).slice(2,7),df=se('defs',{}),mk=se('marker',{id:id,markerWidth:8,markerHeight:8,refX:7,refY:4,orient:'auto',markerUnits:'strokeWidth'});mk.appendChild(se('path',{d:'M0,0 L8,4 L0,8 Z',fill:st,stroke:'none'}));df.appendChild(mk);s.appendChild(df);at['marker-end']='url(#'+id+')'}s.appendChild(se('line',sa(at,{x1:4,y1:50,x2:96,y2:50})))}else if(k==='callout')s.appendChild(se('path',sa(at,{d:'M8 8 H92 Q96 8 96 12 V68 Q96 72 92 72 H58 L44 92 L44 72 H8 Q4 72 4 68 V12 Q4 8 8 8 Z'})));else s.appendChild(se('rect',sa(at,{x:3,y:3,width:94,height:94,rx:k==='roundedRectangle'?12:0})));bx.appendChild(s);if(tx)bx.appendChild(e('div','ppt-shape-text',tx));return bx}" +
-      "function tbl(t){t=t||{};var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr(t.columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr(t.rows).slice(0,8).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);return tb}" +
+      "function tbl(t){t=t||{};var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr(t.columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr(t.rows).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);return tb}" +
       "function ocards(d){var g=e('div','ppt-card-grid');arr((d||{}).cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});return g}" +
       "function ometrics(d){var g=e('div','ppt-metric-grid');arr((d||{}).metrics).slice(0,3).forEach(function(o){var m=e('section','ppt-metric');a(m,'strong','',o.value);a(m,'span','',o.label);a(m,'p','',o.detail);g.appendChild(m)});return g}" +
       "function otimeline(d){var tl=e('div','ppt-timeline');arr((d||{}).items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});return tl}" +
       "function obj(o,j,s){o=o||{};var d=o.data||{},ty=o.type||'shape';if(ty==='line'||ty==='arrow'||ty==='rectangle'||ty==='roundedRectangle'||ty==='ellipse'||ty==='callout'){if(!d.kind)d.kind=ty;ty='shape'}var n=e('div','ppt-object ppt-object-'+ty);n.setAttribute('data-ppt-path','objects.'+j);n.style.left=Math.round(num(o.x))+'px';n.style.top=Math.round(num(o.y))+'px';n.style.width=Math.max(24,Math.round(num(o.w)||320))+'px';n.style.height=Math.max(24,Math.round(num(o.h)||180))+'px';n.style.zIndex=String(num(o.zIndex)||8);if(num(o.rotation))n.style.rotate=num(o.rotation)+'deg';sty(n,o.style||{});sty(n,(s.styles&&s.styles['objects.'+j])||{});if(ty==='image')n.appendChild(media(d));else if(ty==='video')n.appendChild(vid(d));else if(ty==='audio')n.appendChild(aud(d));else if(ty==='chart')n.appendChild(chart(d));else if(ty==='table')n.appendChild(tbl(d));else if(ty==='cards')n.appendChild(ocards(d));else if(ty==='metrics')n.appendChild(ometrics(d));else if(ty==='timeline')n.appendChild(otimeline(d));else if(ty==='shape')n.appendChild(shape(d,j));else if(ty==='quote'){a(n,'p','ppt-quote',d.quote);a(n,'p','ppt-author',d.author)}else if(ty==='code')n.appendChild(e('pre','ppt-code',d.code||''));else if(ty==='compare'){[d.left||{},d.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);n.appendChild(ca)})}else n.appendChild(e('div','ppt-image-placeholder',d.label||'Object'));return n}" +
       "function objs(n,s){arr(s.objects).forEach(function(o,j){n.appendChild(obj(o,j,s||{}))})}" +
       "function tp(n,p){if(n)n.setAttribute('data-ppt-path',p)}function off(n,s){tp(n.querySelector('.ppt-kicker'),'kicker');tp(n.querySelector('.ppt-title'),'title');tp(n.querySelector('.ppt-subtitle'),'subtitle');tp(n.querySelector('.ppt-body'),'body');tp(n.querySelector('.ppt-media'),'image');tp(n.querySelector('.ppt-caption'),'image.caption');tp(n.querySelector('.ppt-video'),'video');if(n.querySelector('.ppt-video .ppt-caption'))tp(n.querySelector('.ppt-video .ppt-caption'),'video.caption');tp(n.querySelector('.ppt-audio'),'audio');if(n.querySelector('.ppt-audio .ppt-caption'))tp(n.querySelector('.ppt-audio .ppt-caption'),'audio.caption');tp(n.querySelector('.ppt-chart-wrap'),'chart');tp(n.querySelector('.ppt-table'),'table');tp(n.querySelector('.ppt-card-grid'),'cards');tp(n.querySelector('.ppt-metric-grid'),'metrics');tp(n.querySelector('.ppt-timeline'),'timeline');n.querySelectorAll('.ppt-textbox').forEach(function(x,j){tp(x,'textBoxes.'+j+'.text')});if(s.layout==='quote'){tp(n.querySelector('.ppt-quote'),'quote');tp(n.querySelector('.ppt-author'),'author')}n.querySelectorAll('.ppt-list li').forEach(function(x,j){tp(x,'items.'+j+'.text')});['left','right'].forEach(function(side,j){var c=n.querySelectorAll('.ppt-compare-card')[j];if(c){tp(c.querySelector('h2'),side+'.title');tp(c.querySelector('p'),side+'.text')}});n.querySelectorAll('.ppt-card').forEach(function(c,j){tp(c.querySelector('h2'),'cards.'+j+'.title');tp(c.querySelector('p'),'cards.'+j+'.text')});n.querySelectorAll('.ppt-time-item').forEach(function(c,j){tp(c.querySelector('h2'),'items.'+j+'.title');tp(c.querySelector('p'),'items.'+j+'.text')});n.querySelectorAll('.ppt-metric').forEach(function(c,j){tp(c.querySelector('strong'),'metrics.'+j+'.value');tp(c.querySelector('span'),'metrics.'+j+'.label');tp(c.querySelector('p'),'metrics.'+j+'.detail')});n.querySelectorAll('.ppt-table th').forEach(function(c,j){tp(c,'table.columns.'+j)});n.querySelectorAll('.ppt-table tbody tr').forEach(function(r,ri){r.querySelectorAll('td').forEach(function(c,ci){tp(c,'table.rows.'+ri+'.'+ci)})});n.querySelectorAll('.ppt-chart-legend-item strong').forEach(function(x,j){tp(x,s.chart&&s.chart.kind==='donut'?'chart.labels.'+j:'chart.series.'+j+'.name')});if(s.chart&&s.chart.kind==='donut')n.querySelectorAll('.ppt-chart-legend-item small').forEach(function(x,j){tp(x,'chart.series.0.values.'+j)});tp(n.querySelector('.ppt-code'),'code');var st=s.styles&&typeof s.styles==='object'?s.styles:{},cv=s.canvas&&typeof s.canvas==='object'?s.canvas:{};n.querySelectorAll('[data-ppt-path]').forEach(function(x){var p=x.getAttribute('data-ppt-path'),o=cv[p]||{},dx=num(o.x),dy=num(o.y),ww=Math.max(0,num(o.w)),hh=Math.max(0,num(o.h));sty(x,st[p]||{});if(!dx&&!dy&&!ww&&!hh)return;if(!x.classList.contains('ppt-textbox')&&getComputedStyle(x).position==='static')x.style.position='relative';x.style.zIndex='5';if(dx||dy)x.style.transform='translate('+dx+'px, '+dy+'px)';if(ww){x.style.width=ww+'px';x.style.maxWidth=ww+'px'}if(hh)x.style.minHeight=hh+'px'})}" +
-      "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='video'){n.appendChild(stack(s,false));n.appendChild(vid(s.video));return n}if(s.layout==='audio'){n.appendChild(stack(s,false));n.appendChild(aud(s.audio));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
-      "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
-      "function fit(){var sc=Math.min(window.innerWidth/w,window.innerHeight/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
-      "function bg(){var sl=stage.querySelector('.ppt-slide.is-entering')||stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide');if(sl)root.style.background=getComputedStyle(sl).backgroundColor||''}" +
-      "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1800)}" +
+      "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='video'){n.appendChild(stack(s,false));n.appendChild(vid(s.video));return n}if(s.layout==='audio'){n.appendChild(stack(s,false));n.appendChild(aud(s.audio));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +
+      "var root=document.getElementById('ppt-player-root'),stage=e('div','ppt-player-stage'),bar=e('div','ppt-player-bar'),prev=e('button','','上一页'),count=e('span','',''),next=e('button','','下一页'),full=e('button','','全屏');root.classList.add('is-ui-hidden');bar.appendChild(prev);bar.appendChild(count);bar.appendChild(next);bar.appendChild(full);root.appendChild(stage);root.appendChild(bar);" +
+      "function vp(){var v=window.visualViewport;return v?{w:v.width,h:v.height,x:v.offsetLeft,y:v.offsetTop}:{w:window.innerWidth,h:window.innerHeight,x:0,y:0}}" +
+      "function fit(){var v=vp(),vw=Math.max(1,v.w),vh=Math.max(1,v.h),sc=Math.min(vw/w,vh/h);stage.style.width=w+'px';stage.style.height=h+'px';stage.style.left=(v.x+vw/2)+'px';stage.style.top=(v.y+vh/2)+'px';stage.style.transform='translate(-50%,-50%) scale('+Math.max(.1,sc)+')'}" +
+      "function bg(){var sl=stage.querySelector('.ppt-slide.is-entering')||stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide'),c=sl?getComputedStyle(sl).backgroundColor:'';if(!c||c==='transparent'||c==='rgba(0, 0, 0, 0)')c='#101214';root.style.background=c;document.documentElement.style.background=c;document.body.style.background=c}" +
+      "function chrome(){clearTimeout(t);root.classList.remove('is-ui-hidden');t=setTimeout(function(){root.classList.add('is-ui-hidden')},1400)}" +
+      "function blankMode(m){blank=blank===m?'':m;root.classList.toggle('is-blank-black',blank==='black');root.classList.toggle('is-blank-white',blank==='white')}" +
+      "function clearJump(){jump='';clearTimeout(jt)}function addJump(k){jump=(jump+k).slice(-3);clearTimeout(jt);jt=setTimeout(clearJump,1800)}function goJump(){var p=num(jump);clearJump();if(p>0)show(p-1)}" +
       "function tr(s){var v=s&&s.transition&&s.transition!=='inherit'?s.transition:d.transition;return /^(none|fade|slide|push|zoom)$/.test(v)?v:'fade'}" +
       "function reduce(){return window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}" +
-      "function show(n,instant){var ni=Math.max(0,Math.min(arr(d.slides).length-1,n)),old=stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide'),dir=ni>=i?'forward':'backward',sd=arr(d.slides)[ni]||{},sn=slide(sd),kind=tr(sd),go=!instant&&old&&ni!==i&&kind!=='none'&&!reduce();clearTimeout(anim);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction');tbs(sn,sd);off(sn,sd);objs(sn,sd);sn.classList.add('is-current');i=ni;if(!go){stage.innerHTML='';stage.appendChild(sn)}else{old.classList.remove('is-current','is-entering');old.classList.add('is-exiting');sn.classList.add('is-entering');stage.dataset.transition=kind;stage.dataset.direction=dir;stage.classList.add('is-transitioning');stage.appendChild(sn);requestAnimationFrame(function(){stage.classList.add('is-animating')});anim=setTimeout(function(){stage.innerHTML='';sn.classList.remove('is-entering','is-exiting');sn.classList.add('is-current');stage.appendChild(sn);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction')},420)}count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();chrome()}" +
+      "function show(n,instant,silent){var ni=Math.max(0,Math.min(arr(d.slides).length-1,n)),old=stage.querySelector('.ppt-slide.is-current')||stage.querySelector('.ppt-slide'),dir=ni>=i?'forward':'backward',sd=arr(d.slides)[ni]||{},sn=slide(sd),kind=tr(sd),go=!instant&&old&&ni!==i&&kind!=='none'&&!reduce();clearTimeout(anim);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction');tbs(sn,sd);off(sn,sd);objs(sn,sd);sn.classList.add('is-current');i=ni;if(!go){stage.innerHTML='';stage.appendChild(sn)}else{old.classList.remove('is-current','is-entering');old.classList.add('is-exiting');sn.classList.add('is-entering');stage.dataset.transition=kind;stage.dataset.direction=dir;stage.classList.add('is-transitioning');stage.appendChild(sn);requestAnimationFrame(function(){stage.classList.add('is-animating')});anim=setTimeout(function(){stage.innerHTML='';sn.classList.remove('is-entering','is-exiting');sn.classList.add('is-current');stage.appendChild(sn);stage.classList.remove('is-transitioning','is-animating');stage.removeAttribute('data-transition');stage.removeAttribute('data-direction')},420)}count.textContent=(i+1)+' / '+arr(d.slides).length;location.hash='slide-'+(i+1);fit();bg();if(!silent)chrome()}" +
       "function fullscreen(){if(!document.documentElement.requestFullscreen)return;var p=document.documentElement.requestFullscreen();if(p&&p.catch)p.catch(function(){})}" +
-      "function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen().catch(function(){})}else fullscreen()}" +
-      "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=fullscreen;root.onpointermove=chrome;root.onpointerdown=chrome;root.ondblclick=toggleFullscreen;" +
-      "document.addEventListener('keydown',function(ev){var k=ev.key;if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();show(i-1);return}if(k==='Home'){ev.preventDefault();show(0);return}if(k==='End'){ev.preventDefault();show(arr(d.slides).length-1)}});" +
-      "window.addEventListener('resize',fit);show(parseInt((location.hash||'').replace(/\\D/g,''),10)-1||0,true);" +
+      "function exitFullscreen(){if(document.fullscreenElement&&document.exitFullscreen){var p=document.exitFullscreen();if(p&&p.catch)p.catch(function(){})}}" +
+      "function toggleFullscreen(ev){if(ev&&ev.target&&ev.target.closest('.ppt-player-bar'))return;chrome();if(document.fullscreenElement)exitFullscreen();else fullscreen()}" +
+      "prev.onclick=function(){show(i-1)};next.onclick=function(){show(i+1)};full.onclick=function(){toggleFullscreen()};['pointermove','pointerdown','touchstart','touchmove'].forEach(function(x){root.addEventListener(x,chrome)});root.addEventListener('click',function(ev){if(ev.target.closest('.ppt-player-bar,video,audio,a,button'))return;clearTimeout(ct);ct=setTimeout(function(){show(i+1)},180)});root.ondblclick=function(ev){clearTimeout(ct);toggleFullscreen(ev)};" +
+      "document.addEventListener('keydown',function(ev){chrome();var k=ev.key;if(k==='Escape'&&document.fullscreenElement){ev.preventDefault();exitFullscreen();return}if(k==='F5'){ev.preventDefault();if(!ev.shiftKey)show(0);fullscreen();return}if(/^\\d$/.test(k)){ev.preventDefault();addJump(k);return}if(jump&&k==='Backspace'){ev.preventDefault();jump=jump.slice(0,-1);return}if(jump&&k==='Enter'){ev.preventDefault();goJump();return}if(k==='b'||k==='B'||k==='.'){ev.preventDefault();blankMode('black');return}if(k==='w'||k==='W'||k===','){ev.preventDefault();blankMode('white');return}if(k==='f'||k==='F'){ev.preventDefault();toggleFullscreen();return}if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='Enter'||k==='PageDown'||k==='n'||k==='N'){ev.preventDefault();clearJump();show(i+1);return}if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'||k==='p'||k==='P'){ev.preventDefault();clearJump();show(i-1);return}if(k==='Home'){ev.preventDefault();clearJump();show(0);return}if(k==='End'){ev.preventDefault();clearJump();show(arr(d.slides).length-1)}});" +
+      "window.addEventListener('resize',fit);if(window.visualViewport){window.visualViewport.addEventListener('resize',fit);window.visualViewport.addEventListener('scroll',fit)}window.addEventListener('orientationchange',function(){setTimeout(fit,120)});show(parseInt((location.hash||'').replace(/\\D/g,''),10)-1||0,true,true);" +
       "})();";
   }
 
@@ -1914,11 +2793,14 @@
       "  <title>" + title + "</title>\n" +
       "  <link rel=\"icon\" type=\"image/svg+xml\" href=\"" + STANDALONE_FAVICON + "\">\n" +
       "  <style>\n" + SLIDE_CSS + "\n" +
-      "    html,body{margin:0;min-height:100%;background:#101214;color:#f4f4f4;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:0}\n" +
-      "    #ppt-player-root{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden;background:#101214}\n" +
+      "    html,body{margin:0;width:100%;height:100%;min-height:100%;overflow:hidden;background:#101214;color:#f4f4f4;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:0}\n" +
+      "    #ppt-player-root{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden;background:#101214;touch-action:manipulation}\n" +
       "    #ppt-player-root.is-ui-hidden{cursor:none}\n" +
-      "    .ppt-player-stage{position:absolute;top:50%;left:50%;overflow:hidden;transform-origin:center center}\n" +
+      "    #ppt-player-root.is-blank-black::after,#ppt-player-root.is-blank-white::after{content:\"\";position:fixed;inset:0;z-index:4}\n" +
+      "    #ppt-player-root.is-blank-black::after{background:#000}#ppt-player-root.is-blank-white::after{background:#fff}\n" +
+      "    .ppt-player-stage{position:fixed;top:50%;left:50%;overflow:hidden;transform-origin:center center;will-change:transform}\n" +
       "    #ppt-player-root .ppt-slide{position:absolute;inset:0;box-shadow:none;will-change:opacity,transform}\n" +
+      "    #ppt-player-root .ppt-image-placeholder,#ppt-player-root .ppt-video-placeholder,#ppt-player-root .ppt-audio-placeholder,#ppt-player-root .ppt-chart-empty{color:transparent;font-size:0}\n" +
       "    .ppt-player-stage .ppt-slide.is-current{opacity:1;transform:translate3d(0,0,0) scale(1)}\n" +
       "    .ppt-player-stage.is-transitioning .ppt-slide{pointer-events:none}.ppt-player-stage.is-transitioning .ppt-slide.is-entering{z-index:2}.ppt-player-stage.is-transitioning .ppt-slide.is-exiting{z-index:1}\n" +
       "    .ppt-player-stage[data-transition=fade] .ppt-slide.is-entering{opacity:0}.ppt-player-stage[data-transition=fade].is-animating .ppt-slide.is-entering{opacity:1;transition:opacity .34s ease}.ppt-player-stage[data-transition=fade].is-animating .ppt-slide.is-exiting{opacity:0;transition:opacity .34s ease}\n" +
@@ -1926,11 +2808,12 @@
       "    .ppt-player-stage[data-transition=push][data-direction=forward] .ppt-slide.is-entering{transform:translate3d(100%,0,0)}.ppt-player-stage[data-transition=push][data-direction=backward] .ppt-slide.is-entering{transform:translate3d(-100%,0,0)}.ppt-player-stage[data-transition=push].is-animating .ppt-slide.is-entering{transform:translate3d(0,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=push][data-direction=forward].is-animating .ppt-slide.is-exiting{transform:translate3d(-100%,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=push][data-direction=backward].is-animating .ppt-slide.is-exiting{transform:translate3d(100%,0,0);transition:transform .36s cubic-bezier(.2,.8,.2,1)}\n" +
       "    .ppt-player-stage[data-transition=zoom] .ppt-slide.is-entering{opacity:0;transform:scale(.94)}.ppt-player-stage[data-transition=zoom].is-animating .ppt-slide.is-entering{opacity:1;transform:scale(1);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}.ppt-player-stage[data-transition=zoom].is-animating .ppt-slide.is-exiting{opacity:0;transform:scale(1.04);transition:opacity .34s ease,transform .34s cubic-bezier(.2,.8,.2,1)}\n" +
       "    @media (prefers-reduced-motion:reduce){.ppt-player-stage .ppt-slide{transition:none!important}}\n" +
-      "    .ppt-player-bar{position:fixed;left:50%;bottom:18px;display:flex;align-items:center;gap:10px;transform:translateX(-50%);padding:8px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(16,18,20,.82);backdrop-filter:blur(10px);opacity:1;transition:opacity .18s ease,transform .18s ease}\n" +
-      "    #ppt-player-root.is-ui-hidden .ppt-player-bar{pointer-events:none;opacity:0;transform:translate(-50%,12px)}\n" +
+      "    .ppt-player-bar{position:fixed;left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:10;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px));box-sizing:border-box;transform:translateX(-50%);padding:7px;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(16,18,20,.82);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:1;transition:opacity .18s ease,transform .18s ease}\n" +
+      "    #ppt-player-root.is-ui-hidden .ppt-player-bar{pointer-events:none;opacity:0;transform:translate(-50%,10px)}\n" +
       "    #ppt-player-root.is-ui-hidden .ppt-player-bar:focus-within{pointer-events:auto;opacity:1;transform:translateX(-50%)}\n" +
-      "    .ppt-player-bar button{height:36px;padding:0 14px;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:#f7f7f2;color:#141414;font-weight:760;cursor:pointer}\n" +
-      "    .ppt-player-bar span{min-width:70px;text-align:center;color:#f4f4f4;font-size:14px}\n" +
+      "    .ppt-player-bar button{flex:0 0 auto;height:38px;min-width:48px;padding:0 12px;border:1px solid rgba(255,255,255,.16);border-radius:6px;background:#f7f7f2;color:#141414;font-size:14px;font-weight:760;white-space:nowrap;cursor:pointer}\n" +
+      "    .ppt-player-bar span{flex:0 0 auto;min-width:62px;text-align:center;color:#f4f4f4;font-size:14px}\n" +
+      "    @media (max-width:520px){.ppt-player-bar{bottom:calc(10px + env(safe-area-inset-bottom,0px));gap:6px;padding:6px}.ppt-player-bar button{height:44px;min-width:52px;padding:0 12px;font-size:13px}.ppt-player-bar span{min-width:54px;font-size:13px}}\n" +
       "  </style>\n" +
       "  <script id=\"ppt-html-data\" type=\"application/vnd.ppt-html+json\">\n" + json + "\n  </script>\n" +
       "</head>\n" +
@@ -1962,11 +2845,18 @@
     transitions: TRANSITIONS,
     slideCss: SLIDE_CSS,
     deckTemplates: [
-      { id: "ai-camera", name: "AI 导演相机", description: "产品发布 demo，适合展示一个新想法。" },
-      { id: "product-pitch", name: "产品发布", description: "问题、方案、价值和下一步。" },
-      { id: "lesson", name: "课程课件", description: "学习目标、概念、练习和课后任务。" },
-      { id: "project-update", name: "项目汇报", description: "状态、风险、决策和里程碑。" }
+      { id: "ai-camera", name: "AI 导演相机", description: "硬件发布 demo：问题、流程、数据和产品主张。" },
+      { id: "product-pitch", name: "产品发布", description: "知识库 AI 助手发布稿，含痛点、证据、发布计划。" },
+      { id: "investor-pitch", name: "融资路演", description: "种子轮融资范例，含市场压力、牵引力、资金用途。" },
+      { id: "enterprise-proposal", name: "企业销售方案", description: "面向客户的解决方案、ROI 和试点成功计划。" },
+      { id: "research-brief", name: "研究决策简报", description: "用访谈、数据和竞品证据支持一个产品决策。" },
+      { id: "product-review", name: "产品评审", description: "评审流程改版，含问题、路径、取舍和实验指标。" },
+      { id: "project-update", name: "QBR 业务复盘", description: "季度业务复盘，含漏斗、学习、下季度下注。" },
+      { id: "lesson", name: "实战工作坊", description: "90 分钟培训课，含目标、流程、练习材料和作业。" },
+      { id: "incident-review", name: "事故复盘", description: "线上事故复盘，含影响、时间线、根因和行动项。" },
+      { id: "marketing-campaign", name: "营销战役", description: "会员增长活动，含人群洞察、渠道预算和 21 天节奏。" }
     ],
+    createBlankDeck: createBlankDeck,
     createDemoDeck: createDemoDeck,
     createTemplateDeck: createTemplateDeck,
     normalizeDeck: normalizeDeck,

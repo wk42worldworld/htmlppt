@@ -288,7 +288,7 @@ AI は自由な HTML ではなく、構造化された deck JSON を出力しま
 }
 ```
 
-`styles` は個別要素の見た目の上書きを保存します。キーは同じ構造化フィールドパスです。使用できるフィールドは `fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle` です。自由な CSS、セレクタ、クラス名、スクリプトは出力しないでください。文言を修正する場合、ユーザーがスタイル削除や既定テーマ復元を求めない限り、既存の `styles` を保持してください。
+`styles` は個別要素の見た目の上書きを保存します。キーは同じ構造化フィールドパスです。使用できるフィールドは `fontFamily`、`fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle` です。`fontFamily` は `system`、`display`、`arial`、`helvetica`、`avenir`、`serif`、`georgia`、`times`、`cjk-sans`、`pingfang`、`yahei`、`cjk-serif`、`songti`、`kaiti`、`yu-mincho`、`mono`、`menlo`、`consolas`、`handwriting` のいずれかを使用してください。自由な CSS、セレクタ、クラス名、スクリプトは出力しないでください。文言を修正する場合、ユーザーがスタイル削除や既定テーマ復元を求めない限り、既存の `styles` を保持してください。
 
 ## 6. 推奨生成フロー
 

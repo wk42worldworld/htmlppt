@@ -288,7 +288,7 @@ AI는 자유 형식 HTML이 아니라 구조화된 deck JSON을 출력해야 합
 }
 ```
 
-`styles` 는 개별 요소의 시각적 덮어쓰기를 저장하며 같은 구조화 필드 경로를 키로 사용합니다. 사용할 수 있는 필드는 `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, `fontStyle` 입니다. 자유 CSS, 선택자, 클래스 이름, 스크립트를 출력하지 마세요. 문구를 수정할 때는 사용자가 스타일 삭제나 기본 테마 복원을 요청하지 않는 한 기존 `styles` 를 보존해야 합니다.
+`styles` 는 개별 요소의 시각적 덮어쓰기를 저장하며 같은 구조화 필드 경로를 키로 사용합니다. 사용할 수 있는 필드는 `fontFamily`, `fontSize`, `color`, `backgroundColor`, `borderColor`, `borderWidth`, `borderRadius`, `opacity`, `textAlign`, `fontWeight`, `fontStyle` 입니다. `fontFamily` 는 `system`, `display`, `arial`, `helvetica`, `avenir`, `serif`, `georgia`, `times`, `cjk-sans`, `pingfang`, `yahei`, `cjk-serif`, `songti`, `kaiti`, `yu-mincho`, `mono`, `menlo`, `consolas`, `handwriting` 중 하나를 사용해야 합니다. 자유 CSS, 선택자, 클래스 이름, 스크립트를 출력하지 마세요. 문구를 수정할 때는 사용자가 스타일 삭제나 기본 테마 복원을 요청하지 않는 한 기존 `styles` 를 보존해야 합니다.
 
 ## 6. 권장 생성 흐름
 

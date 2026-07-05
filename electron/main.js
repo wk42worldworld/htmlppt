@@ -9,8 +9,20 @@ const isMac = process.platform === "darwin";
 const appName = "PPT.html Studio";
 
 function appIconPath() {
-  const iconFile = process.platform === "win32" ? "icon.ico" : "icon.png";
+  let iconFile = "icon.png";
+  if (process.platform === "darwin") iconFile = "icon.icns";
+  if (process.platform === "win32") iconFile = "icon.ico";
   return path.join(__dirname, "..", "build", iconFile);
+}
+
+function appPngIconPath() {
+  return path.join(__dirname, "..", "build", "icon.png");
+}
+
+function loadAppIcon() {
+  const primaryIcon = nativeImage.createFromPath(appIconPath());
+  if (!primaryIcon.isEmpty()) return primaryIcon;
+  return nativeImage.createFromPath(appPngIconPath());
 }
 
 function configureAppIdentity() {
@@ -30,7 +42,7 @@ function configureAppIdentity() {
 
   if (isMac && app.dock) {
     try {
-      const dockIcon = nativeImage.createFromPath(appIconPath());
+      const dockIcon = loadAppIcon();
       if (!dockIcon.isEmpty()) app.dock.setIcon(dockIcon);
     } catch (error) {
       console.warn("Unable to set PPT.html dock icon:", error.message);
@@ -304,9 +316,26 @@ function buildMenu() {
         { role: "forceReload" },
         { role: "toggleDevTools" },
         { type: "separator" },
-        { role: "resetZoom" },
-        { role: "zoomIn" },
-        { role: "zoomOut" },
+        {
+          label: "Fit Canvas to Window",
+          accelerator: "CmdOrCtrl+0",
+          click: () => sendCommand("canvasZoomFit")
+        },
+        {
+          label: "Actual Canvas Size",
+          accelerator: "CmdOrCtrl+1",
+          click: () => sendCommand("canvasZoomActual")
+        },
+        {
+          label: "Zoom Canvas In",
+          accelerator: "CmdOrCtrl+=",
+          click: () => sendCommand("canvasZoomIn")
+        },
+        {
+          label: "Zoom Canvas Out",
+          accelerator: "CmdOrCtrl+-",
+          click: () => sendCommand("canvasZoomOut")
+        },
         { type: "separator" },
         { role: "togglefullscreen" }
       ]

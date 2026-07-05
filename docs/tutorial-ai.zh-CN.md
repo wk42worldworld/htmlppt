@@ -288,7 +288,7 @@ AI 应输出结构化 deck JSON，而不是自由 HTML。
 }
 ```
 
-`styles` 用于保存单个元素的视觉覆盖，键名同样是结构化字段路径。可用字段包括 `fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle`。不要输出自由 CSS、选择器、类名或脚本。AI 修正文案时应保留已有 `styles`，除非用户明确要求清除样式或恢复默认主题。
+`styles` 用于保存单个元素的视觉覆盖，键名同样是结构化字段路径。可用字段包括 `fontFamily`、`fontSize`、`color`、`backgroundColor`、`borderColor`、`borderWidth`、`borderRadius`、`opacity`、`textAlign`、`fontWeight`、`fontStyle`。`fontFamily` 只能使用 `system`、`display`、`arial`、`helvetica`、`avenir`、`serif`、`georgia`、`times`、`cjk-sans`、`pingfang`、`yahei`、`cjk-serif`、`songti`、`kaiti`、`yu-mincho`、`mono`、`menlo`、`consolas`、`handwriting`。不要输出自由 CSS、选择器、类名或脚本。AI 修正文案时应保留已有 `styles`，除非用户明确要求清除样式或恢复默认主题。
 
 ## 6. 推荐生成流程
 

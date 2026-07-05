@@ -9,6 +9,9 @@ const root = path.join(__dirname, "..");
 const rendererPath = path.join(root, "renderer.js");
 const code = fs.readFileSync(rendererPath, "utf8");
 const indexHtml = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const appJs = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const electronMain = fs.readFileSync(path.join(root, "electron/main.js"), "utf8");
+const stylesCss = fs.readFileSync(path.join(root, "styles.css"), "utf8");
 const context = { window: {}, console };
 
 vm.runInNewContext(code, context, { filename: rendererPath });
@@ -17,8 +20,32 @@ const ppt = context.window.PPTHtml;
 
 assert.equal(ppt.version, "0.1");
 assert.ok(Array.isArray(ppt.deckTemplates));
-assert.ok(ppt.deckTemplates.length >= 4);
+assert.ok(ppt.deckTemplates.length >= 10);
+assert.equal(typeof ppt.createBlankDeck, "function");
+const blankDeck = ppt.createBlankDeck();
+assert.equal(blankDeck.slides.length, 1);
+assert.equal(blankDeck.slides[0].layout, "text");
+assert.equal(blankDeck.slides[0].title, "");
+assert.equal(blankDeck.slides[0].subtitle, "");
+assert.equal(blankDeck.slides[0].body, "");
+assert.equal(blankDeck.slides[0].objects.length, 0);
 [
+  "investor-pitch",
+  "enterprise-proposal",
+  "research-brief",
+  "product-review",
+  "incident-review",
+  "marketing-campaign"
+].forEach((id) => {
+  assert.ok(ppt.deckTemplates.some((template) => template.id === id), `missing template ${id}`);
+});
+[
+  /data-insert="text" data-variant="title"/,
+  /data-insert="text" data-variant="subtitle"/,
+  /data-insert="text" data-variant="body"/,
+  /data-insert="text" data-variant="bullet"/,
+  /data-insert="text" data-variant="label"/,
+  /data-insert="text" data-variant="box"/,
   /data-insert="compare" data-variant="decision"/,
   /data-insert="chart" data-variant="line"/,
   /data-insert="chart" data-variant="donut"/,
@@ -29,6 +56,144 @@ assert.ok(ppt.deckTemplates.length >= 4);
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
 });
+[
+  /id="tableAddRowBtn"/,
+  /id="objectTableAddRowBtn"/,
+  /id="objectDeleteBtn"/,
+  /id="presentFullscreenBtn"/,
+  /id="styleFontFamilyInput"/,
+  /id="zoomOutBtn"/,
+  /id="zoomFitBtn"/,
+  /id="zoomInBtn"/,
+  /class="rail-action"/,
+  /id="slideContextMenu"/,
+  /id="newDeckBtn"[\s\S]*data-i18n="action\.newShort"/,
+  /id="templatesBtn"[\s\S]*data-i18n="action\.templatesShort"/,
+  /id="templateDialog"[\s\S]*data-i18n="dialog\.templatesHint"/,
+  /data-slide-action="duplicate"/,
+  /data-slide-action="delete"/,
+  /data-context-action="tableInsertRowAbove"/,
+  /data-context-action="tableInsertColumnRight"/,
+  /data-context-action="tableClearCell"/
+].forEach((pattern) => {
+  assert.match(indexHtml, pattern);
+});
+[
+  /data-insert="chart" data-variant="line"[\s\S]*?#icon-chart-line/,
+  /data-insert="chart" data-variant="donut"[\s\S]*?#icon-chart-donut/,
+  /data-insert="shape" data-variant="rectangle"[\s\S]*?#icon-shape-rectangle/,
+  /data-insert="shape" data-variant="ellipse"[\s\S]*?#icon-shape-ellipse/,
+  /data-insert="shape" data-variant="line"[\s\S]*?#icon-shape-line/,
+  /data-insert="shape" data-variant="arrow"[\s\S]*?#icon-shape-arrow/,
+  /data-insert="shape" data-variant="callout"[\s\S]*?#icon-shape-callout/,
+  /data-insert="table" data-variant="compare"[\s\S]*?#icon-table-compare/,
+  /data-insert="table" data-variant="checklist"[\s\S]*?#icon-table-checklist/,
+  /data-insert="cards" data-variant="features"[\s\S]*?#icon-cards-features/,
+  /data-insert="cards" data-variant="prosCons"[\s\S]*?#icon-cards-pros-cons/,
+  /data-insert="compare" data-variant="decision"[\s\S]*?#icon-decision/,
+  /id="objectBringFrontBtn"[\s\S]*?#icon-layer-front/,
+  /id="objectSendBackBtn"[\s\S]*?#icon-layer-back/,
+  /id="presentPrevBtn"[\s\S]*?#icon-chevron-left/,
+  /id="presentFullscreenBtn"[\s\S]*?#icon-fullscreen/
+].forEach((pattern) => {
+  assert.match(indexHtml, pattern);
+});
+assert.match(appJs, /function createSlideThumbPreview/);
+assert.match(appJs, /replaceDeck\(PPTHtml\.createBlankDeck\(\)/);
+assert.match(appJs, /return PPTHtml\.normalizeDeck\(PPTHtml\.createBlankDeck\(\)\)/);
+assert.match(appJs, /function handleCanvasWheel/);
+assert.match(appJs, /function fitCanvasToViewport/);
+assert.match(appJs, /function deleteSelectedCanvasContent/);
+assert.match(appJs, /function deleteSlideAt/);
+assert.match(appJs, /function handleSlideShortcut/);
+assert.match(appJs, /function handleSlideContextMenuAction/);
+assert.match(appJs, /addSlideAfter\(currentIndex/);
+assert.match(appJs, /lowerKey === "m"/);
+assert.match(appJs, /function selectedExplicitTableInfo/);
+assert.match(appJs, /function sameTableScope/);
+assert.match(appJs, /function previewCanvasSelectionBox/);
+assert.match(appJs, /function textBoxPreset/);
+assert.match(appJs, /function fontFamilyStack/);
+assert.match(appJs, /function tableObjectSize/);
+assert.match(appJs, /function findObjectPlacement/);
+assert.match(appJs, /function fitTableObjectToData/);
+assert.match(appJs, /function fitTableObjectForPath/);
+assert.match(appJs, /function clampObjectInsideSlide/);
+assert.match(appJs, /defaultObjectSize\(objectType, variant, data\)/);
+assert.match(appJs, /if \(activeCanvasEdit\) \{[\s\S]*finishCanvasEdit\(true\);[\s\S]*canvasNodeByPath\(nextTargetPath\)/);
+assert.match(appJs, /startSelectionBounds/);
+assert.match(appJs, /previewOffsets/);
+assert.match(appJs, /tableInsertRowAbove/);
+assert.match(appJs, /table\.insertColumnRight/);
+assert.match(appJs, /bindCanvasComponent\("\.ppt-chart-wrap, \.ppt-chart-empty"/);
+assert.match(appJs, /bindStyleInput\(els\.styleFontFamilyInput, "fontFamily"\)/);
+assert.match(appJs, /editable: true/);
+assert.match(appJs, /canvasZoomMode/);
+[
+  "insert.text.title",
+  "insert.text.subtitle",
+  "insert.text.body",
+  "insert.text.bullet",
+  "insert.text.label",
+  "insert.text.box",
+  "field.fontFamily",
+  "font.display",
+  "font.avenir",
+  "font.pingfang",
+  "font.yahei",
+  "font.dengxian",
+  "font.simhei",
+  "font.simsun",
+  "font.fangsong",
+  "font.aptos",
+  "font.calibri",
+  "font.consolas",
+  "font.mono"
+].forEach((key) => {
+  assert.match(appJs, new RegExp(`"${key.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}"`));
+});
+[
+  /<option value="yahei" data-i18n="font\.yahei">/,
+  /<option value="dengxian" data-i18n="font\.dengxian">/,
+  /<option value="simhei" data-i18n="font\.simhei">/,
+  /<option value="simsun" data-i18n="font\.simsun">/,
+  /<option value="fangsong" data-i18n="font\.fangsong">/,
+  /<option value="aptos" data-i18n="font\.aptos">/,
+  /<option value="calibri" data-i18n="font\.calibri">/
+].forEach((pattern) => {
+  assert.match(indexHtml, pattern);
+});
+[
+  /yahei: "\\"Microsoft YaHei\\"/,
+  /dengxian: "DengXian/,
+  /simhei: "SimHei/,
+  /simsun: "SimSun/,
+  /fangsong: "FangSong/,
+  /aptos: "Aptos/,
+  /calibri: "Calibri/
+].forEach((pattern) => {
+  assert.match(appJs, pattern);
+});
+const i18nKeys = Array.from(indexHtml.matchAll(/data-i18n(?:-[a-z]+)?="([^"]+)"/g)).map((match) => match[1]);
+Array.from(new Set(i18nKeys)).forEach((key) => {
+  assert.match(appJs, new RegExp(`"${key.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}"`), `missing i18n key ${key}`);
+});
+assert.match(electronMain, /canvasZoomIn/);
+assert.match(electronMain, /canvasZoomFit/);
+assert.doesNotMatch(electronMain, /role: "zoomIn"/);
+assert.match(stylesCss, /\.slide-thumb-preview/);
+assert.match(stylesCss, /\.canvas-zoom-controls/);
+assert.match(stylesCss, /button\.icon-button\.labeled-action/);
+assert.match(stylesCss, /\.template-grid \{[\s\S]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+assert.match(stylesCss, /\.stage-frame\.is-canvas-moving \[data-canvas-edit\]/);
+assert.match(stylesCss, /contain: layout paint/);
+assert.match(stylesCss, /\.stage-frame \.ppt-object-table/);
+assert.match(stylesCss, /Layout stability pass/);
+assert.match(stylesCss, /grid-template-columns: 228px 88px minmax\(420px, 1fr\) minmax\(300px, 336px\)/);
+assert.doesNotMatch(stylesCss, /\.slide-thumb::after/);
+assert.match(code, /\.ppt-object-table\{align-content:start;overflow:visible;contain:layout\}/);
+assert.match(code, /\.ppt-object \.ppt-table\{width:100%;height:auto;margin:0;table-layout:fixed/);
+assert.match(code, /function tableObjectSize/);
 
 ppt.deckTemplates.forEach((template) => {
   const deck = ppt.createTemplateDeck(template.id);
@@ -200,6 +365,7 @@ const styleDeck = ppt.normalizeDeck({
       title: "Styled title",
       styles: {
         title: {
+          fontFamily: "menlo",
           fontSize: 88,
           color: "#ff3366",
           backgroundColor: "#ffffff",
@@ -216,11 +382,14 @@ const styleDeck = ppt.normalizeDeck({
   ]
 });
 assert.equal(styleDeck.slides[0].styles.title.fontSize, 88);
+assert.equal(styleDeck.slides[0].styles.title.fontFamily, "menlo");
 assert.equal(styleDeck.slides[0].styles.title.textAlign, "center");
 const styleHtml = ppt.exportStandalone(styleDeck);
 assert.match(styleHtml, /"styles"/);
+assert.match(styleHtml, /"fontFamily": "menlo"/);
 assert.match(styleHtml, /"fontSize": 88/);
 assert.match(styleHtml, /function sty/);
+assert.match(styleHtml, /s\.fontFamily/);
 assert.match(styleHtml, /style\.fontSize/);
 
 const textBoxDeck = ppt.normalizeDeck({
@@ -257,8 +426,11 @@ assert.match(html, /is-ui-hidden/);
 assert.match(html, /requestFullscreen/);
 assert.match(html, /is-transitioning/);
 assert.match(html, /data-transition/);
+assert.match(html, /blankMode/);
+assert.match(html, /addJump/);
+assert.match(html, /is-blank-black/);
 
 const fencedDeck = ppt.parseFileText("```json\n" + JSON.stringify(ppt.createTemplateDeck("lesson")) + "\n```");
-assert.equal(fencedDeck.title, "课程课件");
+assert.equal(fencedDeck.title, "实战工作坊：用 AI 做用户访谈分析");
 
 console.log("smoke tests passed");
