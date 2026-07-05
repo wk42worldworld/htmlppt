@@ -60,6 +60,25 @@
       <path d="M8 20H4v-4"></path>
       <path d="M16 20h4v-4"></path>
     </symbol>
+    <symbol id="icon-fit-fill" viewBox="0 0 24 24">
+      <path d="M4 9V4h5"></path>
+      <path d="M20 9V4h-5"></path>
+      <path d="M4 15v5h5"></path>
+      <path d="M20 15v5h-5"></path>
+      <path d="M9 9 4 4"></path>
+      <path d="m15 9 5-5"></path>
+      <path d="m9 15-5 5"></path>
+      <path d="m15 15 5 5"></path>
+    </symbol>
+    <symbol id="icon-keyboard" viewBox="0 0 24 24">
+      <path d="M4 6h16v12H4z"></path>
+      <path d="M7 10h.01"></path>
+      <path d="M10 10h.01"></path>
+      <path d="M13 10h.01"></path>
+      <path d="M16 10h.01"></path>
+      <path d="M7 14h6"></path>
+      <path d="M16 14h1"></path>
+    </symbol>
     <symbol id="icon-exit" viewBox="0 0 24 24">
       <path d="M7 7 17 17"></path>
       <path d="M17 7 7 17"></path>
@@ -1022,10 +1041,33 @@
       <button type="button" id="presentPrevBtn" data-i18n-title="present.prev"><svg><use href="#icon-chevron-left"></use></svg><span data-i18n="present.prev">上一页</span></button>
       <span id="presentCounter">1 / 1</span>
       <button type="button" id="presentNextBtn" data-i18n-title="present.next"><span data-i18n="present.next">下一页</span><svg><use href="#icon-chevron-right"></use></svg></button>
+      <button type="button" id="presentFitBtn" data-i18n-title="present.fitMode"><svg><use href="#icon-fit-fill"></use></svg><span id="presentFitLabel" data-i18n="present.fitContain">适合</span></button>
+      <button type="button" id="presentShortcutsBtn" data-i18n-title="present.shortcutsTitle"><svg><use href="#icon-keyboard"></use></svg><span data-i18n="present.shortcuts">快捷键</span></button>
       <button type="button" id="presentFullscreenBtn" data-i18n-title="present.fullscreen"><svg><use href="#icon-fullscreen"></use></svg><span data-i18n="present.fullscreen">全屏</span></button>
       <button type="button" id="presentExitBtn" data-i18n-title="present.exit"><svg><use href="#icon-exit"></use></svg><span data-i18n="present.exit">退出</span></button>
     </div>
   </div>
+
+  <dialog class="shortcut-dialog" id="shortcutDialog">
+    <form method="dialog">
+      <header>
+        <strong data-i18n="dialog.shortcuts">快捷键</strong>
+        <button type="submit" data-i18n="dialog.close" data-i18n-title="dialog.close">关闭</button>
+      </header>
+      <div class="shortcut-grid">
+        <span data-i18n="shortcut.presentStart">从第一页播放</span><kbd>F5</kbd>
+        <span data-i18n="shortcut.presentCurrent">从当前页播放</span><kbd>Shift+F5</kbd>
+        <span data-i18n="shortcut.next">下一页</span><kbd>Space / Enter / →</kbd>
+        <span data-i18n="shortcut.prev">上一页</span><kbd>Backspace / P / ←</kbd>
+        <span data-i18n="shortcut.fitMode">切换适合 / 填满</span><kbd>M</kbd>
+        <span data-i18n="shortcut.fullscreen">切换全屏</span><kbd>F</kbd>
+        <span data-i18n="shortcut.blank">黑屏 / 白屏</span><kbd>B / W</kbd>
+        <span data-i18n="shortcut.jump">输入页码后跳转</span><kbd>1...9 + Enter</kbd>
+        <span data-i18n="shortcut.help">显示快捷键</span><kbd>?</kbd>
+        <span data-i18n="shortcut.exit">退出演示</span><kbd>Esc</kbd>
+      </div>
+    </form>
+  </dialog>
 
   <dialog class="json-dialog" id="jsonDialog">
     <form method="dialog">

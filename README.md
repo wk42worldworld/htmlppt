@@ -20,6 +20,10 @@ PPT.html Studio is built for the missing middle between plain HTML and tradition
 
 In short: this is not “HTML pretending to be PPT” and not “another PPT clone.” It is a structured presentation container where AI edits the data, humans edit the visual result, and the renderer keeps the output portable and predictable.
 
+## New in v0.2.15
+
+PPT.html Studio now tightens the presentation and editor basics that matter for everyday PPT use: presentation mode can switch between full-slide Fit and edge-to-edge Fill, the same shortcut is available in exported single-file players with `M`, a built-in shortcut dialog is available from the player and desktop Help menu, portrait touch presentation avoids accidental page turns when showing controls, `Shift+F5` now respects the currently presented slide, the object-panel Delete button follows the same multi-selection deletion path as the keyboard, and the release workflow runs on Node.js 24.
+
 ## New in v0.2.14
 
 PPT.html Studio now has a stronger AI/human editing loop: inserted canvas objects receive object-level validation for duplicate ids, geometry, media, chart, table, card, metric, timeline, quote, code, and compare data; selected image/video/audio, chart, and table objects expose typed inspectors so users can edit common fields without touching JSON; the Quality Check dialog can copy a complete AI repair prompt containing the current deck and validation report; and the bundled `htmlppt` skill plus deck CLI are documented as the official handoff path for other agents.

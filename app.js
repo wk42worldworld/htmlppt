@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.14";
+  var APP_VERSION_LABEL = "v0.2.15";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();
@@ -31,10 +31,12 @@
   var presenterUiTimer = 0;
   var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
+  var presenterScaleMode = "fit";
   var presenterBlankMode = "";
   var presenterJumpBuffer = "";
   var presenterJumpTimer = 0;
   var presenterClickTimer = 0;
+  var suppressNextPresenterClick = false;
   var pendingMediaInsertType = "";
   var pendingMediaObjectPath = "";
   var pendingMediaPlaceholderPath = "";
@@ -2169,7 +2171,23 @@
   });
 
   Object.assign(I18N["zh-CN"], {
+    "dialog.shortcuts": "快捷键",
     "present.fullscreen": "全屏",
+    "present.fitMode": "切换适合 / 填满（M）",
+    "present.fitContain": "适合",
+    "present.fitFill": "填满",
+    "present.shortcuts": "快捷键",
+    "present.shortcutsTitle": "查看演示快捷键（?）",
+    "shortcut.presentStart": "从第一页播放",
+    "shortcut.presentCurrent": "从当前页播放",
+    "shortcut.next": "下一页",
+    "shortcut.prev": "上一页",
+    "shortcut.fitMode": "切换适合 / 填满",
+    "shortcut.fullscreen": "切换全屏",
+    "shortcut.blank": "黑屏 / 白屏",
+    "shortcut.jump": "输入页码后跳转",
+    "shortcut.help": "显示快捷键",
+    "shortcut.exit": "退出演示",
     "table.commands": "表格操作",
     "table.addRow": "加行",
     "table.insertRowAbove": "上方插入行",
@@ -2186,7 +2204,23 @@
   });
 
   Object.assign(I18N["en-US"], {
+    "dialog.shortcuts": "Keyboard Shortcuts",
     "present.fullscreen": "Full screen",
+    "present.fitMode": "Toggle fit / fill (M)",
+    "present.fitContain": "Fit",
+    "present.fitFill": "Fill",
+    "present.shortcuts": "Shortcuts",
+    "present.shortcutsTitle": "View presentation shortcuts (?)",
+    "shortcut.presentStart": "Present from first slide",
+    "shortcut.presentCurrent": "Present from current slide",
+    "shortcut.next": "Next slide",
+    "shortcut.prev": "Previous slide",
+    "shortcut.fitMode": "Toggle fit / fill",
+    "shortcut.fullscreen": "Toggle full screen",
+    "shortcut.blank": "Black / white screen",
+    "shortcut.jump": "Type a page number, then jump",
+    "shortcut.help": "Show shortcuts",
+    "shortcut.exit": "Exit presentation",
     "table.commands": "Table actions",
     "table.addRow": "Add row",
     "table.insertRowAbove": "Insert row above",
@@ -2203,7 +2237,23 @@
   });
 
   Object.assign(I18N["ja-JP"], {
+    "dialog.shortcuts": "ショートカット",
     "present.fullscreen": "全画面",
+    "present.fitMode": "自動調整 / 塗りつぶしを切替（M）",
+    "present.fitContain": "自動",
+    "present.fitFill": "塗りつぶし",
+    "present.shortcuts": "キー",
+    "present.shortcutsTitle": "発表ショートカットを表示（?）",
+    "shortcut.presentStart": "最初のスライドから発表",
+    "shortcut.presentCurrent": "現在のスライドから発表",
+    "shortcut.next": "次のスライド",
+    "shortcut.prev": "前のスライド",
+    "shortcut.fitMode": "自動調整 / 塗りつぶしを切替",
+    "shortcut.fullscreen": "全画面を切替",
+    "shortcut.blank": "黒画面 / 白画面",
+    "shortcut.jump": "ページ番号を入力して移動",
+    "shortcut.help": "ショートカットを表示",
+    "shortcut.exit": "発表を終了",
     "table.commands": "表の操作",
     "table.addRow": "行を追加",
     "table.insertRowAbove": "上に行を挿入",
@@ -2220,7 +2270,23 @@
   });
 
   Object.assign(I18N["ko-KR"], {
+    "dialog.shortcuts": "단축키",
     "present.fullscreen": "전체 화면",
+    "present.fitMode": "맞춤 / 채우기 전환 (M)",
+    "present.fitContain": "맞춤",
+    "present.fitFill": "채우기",
+    "present.shortcuts": "단축키",
+    "present.shortcutsTitle": "발표 단축키 보기 (?)",
+    "shortcut.presentStart": "첫 슬라이드부터 발표",
+    "shortcut.presentCurrent": "현재 슬라이드부터 발표",
+    "shortcut.next": "다음 슬라이드",
+    "shortcut.prev": "이전 슬라이드",
+    "shortcut.fitMode": "맞춤 / 채우기 전환",
+    "shortcut.fullscreen": "전체 화면 전환",
+    "shortcut.blank": "검은 화면 / 흰 화면",
+    "shortcut.jump": "페이지 번호 입력 후 이동",
+    "shortcut.help": "단축키 보기",
+    "shortcut.exit": "발표 종료",
     "table.commands": "표 작업",
     "table.addRow": "행 추가",
     "table.insertRowAbove": "위에 행 삽입",
@@ -2374,9 +2440,9 @@
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
-      "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFullscreenBtn", "presentExitBtn",
+      "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFitBtn", "presentFitLabel", "presentShortcutsBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
-      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "toast"
+      "templateDialog", "shortcutDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
@@ -2435,6 +2501,7 @@
     populateLayoutSelect();
     refreshTooltips();
     updateZoomLabel();
+    updatePresenterFitButton();
     if (!settings.skipRender) renderAll();
   }
 
@@ -2578,7 +2645,8 @@
         if (command === "saveAs") saveDeck(true);
         if (command === "validate") showValidationDialog();
         if (command === "presentFromStart" && !isTextEditingTarget(document.activeElement)) openPresenter(0);
-        if (command === "present" && !isTextEditingTarget(document.activeElement)) openPresenter(currentIndex);
+        if (command === "present" && !isTextEditingTarget(document.activeElement)) openPresenter(presenting ? presentIndex : currentIndex);
+        if (command === "shortcuts") showShortcutDialog();
         if (command === "canvasZoomIn") stepCanvasZoom(1);
         if (command === "canvasZoomOut") stepCanvasZoom(-1);
         if (command === "canvasZoomFit") fitCanvasToViewport();
@@ -2827,11 +2895,7 @@
     bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
     els.objectDuplicateBtn.addEventListener("click", duplicateSelectedCanvas);
     els.objectDeleteBtn.addEventListener("click", function () {
-      if (deleteSelectedObject()) {
-        toast(t("toast.deleted"));
-        return;
-      }
-      deleteSelectedCanvasContent();
+      deleteSelectedCanvasContent(currentCanvasSelectionPaths());
     });
     els.objectBringForwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("forward"); });
     els.objectSendBackwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("backward"); });
@@ -2906,6 +2970,8 @@
     els.presentBtn.addEventListener("click", function () { openPresenter(currentIndex); });
     els.presentPrevBtn.addEventListener("click", function () { showPresentationSlide(presentIndex - 1); });
     els.presentNextBtn.addEventListener("click", function () { showPresentationSlide(presentIndex + 1); });
+    els.presentFitBtn.addEventListener("click", togglePresenterScaleMode);
+    els.presentShortcutsBtn.addEventListener("click", showShortcutDialog);
     els.presentFullscreenBtn.addEventListener("click", function (event) {
       event.stopPropagation();
       togglePresenterFullscreen();
@@ -3754,6 +3820,8 @@
       hideSlideContextMenu();
     }
 
+    if (event.target && event.target.closest && event.target.closest("dialog")) return;
+
     if (!presenting && isTextEditingTarget(event.target) && key === "F5") {
       event.preventDefault();
       return;
@@ -3762,7 +3830,7 @@
     if (key === "F5") {
       event.preventDefault();
       commitActiveCanvasEdit();
-      openPresenter(event.shiftKey ? currentIndex : 0);
+      openPresenter(event.shiftKey ? (presenting ? presentIndex : currentIndex) : 0);
       return;
     }
 
@@ -3770,6 +3838,12 @@
       event.preventDefault();
       commitActiveCanvasEdit();
       openPresenter(currentIndex);
+      return;
+    }
+
+    if (!isTextEditingTarget(event.target) && (key === "?" || (commandKey && key === "/"))) {
+      event.preventDefault();
+      showShortcutDialog();
       return;
     }
 
@@ -3943,6 +4017,16 @@
     if (key === "f" || key === "F") {
       event.preventDefault();
       togglePresenterFullscreen();
+      return true;
+    }
+    if (key === "m" || key === "M") {
+      event.preventDefault();
+      togglePresenterScaleMode();
+      return true;
+    }
+    if (key === "?" || key === "h" || key === "H") {
+      event.preventDefault();
+      showShortcutDialog();
       return true;
     }
     if (nextKeys.indexOf(key) !== -1) {
@@ -8109,11 +8193,38 @@
 
   function fitPresentationFrame(frame, viewport) {
     if (!frame || !viewport) return;
-    var scale = Math.min(viewport.clientWidth / PPTHtml.baseWidth, viewport.clientHeight / PPTHtml.baseHeight);
+    var portraitTouch = viewport.clientWidth <= 720 && viewport.clientHeight > viewport.clientWidth;
+    var fill = presenterScaleMode === "fill" && !portraitTouch;
+    var scale = (fill ? Math.max : Math.min)(viewport.clientWidth / PPTHtml.baseWidth, viewport.clientHeight / PPTHtml.baseHeight);
     scale = Math.max(0.1, scale);
     frame.style.width = PPTHtml.baseWidth + "px";
     frame.style.height = PPTHtml.baseHeight + "px";
     frame.style.transform = "translate(-50%, -50%) scale(" + scale + ")";
+    frame.dataset.scaleMode = fill ? "fill" : "fit";
+    if (els.presenter) els.presenter.classList.toggle("is-fill-mode", fill);
+    updatePresenterFitButton();
+  }
+
+  function togglePresenterScaleMode() {
+    presenterScaleMode = presenterScaleMode === "fill" ? "fit" : "fill";
+    fitPresentationFrame(els.presenterStage, els.presenter);
+    showPresenterChrome();
+  }
+
+  function updatePresenterFitButton() {
+    if (!els.presentFitLabel || !els.presentFitBtn) return;
+    var isFill = presenterScaleMode === "fill";
+    els.presentFitLabel.textContent = isFill ? t("present.fitFill") : t("present.fitContain");
+    els.presentFitBtn.setAttribute("aria-pressed", isFill ? "true" : "false");
+    setTooltip(els.presentFitBtn, t("present.fitMode"));
+  }
+
+  function showShortcutDialog() {
+    if (!els.shortcutDialog) return;
+    hideCanvasContextMenu();
+    hideSlideContextMenu();
+    hideTooltip();
+    els.shortcutDialog.showModal();
   }
 
   function syncPresenterBackdrop() {
@@ -8198,6 +8309,7 @@
       return;
     }
     if (isTouchPortraitPresenterEvent(event)) {
+      suppressNextPresenterClick = true;
       togglePresenterChrome();
       return;
     }
@@ -8207,6 +8319,10 @@
   function handlePresenterClick(event) {
     if (!presenting) return;
     if (event.target.closest(".presenter-controls, video, audio, a, button")) return;
+    if (suppressNextPresenterClick) {
+      suppressNextPresenterClick = false;
+      return;
+    }
     window.clearTimeout(presenterClickTimer);
     presenterClickTimer = window.setTimeout(function () {
       if (presenting) showPresentationSlide(presentIndex + 1);
@@ -8351,6 +8467,7 @@
     window.clearTimeout(presenterUiTimer);
     window.clearTimeout(presenterTransitionTimer);
     window.clearTimeout(presenterClickTimer);
+    suppressNextPresenterClick = false;
     clearPresenterJumpBuffer();
     els.presenter.hidden = true;
     presenterBlankMode = "";

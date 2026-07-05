@@ -4,6 +4,8 @@ PPT.html Studio is a presentation tool for the AI era. AI does not need to write
 
 ## What Is New
 
+v0.2.15 tightens the everyday presentation and editing basics: presentation mode now switches between `Fit` and `Fill`, exported single-file players support the same `M` shortcut, the player and desktop Help menu include a shortcut guide, portrait touch presentation avoids accidental page turns when showing controls, pressing `Shift+F5` during presentation respects the currently presented slide, the object-panel Delete button uses the same multi-selection deletion path as the keyboard, and the release workflow now runs on Node.js 24.
+
 v0.2.14 strengthens the AI and human editing loop: canvas objects now receive object-level validation for duplicate ids, geometry, media, chart, table, card, metric, timeline, quote, code, and compare data; selected image/video/audio, chart, and table objects expose typed inspectors; the Quality Check dialog can copy a complete AI repair prompt; and the bundled `htmlppt` Codex skill plus deck CLI are now the documented handoff path for other agents.
 
 v0.2.10 polishes the first-run experience: a clearer HTML slide app icon, real favicons in both the editor and exported standalone `.ppt.html` files, a wider default desktop window, less cramped 1280px columns, a cleaner current-slide action bar, and earlier Electron app identity setup to reduce default Electron branding during launch.

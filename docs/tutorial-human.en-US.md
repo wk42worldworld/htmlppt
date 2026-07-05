@@ -119,7 +119,7 @@ Direct canvas editing:
 - After selection, the right `Element Style` panel becomes active. Use it to adjust font size, text color, alignment, bold, italic, background, border color, border width, radius, and opacity.
 - Drag the selected element for light position tweaks. Drag the frame's corner or side handles to change width and height.
 - With an element selected, press arrow keys to nudge by 1 pixel. Hold `Shift` while pressing an arrow key to move by 10 pixels.
-- Click `Reset` on the selection frame, or press `Delete` / `Backspace`, to clear the selected element's saved position and size.
+- Click `Reset` on the selection frame to clear the selected element's saved position and size. Press `Delete` / `Backspace` to delete the selected element; table cells are cleared instead of removing the table.
 - Position and size are saved in the current slide's `canvas` data, so exported `.ppt.html` files keep the adjustment.
 - Element style is saved in the current slide's `styles` data. `Clear style` restores visual overrides without deleting text content or position changes.
 - Use `Undo` if a drag lands in the wrong place.
@@ -309,6 +309,10 @@ During presentation:
 - Press Space, `Enter`, or `N` to advance.
 - Press `P` or `Backspace` to go back.
 - Press `Home` / `End` to jump to the first or last slide.
+- Click `Fit` / `Fill`, or press `M`, to switch between showing the full slide and filling the window. Portrait phones keep the full-slide mode to avoid cropping the page.
+- Click `Shortcuts` or press `?` to view presentation shortcuts.
+- Press `F` to toggle full screen.
+- Press `B` for black screen or `W` for white screen.
 - Click `Exit` or press `Esc` to return to the editor.
 
 The presentation controls hide automatically when the mouse is idle. Move the mouse to show them again.

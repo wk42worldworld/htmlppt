@@ -15,6 +15,7 @@ const appJs = fs.readFileSync(path.join(root, "app.js"), "utf8");
 const appJsLf = appJs.replace(/\r\n/g, "\n");
 const electronMain = fs.readFileSync(path.join(root, "electron/main.js"), "utf8");
 const stylesCss = fs.readFileSync(path.join(root, "styles.css"), "utf8");
+const releaseWorkflow = fs.readFileSync(path.join(root, ".github", "workflows", "release.yml"), "utf8");
 const context = { window: {}, console };
 
 vm.runInNewContext(code, context, { filename: rendererPath });
@@ -81,7 +82,10 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectMediaEditor"/,
   /id="objectChartEditor"/,
   /id="objectTableEditor"/,
-  /id="copyRepairPromptBtn"/
+  /id="copyRepairPromptBtn"/,
+  /id="presentFitBtn"/,
+  /id="presentShortcutsBtn"/,
+  /id="shortcutDialog"/
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
 });
@@ -101,6 +105,8 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectBringFrontBtn"[\s\S]*?#icon-layer-front/,
   /id="objectSendBackBtn"[\s\S]*?#icon-layer-back/,
   /id="presentPrevBtn"[\s\S]*?#icon-chevron-left/,
+  /id="presentFitBtn"[\s\S]*?#icon-fit-fill/,
+  /id="presentShortcutsBtn"[\s\S]*?#icon-keyboard/,
   /id="presentFullscreenBtn"[\s\S]*?#icon-fullscreen/
 ].forEach((pattern) => {
   assert.match(indexHtml, pattern);
@@ -131,6 +137,10 @@ assert.match(appJs, /function fontFamilyStack/);
 assert.match(appJs, /function syncTypedObjectPanel/);
 assert.match(appJs, /function bindObjectDataInput/);
 assert.match(appJs, /function buildRepairPrompt/);
+assert.match(appJs, /function togglePresenterScaleMode/);
+assert.match(appJs, /function showShortcutDialog/);
+assert.match(appJs, /suppressNextPresenterClick/);
+assert.match(appJs, /presenting \? presentIndex : currentIndex/);
 assert.match(appJs, /function tableObjectSize/);
 assert.match(appJs, /function findObjectPlacement/);
 assert.match(appJs, /function fitTableObjectToData/);
@@ -197,7 +207,10 @@ Array.from(new Set(i18nKeys)).forEach((key) => {
 });
 assert.match(electronMain, /canvasZoomIn/);
 assert.match(electronMain, /canvasZoomFit/);
+assert.match(electronMain, /Keyboard Shortcuts/);
+assert.match(electronMain, /sendCommand\("shortcuts"\)/);
 assert.doesNotMatch(electronMain, /role: "zoomIn"/);
+assert.match(releaseWorkflow, /node-version: 24/);
 assert.match(stylesCss, /\.slide-thumb-preview/);
 assert.match(stylesCss, /Thumbnail stability pass/);
 assert.match(stylesCss, /\.slide-thumb-frame,[\s\S]*?\.slide-thumb-frame \*/);
@@ -213,6 +226,9 @@ assert.doesNotMatch(stylesCss, /\.slide-thumb::after/);
 assert.match(code, /\.ppt-object-table\{align-content:start;overflow:visible;contain:layout\}/);
 assert.match(code, /\.ppt-object \.ppt-table\{width:100%;height:auto;margin:0;table-layout:fixed/);
 assert.match(code, /function tableObjectSize/);
+assert.match(code, /mode='fit'/);
+assert.match(code, /fitb=e\('button','','适合'\)/);
+assert.match(code, /k==='m'\|\|k==='M'/);
 
 ppt.deckTemplates.forEach((template) => {
   const deck = ppt.createTemplateDeck(template.id);

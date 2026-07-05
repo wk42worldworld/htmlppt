@@ -355,6 +355,11 @@ function buildMenu() {
       role: "help",
       submenu: [
         {
+          label: "Keyboard Shortcuts",
+          accelerator: "CmdOrCtrl+/",
+          click: () => sendCommand("shortcuts")
+        },
+        {
           label: "PPT.html on GitHub",
           click: async () => {
             await shell.openExternal("https://github.com/wk42worldworld/htmlppt");
