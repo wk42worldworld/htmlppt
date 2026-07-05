@@ -1141,17 +1141,32 @@
             </select>
           </label>
           <label>
-            <span data-i18n="field.chartLabels">标签，用 | 分隔</span>
-            <input id="chartLabelsInput" type="text" placeholder="Q1 | Q2 | Q3 | Q4" data-i18n-placeholder="placeholder.chartLabels">
-          </label>
-          <label>
-            <span data-i18n="field.chartSeries">数据系列：每行一个系列，名称 | 数值 | 数值</span>
-            <textarea id="chartSeriesInput" rows="6" placeholder="收入 | 12 | 20 | 31&#10;成本 | 8 | 11 | 18" data-i18n-placeholder="placeholder.chartSeries"></textarea>
-          </label>
-          <label>
             <span data-i18n="field.unit">单位</span>
             <input id="chartUnitInput" type="text" placeholder="万元" data-i18n-placeholder="placeholder.unit">
           </label>
+          <div class="object-data-grid-block slide-grid-block" id="chartGridBlock">
+            <div class="object-data-grid-head">
+              <span data-i18n="object.chartGrid">可视化数据表</span>
+              <div class="object-grid-actions">
+                <button type="button" id="chartAddLabelBtn" class="mini-button" data-i18n-title="grid.addLabel"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="grid.addLabel">Add label column</span></button>
+                <button type="button" id="chartDeleteLabelBtn" class="mini-button" data-i18n-title="grid.deleteLabel"><svg><use href="#icon-minus"></use></svg><span class="sr-only" data-i18n="grid.deleteLabel">Delete last label column</span></button>
+                <button type="button" id="chartAddSeriesBtn" class="mini-button" data-i18n-title="grid.addSeries"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="grid.addSeries">Add series</span></button>
+                <button type="button" id="chartDeleteSeriesBtn" class="mini-button" data-i18n-title="grid.deleteSeries"><svg><use href="#icon-minus"></use></svg><span class="sr-only" data-i18n="grid.deleteSeries">Delete last series</span></button>
+              </div>
+            </div>
+            <div id="chartGrid" class="object-data-grid" aria-live="polite"></div>
+          </div>
+          <details class="object-legacy-editor" id="chartBulkEditor">
+            <summary data-i18n="object.legacyText">文本批量编辑</summary>
+            <label>
+              <span data-i18n="field.chartLabels">标签，用 | 分隔</span>
+              <input id="chartLabelsInput" type="text" placeholder="Q1 | Q2 | Q3 | Q4" data-i18n-placeholder="placeholder.chartLabels">
+            </label>
+            <label>
+              <span data-i18n="field.chartSeries">数据系列：每行一个系列，名称 | 数值 | 数值</span>
+              <textarea id="chartSeriesInput" rows="6" placeholder="收入 | 12 | 20 | 31&#10;成本 | 8 | 11 | 18" data-i18n-placeholder="placeholder.chartSeries"></textarea>
+            </label>
+          </details>
         </section>
 
         <section class="panel-section field-group" data-layouts="table">
@@ -1162,14 +1177,23 @@
             <button type="button" id="tableAddColumnBtn" class="style-toggle" data-i18n-title="table.addColumn"><svg><use href="#icon-column-add"></use></svg><span data-i18n="table.addColumn">加列</span></button>
             <button type="button" id="tableDeleteColumnBtn" class="style-toggle" data-i18n-title="table.deleteColumn"><svg><use href="#icon-column-delete"></use></svg><span data-i18n="table.deleteColumn">删列</span></button>
           </div>
-          <label>
-            <span data-i18n="field.tableColumns">表头，用 | 分隔</span>
-            <input id="tableColumnsInput" type="text">
-          </label>
-          <label>
-            <span data-i18n="field.tableRows">每行一组单元格，用 | 分隔</span>
-            <textarea id="tableRowsInput" rows="6"></textarea>
-          </label>
+          <div class="object-data-grid-block slide-grid-block" id="tableGridBlock">
+            <div class="object-data-grid-head">
+              <span data-i18n="object.tableGrid">可视化表格</span>
+            </div>
+            <div id="tableGrid" class="object-data-grid" aria-live="polite"></div>
+          </div>
+          <details class="object-legacy-editor" id="tableBulkEditor">
+            <summary data-i18n="object.legacyText">文本批量编辑</summary>
+            <label>
+              <span data-i18n="field.tableColumns">表头，用 | 分隔</span>
+              <input id="tableColumnsInput" type="text">
+            </label>
+            <label>
+              <span data-i18n="field.tableRows">每行一组单元格，用 | 分隔</span>
+              <textarea id="tableRowsInput" rows="6"></textarea>
+            </label>
+          </details>
         </section>
 
         <section class="panel-section field-group" data-layouts="quote">

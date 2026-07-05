@@ -2687,7 +2687,8 @@
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
       "cardsRowsBlock", "cardsRows", "cardsAddRowBtn", "cardsBulkEditor", "cardsInput",
       "metricsRowsBlock", "metricsRows", "metricsAddRowBtn", "metricsBulkEditor", "metricsInput",
-      "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
+      "chartKindInput", "chartUnitInput", "chartGridBlock", "chartGrid", "chartAddLabelBtn", "chartDeleteLabelBtn", "chartAddSeriesBtn", "chartDeleteSeriesBtn", "chartBulkEditor", "chartLabelsInput", "chartSeriesInput",
+      "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableGridBlock", "tableGrid", "tableBulkEditor", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFitBtn", "presentFitLabel", "presentShortcutsBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
       "templateDialog", "shortcutDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "slideLayoutMenu", "toast"
@@ -3156,8 +3157,22 @@
     bindSlideInput(els.chartLabelsInput, function (slide, value) { ensureChart(slide).labels = splitCells(value); });
     bindSlideInput(els.chartSeriesInput, function (slide, value) { ensureChart(slide).series = parseChartSeries(value); });
     bindSlideInput(els.chartUnitInput, function (slide, value) { ensureChart(slide).unit = value; });
+    if (els.chartGrid) {
+      els.chartGrid.addEventListener("focusin", captureEditStart);
+      els.chartGrid.addEventListener("change", handleSlideChartGridChange);
+      els.chartGrid.addEventListener("paste", handleSlideChartGridPaste);
+    }
+    els.chartAddLabelBtn.addEventListener("click", function () { mutateSlideChartGrid("addLabel"); });
+    els.chartDeleteLabelBtn.addEventListener("click", function () { mutateSlideChartGrid("deleteLabel"); });
+    els.chartAddSeriesBtn.addEventListener("click", function () { mutateSlideChartGrid("addSeries"); });
+    els.chartDeleteSeriesBtn.addEventListener("click", function () { mutateSlideChartGrid("deleteSeries"); });
     bindSlideInput(els.tableColumnsInput, function (slide, value) { slide.table.columns = splitTableCells(value); });
     bindSlideInput(els.tableRowsInput, function (slide, value) { slide.table.rows = parseTableRows(value); });
+    if (els.tableGrid) {
+      els.tableGrid.addEventListener("focusin", captureEditStart);
+      els.tableGrid.addEventListener("change", handleSlideTableGridChange);
+      els.tableGrid.addEventListener("paste", handleSlideTableGridPaste);
+    }
     els.tableAddRowBtn.addEventListener("click", function () { mutateSelectedTable("addRow"); });
     els.tableDeleteRowBtn.addEventListener("click", function () { mutateSelectedTable("deleteRow"); });
     els.tableAddColumnBtn.addEventListener("click", function () { mutateSelectedTable("addColumn"); });
@@ -7107,8 +7122,16 @@
   }
 
   function renderObjectChartGrid(data, editable) {
-    if (!els.objectChartGrid) return;
-    els.objectChartGrid.innerHTML = "";
+    renderChartGrid(els.objectChartGrid, data, editable);
+  }
+
+  function renderSlideChartGrid(slide) {
+    renderChartGrid(els.chartGrid, slide && slide.chart, true);
+  }
+
+  function renderChartGrid(container, data, editable) {
+    if (!container) return;
+    container.innerHTML = "";
     if (!data) return;
     var model = chartGridSnapshot(data);
     var table = document.createElement("table");
@@ -7158,12 +7181,20 @@
       tbody.appendChild(row);
     });
     table.appendChild(tbody);
-    els.objectChartGrid.appendChild(table);
+    container.appendChild(table);
   }
 
   function renderObjectTableGrid(data, editable) {
-    if (!els.objectTableGrid) return;
-    els.objectTableGrid.innerHTML = "";
+    renderTableGrid(els.objectTableGrid, data, editable);
+  }
+
+  function renderSlideTableGrid(slide) {
+    renderTableGrid(els.tableGrid, slide && slide.table, true);
+  }
+
+  function renderTableGrid(container, data, editable) {
+    if (!container) return;
+    container.innerHTML = "";
     if (!data) return;
     var model = tableGridSnapshot(data);
     var table = document.createElement("table");
@@ -7202,7 +7233,7 @@
       tbody.appendChild(row);
     });
     table.appendChild(tbody);
-    els.objectTableGrid.appendChild(table);
+    container.appendChild(table);
   }
 
   function gridHeadingCell(text) {
@@ -7286,12 +7317,29 @@
     });
   }
 
+  function handleSlideChartGridChange(event) {
+    var input = objectGridInputFromEvent(event);
+    if (!input) return;
+    commitSlideGridMutation(function (slide) {
+      setChartGridValue(ensureChart(slide), input);
+    });
+  }
+
   function handleObjectTableGridChange(event) {
     var input = objectGridInputFromEvent(event);
     if (!input) return;
     commitSelectedObjectGridMutation("table", function (data) {
       setTableGridValue(data, input);
     }, { fitTable: true });
+  }
+
+  function handleSlideTableGridChange(event) {
+    var input = objectGridInputFromEvent(event);
+    if (!input) return;
+    commitSlideGridMutation(function (slide) {
+      slide.table = slide.table && typeof slide.table === "object" ? slide.table : { columns: [], rows: [] };
+      setTableGridValue(slide.table, input);
+    });
   }
 
   function handleObjectChartGridPaste(event) {
@@ -7301,6 +7349,16 @@
     event.preventDefault();
     commitSelectedObjectGridMutation("chart", function (data) {
       applyChartGridPaste(data, input, matrix);
+    });
+  }
+
+  function handleSlideChartGridPaste(event) {
+    var input = objectGridInputFromEvent(event);
+    var matrix = parseClipboardMatrix(event.clipboardData && event.clipboardData.getData("text/plain"));
+    if (!input || !matrix.length) return;
+    event.preventDefault();
+    commitSlideGridMutation(function (slide) {
+      applyChartGridPaste(ensureChart(slide), input, matrix);
     });
   }
 
@@ -7314,10 +7372,41 @@
     }, { fitTable: true });
   }
 
+  function handleSlideTableGridPaste(event) {
+    var input = objectGridInputFromEvent(event);
+    var matrix = parseClipboardMatrix(event.clipboardData && event.clipboardData.getData("text/plain"));
+    if (!input || !matrix.length) return;
+    event.preventDefault();
+    commitSlideGridMutation(function (slide) {
+      slide.table = slide.table && typeof slide.table === "object" ? slide.table : { columns: [], rows: [] };
+      applyTableGridPaste(slide.table, input, matrix);
+    });
+  }
+
   function objectGridInputFromEvent(event) {
     return event && event.target && event.target.closest
       ? event.target.closest("[data-object-grid-role]")
       : null;
+  }
+
+  function commitSlideGridMutation(mutator) {
+    if (syncing) return false;
+    var before = JSON.stringify(deck);
+    mutator(currentSlide());
+    if (before === JSON.stringify(deck)) {
+      syncInspector();
+      return false;
+    }
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    activeEditSnapshot = "";
+    activeEditPushed = false;
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    persist();
+    return true;
   }
 
   function commitSelectedObjectGridMutation(expectedType, mutator, options) {
@@ -7332,6 +7421,32 @@
   function mutateSelectedChartGrid(action) {
     return commitSelectedObjectGridMutation("chart", function (data) {
       var chart = ensureEditableChartData(data, 1, 1);
+      if (action === "addLabel") {
+        chart.labels.push(defaultLabel(chart.labels.length));
+        chart.series.forEach(function (series) { series.values.push(0); });
+      }
+      if (action === "deleteLabel") {
+        if (chart.labels.length > 1) {
+          chart.labels.pop();
+          chart.series.forEach(function (series) { series.values.pop(); });
+        } else {
+          chart.labels[0] = defaultLabel(0);
+          chart.series.forEach(function (series) { series.values[0] = 0; });
+        }
+      }
+      if (action === "addSeries") {
+        chart.series.push({ name: defaultSeriesName(chart.series.length), values: new Array(chart.labels.length).fill(0) });
+      }
+      if (action === "deleteSeries") {
+        if (chart.series.length > 1) chart.series.pop();
+        else chart.series[0] = { name: defaultSeriesName(0), values: new Array(chart.labels.length).fill(0) };
+      }
+    });
+  }
+
+  function mutateSlideChartGrid(action) {
+    return commitSlideGridMutation(function (slide) {
+      var chart = ensureEditableChartData(ensureChart(slide), 1, 1);
       if (action === "addLabel") {
         chart.labels.push(defaultLabel(chart.labels.length));
         chart.series.forEach(function (series) { series.values.push(0); });
@@ -10013,8 +10128,10 @@
     els.chartLabelsInput.value = slide.chart.labels.join(" | ");
     els.chartSeriesInput.value = stringifyChartSeries(slide.chart.series);
     els.chartUnitInput.value = slide.chart.unit || "";
+    renderSlideChartGrid(slide);
     els.tableColumnsInput.value = slide.table.columns.join(" | ");
     els.tableRowsInput.value = stringifyTableRows(slide.table.rows);
+    renderSlideTableGrid(slide);
     els.quoteInput.value = slide.quote || "";
     els.authorInput.value = slide.author || "";
     els.codeInput.value = slide.code || "";

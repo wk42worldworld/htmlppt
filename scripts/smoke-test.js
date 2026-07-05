@@ -88,10 +88,15 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectChartGrid"/,
   /id="objectChartAddLabelBtn"/,
   /id="objectChartAddSeriesBtn"/,
+  /id="chartGrid"/,
+  /id="chartAddLabelBtn"/,
+  /id="chartAddSeriesBtn"/,
   /id="objectTableEditor"/,
   /id="objectTableGrid"/,
   /id="objectTableGridAddRowBtn"/,
   /id="objectTableGridAddColumnBtn"/,
+  /id="tableGrid"/,
+  /id="tableBulkEditor"/,
   /id="objectStructuredEditor"/,
   /id="objectStructuredRowsBlock"/,
   /id="objectStructuredRows"/,
@@ -297,10 +302,20 @@ assert.match(appJs, /function syncTypedObjectPanel/);
 assert.match(appJs, /function bindObjectDataInput/);
 assert.match(appJs, /function renderObjectChartGrid/);
 assert.match(appJs, /function renderObjectTableGrid/);
+assert.match(appJs, /function renderSlideChartGrid/);
+assert.match(appJs, /function renderSlideTableGrid/);
+assert.match(appJs, /function renderChartGrid/);
+assert.match(appJs, /function renderTableGrid/);
 assert.match(appJs, /function handleObjectChartGridPaste/);
 assert.match(appJs, /function handleObjectTableGridPaste/);
+assert.match(appJs, /function handleSlideChartGridPaste/);
+assert.match(appJs, /function handleSlideTableGridPaste/);
+assert.match(appJs, /function commitSlideGridMutation/);
 assert.match(appJs, /function mutateSelectedChartGrid/);
 assert.match(appJs, /function mutateSelectedTableGrid/);
+assert.match(appJs, /function mutateSlideChartGrid/);
+assert.match(appJs, /renderSlideChartGrid\(slide\)/);
+assert.match(appJs, /renderSlideTableGrid\(slide\)/);
 assert.match(appJs, /function parseClipboardMatrix/);
 assert.match(appJs, /function buildRepairPrompt/);
 assert.match(appJs, /function togglePresenterScaleMode/);
