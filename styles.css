@@ -2244,7 +2244,7 @@ button[hidden] {
 
 .insert-dock {
   display: grid;
-  grid-template-rows: 54px minmax(0, 1fr);
+  grid-template-rows: 54px 44px minmax(0, 1fr);
   min-height: 0;
   border-right: 1px solid var(--ui-line);
   background: #f8fafc;
@@ -2261,6 +2261,24 @@ button[hidden] {
   font-weight: 860;
   letter-spacing: .08em;
   text-transform: uppercase;
+}
+
+.insert-search {
+  display: grid;
+  align-items: center;
+  margin: 0;
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--ui-line);
+}
+
+.insert-search input {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  text-align: center;
 }
 
 .insert-tools {
@@ -2321,6 +2339,21 @@ button[hidden] {
   cursor: grabbing;
 }
 
+.insert-empty {
+  padding: 12px 4px;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-weight: 720;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.insert-tools .insert-group-label[hidden],
+.insert-tools .insert-tool[hidden],
+.insert-tools .insert-empty[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 1280px) {
   .main-layout {
     grid-template-columns: 192px 76px minmax(0, 1fr) 292px;
@@ -2354,7 +2387,7 @@ button[hidden] {
   }
 
   .insert-dock {
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     border-right: 0;
     border-bottom: 1px solid var(--ui-line);
   }
@@ -2370,6 +2403,15 @@ button[hidden] {
     overflow-x: auto;
     padding: 8px 10px 11px;
     scrollbar-width: none;
+  }
+
+  .insert-search {
+    padding: 6px 10px 0;
+    border-bottom: 0;
+  }
+
+  .insert-search input {
+    text-align: left;
   }
 
   .insert-group-label {
@@ -3471,7 +3513,7 @@ textarea:focus {
   grid-row: 1;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 48px minmax(0, 1fr);
+  grid-template-rows: 48px 42px minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -3486,6 +3528,17 @@ textarea:focus {
   padding: 0;
   border-right: 0;
   border-bottom: 1px solid var(--ui-line);
+}
+
+.insert-search {
+  min-width: 0;
+  padding: 6px 7px;
+}
+
+.insert-search input {
+  height: 30px;
+  padding: 0 7px;
+  font-size: 10px;
 }
 
 .insert-tools {
@@ -3669,7 +3722,7 @@ textarea:focus {
     grid-column: 1;
     grid-row: 2;
     grid-template-columns: 1fr;
-    grid-template-rows: 36px auto;
+    grid-template-rows: 36px 38px auto;
     border-right: 0;
     border-bottom: 1px solid var(--ui-line);
   }
@@ -3687,6 +3740,16 @@ textarea:focus {
     overflow-x: auto;
     overflow-y: hidden;
     padding: 8px 10px;
+  }
+
+  .insert-search {
+    padding: 5px 10px 0;
+    border-bottom: 0;
+  }
+
+  .insert-search input {
+    height: 30px;
+    text-align: left;
   }
 
   .insert-group-label {
@@ -3835,7 +3898,7 @@ textarea:focus {
   }
 
   .insert-dock {
-    grid-template-rows: 32px auto;
+    grid-template-rows: 32px 36px auto;
   }
 
   .dock-head {

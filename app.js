@@ -1097,6 +1097,9 @@
     "insert.group.metrics": "数据",
     "insert.group.timeline": "流程",
     "insert.group.other": "其他",
+    "insert.searchLabel": "搜索插入组件",
+    "insert.searchPlaceholder": "搜索",
+    "insert.searchEmpty": "没有匹配组件",
     "insert.text.title": "标题",
     "insert.text.titleLabel": "标题",
     "insert.text.title.title": "插入大标题文本",
@@ -1242,6 +1245,9 @@
     "insert.group.metrics": "Data",
     "insert.group.timeline": "Flow",
     "insert.group.other": "Other",
+    "insert.searchLabel": "Search insert components",
+    "insert.searchPlaceholder": "Search",
+    "insert.searchEmpty": "No matching components",
     "insert.text.title": "Title",
     "insert.text.titleLabel": "Title",
     "insert.text.title.title": "Insert a large title text block",
@@ -1387,6 +1393,9 @@
     "insert.group.metrics": "データ",
     "insert.group.timeline": "流れ",
     "insert.group.other": "その他",
+    "insert.searchLabel": "挿入コンポーネントを検索",
+    "insert.searchPlaceholder": "検索",
+    "insert.searchEmpty": "一致するコンポーネントはありません",
     "insert.text.title": "タイトル",
     "insert.text.titleLabel": "タイトル",
     "insert.text.title.title": "大きなタイトル文字を挿入",
@@ -1532,6 +1541,9 @@
     "insert.group.metrics": "데이터",
     "insert.group.timeline": "흐름",
     "insert.group.other": "기타",
+    "insert.searchLabel": "삽입 컴포넌트 검색",
+    "insert.searchPlaceholder": "검색",
+    "insert.searchEmpty": "일치하는 컴포넌트가 없습니다",
     "insert.text.title": "제목",
     "insert.text.titleLabel": "제목",
     "insert.text.title.title": "큰 제목 텍스트 삽입",
@@ -2594,6 +2606,7 @@
       "newDeckBtn", "templatesBtn", "openDeckBtn", "downloadDeckBtn", "saveAsDeckBtn", "jsonBtn", "validateBtn", "presentBtn",
       "languageInput", "fileInput", "imageFileInput", "videoFileInput", "audioFileInput", "fileStatus",
       "addSlideBtn", "slideList", "duplicateSlideBtn", "moveSlideUpBtn", "moveSlideDownBtn", "deleteSlideBtn",
+      "insertSearchInput", "insertSearchEmpty",
       "currentSlideLabel", "currentSlideTitle", "undoBtn", "redoBtn", "stageViewport", "stageFrame",
       "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "stylePanel", "styleTargetLabel", "styleFontFamilyInput", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
@@ -2671,6 +2684,7 @@
 
     populateLayoutSelect();
     refreshTooltips();
+    updateInsertFilter();
     updateZoomLabel();
     updatePresenterFitButton();
     if (!settings.skipRender) renderAll();
@@ -2715,6 +2729,54 @@
       var text = tooltipTextFromNode(label) || tooltipTextFromNode(node);
       if (text) setTooltip(node, text);
     });
+  }
+
+  function normalizeInsertSearchText(text) {
+    return String(text || "")
+      .toLocaleLowerCase()
+      .normalize("NFKC")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function insertToolSearchText(button, groupLabel) {
+    return normalizeInsertSearchText([
+      groupLabel ? groupLabel.textContent : "",
+      button.textContent,
+      button.getAttribute("data-tooltip"),
+      button.getAttribute("data-insert"),
+      button.getAttribute("data-variant")
+    ].filter(Boolean).join(" "));
+  }
+
+  function updateInsertFilter() {
+    if (!els.insertSearchInput) return;
+    var query = normalizeInsertSearchText(els.insertSearchInput.value);
+    var visibleCount = 0;
+
+    document.querySelectorAll(".insert-group-label").forEach(function (label) {
+      var hasVisibleTool = false;
+      var node = label.nextElementSibling;
+      while (node && !node.classList.contains("insert-group-label")) {
+        if (node.classList.contains("insert-tool")) {
+          var matches = !query || insertToolSearchText(node, label).indexOf(query) !== -1;
+          node.hidden = !matches;
+          hasVisibleTool = hasVisibleTool || matches;
+          if (matches) visibleCount += 1;
+        }
+        node = node.nextElementSibling;
+      }
+      label.hidden = Boolean(query) && !hasVisibleTool;
+    });
+
+    if (els.insertSearchEmpty) els.insertSearchEmpty.hidden = !query || visibleCount > 0;
+  }
+
+  function focusInsertSearch() {
+    if (!els.insertSearchInput) return false;
+    els.insertSearchInput.focus();
+    els.insertSearchInput.select();
+    return true;
   }
 
   function bindTooltipEvents() {
@@ -2854,6 +2916,17 @@
       applyLanguage();
       toast(t("toast.languageChanged"));
     });
+
+    if (els.insertSearchInput) {
+      els.insertSearchInput.addEventListener("input", updateInsertFilter);
+      els.insertSearchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && els.insertSearchInput.value) {
+          event.preventDefault();
+          els.insertSearchInput.value = "";
+          updateInsertFilter();
+        }
+      });
+    }
 
     els.openDeckBtn.addEventListener("click", function () {
       openDeck();
@@ -4026,6 +4099,22 @@
     }
 
     if (event.target && event.target.closest && event.target.closest("dialog")) return;
+
+    if (!presenting && !commandKey && key === "/" && !isTextEditingTarget(event.target)) {
+      event.preventDefault();
+      var previousInsertSearch = els.insertSearchInput ? els.insertSearchInput.value : "";
+      focusInsertSearch();
+      window.setTimeout(function () {
+        if (!els.insertSearchInput) return;
+        var currentValue = els.insertSearchInput.value;
+        if (currentValue === "/" || currentValue === previousInsertSearch + "/") {
+          els.insertSearchInput.value = previousInsertSearch;
+          updateInsertFilter();
+          els.insertSearchInput.select();
+        }
+      }, 0);
+      return;
+    }
 
     if (!presenting && isTextEditingTarget(event.target) && key === "F5") {
       event.preventDefault();

@@ -492,6 +492,10 @@
         <div class="dock-head">
           <span data-i18n="insert.title">插入</span>
         </div>
+        <label class="insert-search">
+          <span class="sr-only" data-i18n="insert.searchLabel">搜索插入组件</span>
+          <input id="insertSearchInput" type="search" autocomplete="off" spellcheck="false" data-i18n-placeholder="insert.searchPlaceholder" aria-label="搜索插入组件" data-i18n-aria="insert.searchLabel" placeholder="搜索组件">
+        </label>
         <div class="insert-tools" role="toolbar" aria-orientation="horizontal" aria-label="插入组件" data-i18n-aria="aria.insertComponents">
           <div class="insert-group-label" id="insertBasicGroup" data-i18n="insert.group.basic">基础</div>
           <button type="button" class="insert-tool" draggable="true" data-insert="text" data-variant="title" aria-describedby="insertBasicGroup" data-i18n-title="insert.text.title.title"><svg><use href="#icon-text"></use></svg><span data-i18n="insert.text.titleLabel">标题</span></button>
@@ -543,6 +547,7 @@
           <div class="insert-group-label" id="insertOtherGroup" data-i18n="insert.group.other">其他</div>
           <button type="button" class="insert-tool" draggable="true" data-insert="quote" aria-describedby="insertOtherGroup" data-i18n-title="insert.quote.title"><svg><use href="#icon-quote"></use></svg><span data-i18n="insert.quote">引用</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="code" aria-describedby="insertOtherGroup" data-i18n-title="insert.code.title"><svg><use href="#icon-code"></use></svg><span data-i18n="insert.code">代码</span></button>
+          <div class="insert-empty" id="insertSearchEmpty" data-i18n="insert.searchEmpty" hidden>没有匹配组件</div>
         </div>
       </aside>
 

@@ -140,7 +140,7 @@ Delete is disabled when only one slide remains, so the deck cannot become empty.
 
 ## 7. Add Images, Video, Audio, Data, Charts, Tables, and Code
 
-The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas:
+The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas. When the list feels long, use the search field at the top of the palette or press `/` to focus it:
 
 - `Text`: adds a visible text box to the current slide; double-click to edit it or drag it to a specific canvas position.
 - `Image`: inserts an image object into the current slide and opens the local image picker. If you cancel, the placeholder object remains so you can add a URL later.

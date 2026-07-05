@@ -22,7 +22,7 @@ In short: this is not “HTML pretending to be PPT” and not “another PPT clo
 
 ## New in v0.2.15
 
-PPT.html Studio now tightens the presentation and editor basics that matter for everyday PPT use: presentation mode can switch between full-slide Fit and edge-to-edge Fill, the same shortcut is available in exported single-file players with `M`, a built-in shortcut dialog is available from the player and desktop Help menu, portrait touch presentation avoids accidental page turns when showing controls, `Shift+F5` now respects the currently presented slide, the object-panel Delete button follows the same multi-selection deletion path as the keyboard, and the release workflow runs on Node.js 24.
+PPT.html Studio now tightens the presentation and editor basics that matter for everyday PPT use: the Insert palette has a search filter so users can quickly find charts, tables, KPI blocks, media, timelines, and other components; presentation mode can switch between full-slide Fit and edge-to-edge Fill; the same shortcut is available in exported single-file players with `M`; a built-in shortcut dialog is available from the player and desktop Help menu; portrait touch presentation avoids accidental page turns when showing controls; `Shift+F5` now respects the currently presented slide; the object-panel Delete button follows the same multi-selection deletion path as the keyboard; and the release workflow runs on Node.js 24.
 
 ## New in v0.2.14
 
@@ -203,6 +203,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Open, save, and save as `.ppt.html` files in the desktop app.
 - Import local images into image slides as embedded data URIs.
 - Double-click canvas text to edit in place, drag or resize editable slide elements for structured `canvas` geometry, style selected elements through structured `styles`, nudge selection with arrow keys, reset a selected element, and drag thumbnails to reorder pages.
+- Search the Insert palette or press `/` to find the right component without scanning the full list.
 - Create bar, line, and donut charts from structured labels and series.
 - Edit selected image/video/audio, chart, table, card, metric, timeline, compare, quote, code, and shape canvas objects through typed inspectors without touching raw JSON for common fields.
 - Copy an AI repair prompt that includes the current deck JSON, validation report, and repair rules.

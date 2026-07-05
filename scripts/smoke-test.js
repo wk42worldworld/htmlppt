@@ -70,6 +70,8 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="zoomOutBtn"/,
   /id="zoomFitBtn"/,
   /id="zoomInBtn"/,
+  /id="insertSearchInput"[\s\S]*data-i18n-placeholder="insert\.searchPlaceholder"/,
+  /id="insertSearchEmpty"/,
   /class="rail-action"/,
   /id="slideContextMenu"/,
   /id="slideLayoutMenu" hidden/,
@@ -148,6 +150,12 @@ assert.match(appJs, /function handleCanvasWheel/);
 assert.match(appJs, /function fitCanvasToViewport/);
 assert.match(appJs, /function refreshSlideThumb/);
 assert.match(appJs, /refreshSlideThumb\(currentIndex\)/);
+assert.match(appJs, /function updateInsertFilter/);
+assert.match(appJs, /function focusInsertSearch/);
+assert.match(appJs, /insertSearchInput\.addEventListener\("input", updateInsertFilter\)/);
+assert.match(appJs, /key === "\/"[\s\S]*focusInsertSearch\(\)/);
+assert.match(stylesCss, /\.insert-search/);
+assert.match(stylesCss, /\.insert-empty/);
 {
   const objectMutationSource = appJsLf.match(/function commitSelectedObjectMutation[\s\S]*?\n  }\n\n  function commitObjectDataFromPanel/)[0];
   assert.match(objectMutationSource, /renderCanvas\(\)[\s\S]*refreshSlideThumb\(currentIndex\)/);
