@@ -27,6 +27,7 @@
   var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
   var pendingMediaInsertType = "";
+  var pendingMediaObjectPath = "";
   var liveRenderFrame = 0;
   var pendingLiveCanvas = false;
   var pendingLiveSlideList = false;
@@ -184,6 +185,7 @@
       "canvas.metrics": "数据组",
       "canvas.timeline": "时间线",
       "canvas.textBox": "文本框",
+      "canvas.object": "对象",
       "canvas.reset": "重置",
       "canvas.resetTitle": "重置这个元素的位置和尺寸",
       "canvas.resize": "拖拽调整尺寸",
@@ -411,6 +413,7 @@
     "canvas.metrics": "Metrics",
     "canvas.timeline": "Timeline",
     "canvas.textBox": "Text box",
+    "canvas.object": "Object",
     "canvas.reset": "Reset",
     "canvas.resetTitle": "Reset this element position and size",
     "canvas.resize": "Drag to resize",
@@ -603,6 +606,7 @@
     "status.unsaved": "未保存",
     "slide.untitled": "無題のスライド",
     "slide.current": "{number} 枚目",
+    "canvas.object": "オブジェクト",
     "canvas.reset": "リセット",
     "canvas.resetTitle": "この要素の位置とサイズをリセット",
     "canvas.resize": "ドラッグしてサイズ変更",
@@ -753,6 +757,7 @@
     "status.unsaved": "저장 안 됨",
     "slide.untitled": "제목 없는 슬라이드",
     "slide.current": "{number}번 슬라이드",
+    "canvas.object": "개체",
     "canvas.reset": "초기화",
     "canvas.resetTitle": "이 요소의 위치와 크기를 초기화",
     "canvas.resize": "드래그하여 크기 조절",
@@ -2072,6 +2077,7 @@
       var file = event.target.files && event.target.files[0];
       if (!file) {
         pendingMediaInsertType = "";
+        pendingMediaObjectPath = "";
         return;
       }
       readImageFile(file);
@@ -2086,6 +2092,7 @@
       var file = event.target.files && event.target.files[0];
       if (!file) {
         pendingMediaInsertType = "";
+        pendingMediaObjectPath = "";
         return;
       }
       readVideoFile(file);
@@ -2105,6 +2112,7 @@
       var file = event.target.files && event.target.files[0];
       if (!file) {
         pendingMediaInsertType = "";
+        pendingMediaObjectPath = "";
         return;
       }
       readAudioFile(file);
@@ -2130,9 +2138,12 @@
   function readImageFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var objectPath = pendingMediaObjectPath;
       var createSlide = pendingMediaInsertType === "image";
       pendingMediaInsertType = "";
+      pendingMediaObjectPath = "";
       commit(function () {
+        if (objectPath && setObjectMediaSource(objectPath, "image", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
         if (["hero", "imageRight", "imageLeft", "imageFull", "imageBackground"].indexOf(slide.layout) === -1) {
           slide.layout = "imageRight";
@@ -2148,9 +2159,12 @@
   function readVideoFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var objectPath = pendingMediaObjectPath;
       var createSlide = pendingMediaInsertType === "video";
       pendingMediaInsertType = "";
+      pendingMediaObjectPath = "";
       commit(function () {
+        if (objectPath && setObjectMediaSource(objectPath, "video", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
         slide.layout = "video";
         slide.video.src = reader.result;
@@ -2164,9 +2178,12 @@
   function readAudioFile(file) {
     var reader = new FileReader();
     reader.onload = function () {
+      var objectPath = pendingMediaObjectPath;
       var createSlide = pendingMediaInsertType === "audio";
       pendingMediaInsertType = "";
+      pendingMediaObjectPath = "";
       commit(function () {
+        if (objectPath && setObjectMediaSource(objectPath, "audio", reader.result, file)) return;
         var slide = createSlide ? createComponentSlide() : currentSlide();
         slide.layout = "audio";
         slide.audio.src = reader.result;
@@ -2178,16 +2195,25 @@
   }
 
   function openImagePicker(insertType) {
+    if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "image") {
+      pendingMediaObjectPath = selectedCanvasPath;
+    }
     pendingMediaInsertType = insertType === "component" ? "image" : "";
     els.imageFileInput.click();
   }
 
   function openVideoPicker(insertType) {
+    if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "video") {
+      pendingMediaObjectPath = selectedCanvasPath;
+    }
     pendingMediaInsertType = insertType === "component" ? "video" : "";
     els.videoFileInput.click();
   }
 
   function openAudioPicker(insertType) {
+    if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "audio") {
+      pendingMediaObjectPath = selectedCanvasPath;
+    }
     pendingMediaInsertType = insertType === "component" ? "audio" : "";
     els.audioFileInput.click();
   }
@@ -2209,34 +2235,124 @@
       return;
     }
     if (type === "image" && settings.source === "click") {
-      insertMediaPlaceholder("image");
+      pendingMediaObjectPath = insertObjectToCurrentSlide("image", variant, settings.point);
       openImagePicker();
       return;
     }
     if (type === "video" && settings.source === "click") {
-      insertMediaPlaceholder("video");
+      pendingMediaObjectPath = insertObjectToCurrentSlide("video", variant, settings.point);
       openVideoPicker();
       return;
     }
     if (type === "audio" && settings.source === "click") {
-      insertMediaPlaceholder("audio");
+      pendingMediaObjectPath = insertObjectToCurrentSlide("audio", variant, settings.point);
       openAudioPicker();
       return;
     }
 
-    commit(function () {
-      var targetSlide = currentSlide();
-      if (shouldCreateComponentSlide(type)) {
-        targetSlide = createComponentSlide();
-      }
-      applyComponentToSlide(targetSlide, type, variant);
-      selectedCanvasPath = "";
-    });
+    insertObjectToCurrentSlide(type, variant, settings.point);
     toast(formatText(t("toast.componentInserted"), { name: insertLabel(type, variant) }));
   }
 
   function shouldCreateComponentSlide(type) {
     return ["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1;
+  }
+
+  function insertObjectToCurrentSlide(type, variant, point) {
+    var nextPath = "";
+    commit(function () {
+      nextPath = addObjectToSlide(currentSlide(), type, variant, point);
+      selectedCanvasPath = nextPath;
+    });
+    window.setTimeout(function () {
+      var node = canvasNodeByPath(nextPath);
+      if (node) selectCanvasTarget(node);
+    }, 0);
+    return nextPath;
+  }
+
+  function addObjectToSlide(slide, type, variant, point) {
+    slide.objects = Array.isArray(slide.objects) ? slide.objects : [];
+    var index = slide.objects.length;
+    var object = createSlideObject(type, variant, point, index);
+    slide.objects.push(object);
+    return "objects." + index;
+  }
+
+  function createSlideObject(type, variant, point, index) {
+    var objectType = normalizeInsertObjectType(type);
+    var size = defaultObjectSize(objectType);
+    var center = point || defaultObjectCenter(index);
+    var x = clamp(center.x - size.w / 2, 32, PPTHtml.baseWidth - size.w - 32);
+    var y = clamp(center.y - size.h / 2, 36, PPTHtml.baseHeight - size.h - 36);
+    return {
+      id: PPTHtml.uid("object"),
+      type: objectType,
+      x: Math.round(x),
+      y: Math.round(y),
+      w: size.w,
+      h: size.h,
+      rotation: 0,
+      zIndex: nextObjectZIndex(),
+      data: createObjectData(objectType, variant)
+    };
+  }
+
+  function normalizeInsertObjectType(type) {
+    if (["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1) {
+      return type;
+    }
+    return "shape";
+  }
+
+  function defaultObjectSize(type) {
+    var sizes = {
+      image: { w: 520, h: 300 },
+      video: { w: 560, h: 320 },
+      audio: { w: 520, h: 150 },
+      chart: { w: 640, h: 360 },
+      table: { w: 600, h: 280 },
+      cards: { w: 620, h: 260 },
+      metrics: { w: 620, h: 240 },
+      timeline: { w: 620, h: 300 },
+      quote: { w: 560, h: 220 },
+      code: { w: 600, h: 260 },
+      compare: { w: 620, h: 260 }
+    };
+    return sizes[type] || { w: 320, h: 180 };
+  }
+
+  function defaultObjectCenter(index) {
+    return {
+      x: 640 + (index % 3) * 28,
+      y: 388 + (index % 4) * 24
+    };
+  }
+
+  function nextObjectZIndex() {
+    return (currentSlide().objects || []).reduce(function (max, object) {
+      return Math.max(max, Number(object.zIndex) || 8);
+    }, 8) + 1;
+  }
+
+  function createObjectData(type, variant) {
+    var slide = { layout: "text", title: "" };
+    applyComponentToSlide(slide, type, variant);
+    if (type === "image") return Object.assign({}, slide.image || {});
+    if (type === "video") return Object.assign({}, slide.video || {});
+    if (type === "audio") return Object.assign({}, slide.audio || {});
+    if (type === "chart") return JSON.parse(JSON.stringify(slide.chart || {}));
+    if (type === "table") return JSON.parse(JSON.stringify(slide.table || {}));
+    if (type === "cards") return { cards: JSON.parse(JSON.stringify(slide.cards || [])) };
+    if (type === "metrics") return { metrics: JSON.parse(JSON.stringify(slide.metrics || [])) };
+    if (type === "timeline") return { items: JSON.parse(JSON.stringify(slide.items || [])) };
+    if (type === "quote") return { quote: slide.quote || "", author: slide.author || "" };
+    if (type === "code") return { code: slide.code || "" };
+    if (type === "compare") return {
+      left: JSON.parse(JSON.stringify(slide.left || {})),
+      right: JSON.parse(JSON.stringify(slide.right || {}))
+    };
+    return { label: insertLabel(type, variant) };
   }
 
   function createComponentSlide() {
@@ -2968,32 +3084,43 @@
     bindCanvasTable();
     bindCanvasChartLegend();
     bindCanvasTextBoxes();
+    bindCanvasObjects();
     bindCanvasText(".ppt-code", "code", { multiline: true, preserveWhitespace: true });
     applyCanvasOffsets();
   }
 
+  function editableNodes(selector) {
+    return Array.prototype.filter.call(els.stageFrame.querySelectorAll(selector), function (node) {
+      return !node.closest(".ppt-object");
+    });
+  }
+
+  function firstEditableNode(selector) {
+    return editableNodes(selector)[0] || null;
+  }
+
   function bindCanvasText(selector, path, options) {
-    var node = els.stageFrame.querySelector(selector);
+    var node = firstEditableNode(selector);
     if (!node) return;
     registerCanvasEdit(node, path, options);
   }
 
   function bindCanvasComponent(selector, path, options) {
-    var node = els.stageFrame.querySelector(selector);
+    var node = firstEditableNode(selector);
     if (!node) return;
     var settings = Object.assign({ draggableOnly: true }, options || {});
     registerCanvasEdit(node, path, settings);
   }
 
   function bindCanvasListItems() {
-    els.stageFrame.querySelectorAll(".ppt-list li").forEach(function (node, index) {
+    editableNodes(".ppt-list li").forEach(function (node, index) {
       registerCanvasEdit(node, "items." + index + ".text");
     });
   }
 
   function bindCanvasCompare() {
     ["left", "right"].forEach(function (side, index) {
-      var card = els.stageFrame.querySelectorAll(".ppt-compare-card")[index];
+      var card = editableNodes(".ppt-compare-grid .ppt-compare-card")[index];
       if (!card) return;
       registerCanvasEdit(card.querySelector("h2"), side + ".title", { singleLine: true });
       registerCanvasEdit(card.querySelector("p"), side + ".text");
@@ -3001,21 +3128,21 @@
   }
 
   function bindCanvasCards() {
-    els.stageFrame.querySelectorAll(".ppt-card").forEach(function (card, index) {
+    editableNodes(".ppt-card").forEach(function (card, index) {
       registerCanvasEdit(card.querySelector("h2"), "cards." + index + ".title", { singleLine: true });
       registerCanvasEdit(card.querySelector("p"), "cards." + index + ".text");
     });
   }
 
   function bindCanvasTimeline() {
-    els.stageFrame.querySelectorAll(".ppt-time-item").forEach(function (item, index) {
+    editableNodes(".ppt-time-item").forEach(function (item, index) {
       registerCanvasEdit(item.querySelector("h2"), "items." + index + ".title", { singleLine: true });
       registerCanvasEdit(item.querySelector("p"), "items." + index + ".text");
     });
   }
 
   function bindCanvasMetrics() {
-    els.stageFrame.querySelectorAll(".ppt-metric").forEach(function (metric, index) {
+    editableNodes(".ppt-metric").forEach(function (metric, index) {
       registerCanvasEdit(metric.querySelector("strong"), "metrics." + index + ".value", { singleLine: true });
       registerCanvasEdit(metric.querySelector("span"), "metrics." + index + ".label", { singleLine: true });
       registerCanvasEdit(metric.querySelector("p"), "metrics." + index + ".detail");
@@ -3023,10 +3150,10 @@
   }
 
   function bindCanvasTable() {
-    els.stageFrame.querySelectorAll(".ppt-table th").forEach(function (cell, index) {
+    editableNodes(".ppt-table th").forEach(function (cell, index) {
       registerCanvasEdit(cell, "table.columns." + index, { singleLine: true });
     });
-    els.stageFrame.querySelectorAll(".ppt-table tbody tr").forEach(function (row, rowIndex) {
+    editableNodes(".ppt-table tbody tr").forEach(function (row, rowIndex) {
       row.querySelectorAll("td").forEach(function (cell, cellIndex) {
         registerCanvasEdit(cell, "table.rows." + rowIndex + "." + cellIndex, { singleLine: true });
       });
@@ -3035,12 +3162,12 @@
 
   function bindCanvasChartLegend() {
     var slide = currentSlide();
-    els.stageFrame.querySelectorAll(".ppt-chart-legend-item strong").forEach(function (node, index) {
+    editableNodes(".ppt-chart-legend-item strong").forEach(function (node, index) {
       var path = slide.chart.kind === "donut" ? "chart.labels." + index : "chart.series." + index + ".name";
       registerCanvasEdit(node, path, { singleLine: true });
     });
     if (slide.chart.kind !== "donut") return;
-    els.stageFrame.querySelectorAll(".ppt-chart-legend-item small").forEach(function (node, index) {
+    editableNodes(".ppt-chart-legend-item small").forEach(function (node, index) {
       registerCanvasEdit(node, "chart.series.0.values." + index, { singleLine: true, numberValue: true });
     });
   }
@@ -3048,6 +3175,31 @@
   function bindCanvasTextBoxes() {
     els.stageFrame.querySelectorAll(".ppt-textbox").forEach(function (node, index) {
       registerCanvasEdit(node, "textBoxes." + index + ".text", { labelKey: "canvas.textBox" });
+    });
+  }
+
+  function bindCanvasObjects() {
+    var labelKeys = {
+      image: "canvas.image",
+      video: "canvas.video",
+      audio: "canvas.audio",
+      chart: "canvas.chart",
+      table: "canvas.table",
+      cards: "canvas.cards",
+      metrics: "canvas.metrics",
+      timeline: "canvas.timeline",
+      quote: "insert.quote",
+      code: "insert.code",
+      compare: "insert.compare"
+    };
+    els.stageFrame.querySelectorAll(".ppt-object").forEach(function (node, index) {
+      var type = node.dataset.objectType || objectTypeFromPath("objects." + index);
+      var options = {
+        draggableOnly: true,
+        labelKey: labelKeys[type] || "canvas.object"
+      };
+      if (type === "image" || type === "video" || type === "audio") options.fileAction = type;
+      registerCanvasEdit(node, "objects." + index, options);
     });
   }
 
@@ -3062,6 +3214,7 @@
     node.setAttribute("data-canvas-edit", path);
     node.setAttribute("tabindex", "0");
     node.dataset.canvasOptions = JSON.stringify(options || {});
+    setTooltip(node, canvasLabel(options || {}, path));
   }
 
   function handleCanvasPointerDown(event) {
@@ -3096,12 +3249,21 @@
       drag.node.classList.add("is-canvas-dragging");
     }
     event.preventDefault();
-    setCanvasOffsetStyle(drag.node, {
+    var nextOffset = {
       x: clamp(drag.origin.x + dx, -420, 420),
       y: clamp(drag.origin.y + dy, -240, 240),
       w: drag.origin.w,
       h: drag.origin.h
-    });
+    };
+    if (getObjectByPath(drag.path)) {
+      nextOffset = clampObjectGeometry({
+        x: drag.origin.x + dx,
+        y: drag.origin.y + dy,
+        w: drag.origin.w,
+        h: drag.origin.h
+      });
+    }
+    setCanvasOffsetStyle(drag.node, nextOffset);
     positionCanvasSelectionBox(drag.node);
   }
 
@@ -3179,6 +3341,7 @@
     var reset = document.createElement("button");
     reset.type = "button";
     reset.className = "canvas-reset-button";
+    reset.hidden = Boolean(getObjectByPath(selectedCanvasPath));
     setTooltip(reset, t("canvas.resetTitle"));
     reset.textContent = t("canvas.reset");
     reset.addEventListener("pointerdown", function (event) {
@@ -3424,8 +3587,12 @@
       next.y = resize.origin.y + resize.startBox.h - next.h;
     }
 
-    next.x = clamp(next.x, -420, 420);
-    next.y = clamp(next.y, -240, 240);
+    if (getObjectByPath(resize.path)) {
+      next = clampObjectGeometry(next);
+    } else {
+      next.x = clamp(next.x, -420, 420);
+      next.y = clamp(next.y, -240, 240);
+    }
     setCanvasOffsetStyle(resize.node, next);
     positionCanvasSelectionBox(resize.node);
   }
@@ -3474,7 +3641,7 @@
 
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
-      if (!deleteSelectedTextBox()) resetSelectedCanvasOffset();
+      if (!deleteSelectedObject() && !deleteSelectedTextBox()) resetSelectedCanvasOffset();
       return true;
     }
 
@@ -3495,6 +3662,14 @@
       w: origin.w,
       h: origin.h
     };
+    if (getObjectByPath(selectedCanvasPath)) {
+      next = clampObjectGeometry({
+        x: origin.x + arrowDelta[0] * step,
+        y: origin.y + arrowDelta[1] * step,
+        w: origin.w,
+        h: origin.h
+      });
+    }
     history.push(JSON.stringify(deck));
     if (history.length > 80) history.shift();
     future = [];
@@ -3519,6 +3694,7 @@
 
   function resetSelectedCanvasOffset() {
     if (!selectedCanvasPath) return;
+    if (getObjectByPath(selectedCanvasPath)) return;
     var node = canvasNodeByPath(selectedCanvasPath);
     var slide = currentSlide();
     var canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
@@ -3560,6 +3736,48 @@
     return true;
   }
 
+  function deleteSelectedObject() {
+    var index = objectIndexFromPath(selectedCanvasPath);
+    if (index < 0) return false;
+    var slide = currentSlide();
+    if (!Array.isArray(slide.objects) || !slide.objects[index]) return false;
+
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+    slide.objects.splice(index, 1);
+    remapObjectCanvasPaths(slide, index);
+    selectedCanvasPath = "";
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    schedulePersist();
+    return true;
+  }
+
+  function remapObjectCanvasPaths(slide, removedIndex) {
+    remapObjectPathMap(slide, "canvas", removedIndex);
+    remapObjectPathMap(slide, "styles", removedIndex);
+  }
+
+  function remapObjectPathMap(slide, key, removedIndex) {
+    var map = slide[key] && typeof slide[key] === "object" ? slide[key] : {};
+    var nextMap = {};
+    Object.keys(map).forEach(function (path) {
+      var match = path.match(/^objects\.(\d+)$/);
+      if (!match) {
+        nextMap[path] = map[path];
+        return;
+      }
+      var index = Number(match[1]);
+      if (index === removedIndex) return;
+      var nextPath = index > removedIndex ? "objects." + (index - 1) : path;
+      nextMap[nextPath] = map[path];
+    });
+    if (Object.keys(nextMap).length) slide[key] = nextMap;
+    else delete slide[key];
+  }
+
   function remapTextBoxCanvasPaths(slide, removedIndex) {
     remapTextBoxPathMap(slide, "canvas", removedIndex);
     remapTextBoxPathMap(slide, "styles", removedIndex);
@@ -3596,6 +3814,15 @@
   }
 
   function getCanvasOffset(path) {
+    var object = getObjectByPath(path);
+    if (object) {
+      return {
+        x: Number(object.x) || 0,
+        y: Number(object.y) || 0,
+        w: Math.max(0, Number(object.w) || 0),
+        h: Math.max(0, Number(object.h) || 0)
+      };
+    }
     var canvas = currentSlide().canvas || {};
     var offset = canvas[path] || {};
     return {
@@ -3607,6 +3834,20 @@
   }
 
   function setCanvasOffset(path, offset) {
+    var object = getObjectByPath(path);
+    if (object) {
+      var nextObject = clampObjectGeometry({
+        x: Number(offset.x) || 0,
+        y: Number(offset.y) || 0,
+        w: Math.max(44, Number(offset.w) || Number(object.w) || 44),
+        h: Math.max(24, Number(offset.h) || Number(object.h) || 24)
+      });
+      object.x = Math.round(nextObject.x);
+      object.y = Math.round(nextObject.y);
+      object.w = Math.round(nextObject.w);
+      object.h = Math.round(nextObject.h);
+      return;
+    }
     var slide = currentSlide();
     slide.canvas = slide.canvas && typeof slide.canvas === "object" ? slide.canvas : {};
     var next = {
@@ -3627,9 +3868,47 @@
     if (!Object.keys(slide.canvas).length) delete slide.canvas;
   }
 
+  function clampObjectGeometry(geometry) {
+    var w = Math.max(44, Number(geometry.w) || 44);
+    var h = Math.max(24, Number(geometry.h) || 24);
+    return {
+      x: clamp(Number(geometry.x) || 0, -w + 24, PPTHtml.baseWidth - 24),
+      y: clamp(Number(geometry.y) || 0, -h + 24, PPTHtml.baseHeight - 24),
+      w: w,
+      h: h
+    };
+  }
+
   function textBoxIndexFromPath(path) {
     var match = String(path || "").match(/^textBoxes\.(\d+)\.text$/);
     return match ? Number(match[1]) : -1;
+  }
+
+  function objectIndexFromPath(path) {
+    var match = String(path || "").match(/^objects\.(\d+)$/);
+    return match ? Number(match[1]) : -1;
+  }
+
+  function getObjectByPath(path) {
+    var index = objectIndexFromPath(path);
+    var objects = currentSlide().objects;
+    return index >= 0 && Array.isArray(objects) ? objects[index] : null;
+  }
+
+  function objectTypeFromPath(path) {
+    var object = getObjectByPath(path);
+    return object ? object.type : "";
+  }
+
+  function setObjectMediaSource(path, type, src, file) {
+    var object = getObjectByPath(path);
+    if (!object || object.type !== type) return false;
+    object.data = object.data && typeof object.data === "object" ? object.data : {};
+    object.data.src = src;
+    if (type === "image" && !object.data.alt) object.data.alt = file.name.replace(/\.[^.]+$/, "");
+    if ((type === "video" || type === "audio") && !object.data.caption) object.data.caption = file.name.replace(/\.[^.]+$/, "");
+    selectedCanvasPath = path;
+    return true;
   }
 
   function getTextBoxByPath(path) {
@@ -3678,6 +3957,7 @@
 
   function setCanvasOffsetStyle(node, offset) {
     var isTextBox = node.classList.contains("ppt-textbox");
+    var isObject = node.classList.contains("ppt-object");
     if (isTextBox && !node.dataset.canvasBaseWidth) {
       node.dataset.canvasBaseWidth = node.style.width || "";
       node.dataset.canvasBaseMinHeight = node.style.minHeight || "";
@@ -3690,6 +3970,21 @@
     node.dataset.canvasY = String(y);
     node.dataset.canvasW = String(w);
     node.dataset.canvasH = String(h);
+    if (isObject) {
+      var objectGeometry = clampObjectGeometry({ x: x, y: y, w: w, h: h });
+      node.style.left = Math.round(objectGeometry.x) + "px";
+      node.style.top = Math.round(objectGeometry.y) + "px";
+      node.style.width = Math.round(objectGeometry.w) + "px";
+      node.style.height = Math.round(objectGeometry.h) + "px";
+      node.style.maxWidth = "";
+      node.style.minHeight = "";
+      node.style.transform = "";
+      node.dataset.canvasX = String(objectGeometry.x);
+      node.dataset.canvasY = String(objectGeometry.y);
+      node.dataset.canvasW = String(objectGeometry.w);
+      node.dataset.canvasH = String(objectGeometry.h);
+      return;
+    }
     if (w) {
       node.style.width = w + "px";
       node.style.maxWidth = w + "px";
@@ -3939,18 +4234,21 @@
 
     var imageFile = droppedFile(event.dataTransfer, "image/");
     if (imageFile) {
+      pendingMediaObjectPath = insertObjectToCurrentSlide("image", "", canvasPointFromEvent(event));
       readImageFile(imageFile);
       return;
     }
 
     var videoFile = droppedFile(event.dataTransfer, "video/");
     if (videoFile) {
+      pendingMediaObjectPath = insertObjectToCurrentSlide("video", "", canvasPointFromEvent(event));
       readVideoFile(videoFile);
       return;
     }
 
     var audioFile = droppedFile(event.dataTransfer, "audio/");
     if (audioFile) {
+      pendingMediaObjectPath = insertObjectToCurrentSlide("audio", "", canvasPointFromEvent(event));
       readAudioFile(audioFile);
     }
   }
@@ -4242,6 +4540,12 @@
   function setAssetReference(targetDeck, ref, dataUrl) {
     var slide = targetDeck.slides[ref.slideIndex];
     if (!slide) return;
+    var objectMatch = ref.path.match(/\.objects\.(\d+)\.data\.(src|poster)$/);
+    if (objectMatch) {
+      var object = slide.objects && slide.objects[Number(objectMatch[1])];
+      if (object && object.data && typeof object.data === "object") object.data[objectMatch[2]] = dataUrl;
+      return;
+    }
     if (ref.path.indexOf(".image.src") !== -1) slide.image.src = dataUrl;
     if (ref.path.indexOf(".video.src") !== -1) slide.video.src = dataUrl;
     if (ref.path.indexOf(".video.poster") !== -1) slide.video.poster = dataUrl;
