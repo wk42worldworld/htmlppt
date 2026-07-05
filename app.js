@@ -2003,7 +2003,16 @@
     "object.layerNumber": "第 {level} 层",
     "object.chartGrid": "可视化数据表",
     "object.tableGrid": "可视化表格",
+    "object.structuredRows": "逐项编辑",
     "object.legacyText": "文本批量编辑",
+    "object.addItem": "新增一项",
+    "object.deleteItem": "删除这一项",
+    "object.itemNumber": "第 {index} 项",
+    "object.rowTitle": "标题",
+    "object.rowText": "正文",
+    "object.rowValue": "数值",
+    "object.rowLabel": "标签",
+    "object.rowDetail": "说明",
     "grid.series": "系列",
     "grid.header": "表头",
     "grid.value": "数值",
@@ -2097,7 +2106,16 @@
     "object.layerNumber": "Layer {level}",
     "object.chartGrid": "Visual data table",
     "object.tableGrid": "Visual table",
+    "object.structuredRows": "Item editor",
     "object.legacyText": "Bulk text editor",
+    "object.addItem": "Add item",
+    "object.deleteItem": "Delete this item",
+    "object.itemNumber": "Item {index}",
+    "object.rowTitle": "Title",
+    "object.rowText": "Body",
+    "object.rowValue": "Value",
+    "object.rowLabel": "Label",
+    "object.rowDetail": "Detail",
     "grid.series": "Series",
     "grid.header": "Header",
     "grid.value": "Value",
@@ -2191,7 +2209,16 @@
     "object.layerNumber": "レイヤー {level}",
     "object.chartGrid": "ビジュアルデータ表",
     "object.tableGrid": "ビジュアル表",
+    "object.structuredRows": "項目ごとに編集",
     "object.legacyText": "テキスト一括編集",
+    "object.addItem": "項目を追加",
+    "object.deleteItem": "この項目を削除",
+    "object.itemNumber": "項目 {index}",
+    "object.rowTitle": "タイトル",
+    "object.rowText": "本文",
+    "object.rowValue": "値",
+    "object.rowLabel": "ラベル",
+    "object.rowDetail": "詳細",
     "grid.series": "系列",
     "grid.header": "見出し",
     "grid.value": "値",
@@ -2285,7 +2312,16 @@
     "object.layerNumber": "{level} 레이어",
     "object.chartGrid": "시각 데이터 표",
     "object.tableGrid": "시각 표",
+    "object.structuredRows": "항목별 편집",
     "object.legacyText": "텍스트 일괄 편집",
+    "object.addItem": "항목 추가",
+    "object.deleteItem": "이 항목 삭제",
+    "object.itemNumber": "{index}번 항목",
+    "object.rowTitle": "제목",
+    "object.rowText": "본문",
+    "object.rowValue": "값",
+    "object.rowLabel": "라벨",
+    "object.rowDetail": "설명",
     "grid.series": "시리즈",
     "grid.header": "헤더",
     "grid.value": "값",
@@ -2618,7 +2654,7 @@
       "objectMediaEditor", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
       "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartGrid", "objectChartAddLabelBtn", "objectChartDeleteLabelBtn", "objectChartAddSeriesBtn", "objectChartDeleteSeriesBtn", "objectChartLabelsInput", "objectChartSeriesInput",
       "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
-      "objectStructuredEditor", "objectStructuredTitle", "objectStructuredHint", "objectStructuredInput",
+      "objectStructuredEditor", "objectStructuredTitle", "objectStructuredRowsBlock", "objectStructuredRows", "objectStructuredAddRowBtn", "objectStructuredBulkEditor", "objectStructuredHint", "objectStructuredInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
@@ -3142,6 +3178,16 @@
     bindObjectDataInput(els.objectTableColumnsInput, function (object, value) { ensureObjectData(object).columns = splitTableCells(value); }, { fitTable: true });
     bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
     bindObjectDataInput(els.objectStructuredInput, applyStructuredObjectText);
+    if (els.objectStructuredRows) {
+      els.objectStructuredRows.addEventListener("focusin", captureEditStart);
+      els.objectStructuredRows.addEventListener("change", handleStructuredRowsChange);
+      els.objectStructuredRows.addEventListener("click", handleStructuredRowsClick);
+    }
+    if (els.objectStructuredAddRowBtn) {
+      els.objectStructuredAddRowBtn.addEventListener("click", function () {
+        mutateSelectedStructuredRows("add");
+      });
+    }
     if (els.objectChartGrid) {
       els.objectChartGrid.addEventListener("focusin", captureEditStart);
       els.objectChartGrid.addEventListener("change", handleObjectChartGridChange);
@@ -6475,11 +6521,16 @@
 
     if (els.objectStructuredEditor) {
       var structuredSpec = structuredObjectEditorSpec(type);
+      var rowSpec = structuredRowsSpec(type);
       els.objectStructuredEditor.hidden = !structuredSpec;
       els.objectStructuredTitle.textContent = structuredSpec ? t(structuredSpec.titleKey) : t("object.typedStructured");
       els.objectStructuredHint.textContent = structuredSpec ? t(structuredSpec.hintKey) : t("object.structuredHint");
       els.objectStructuredInput.value = structuredSpec ? stringifyStructuredObjectData(type, data) : "";
       els.objectStructuredInput.rows = structuredSpec && structuredSpec.rows ? structuredSpec.rows : 6;
+      if (els.objectStructuredRowsBlock) els.objectStructuredRowsBlock.hidden = !rowSpec;
+      if (els.objectStructuredBulkEditor && !rowSpec) els.objectStructuredBulkEditor.open = Boolean(structuredSpec);
+      if (els.objectStructuredAddRowBtn) els.objectStructuredAddRowBtn.disabled = !editable || !rowSpec;
+      renderStructuredObjectRows(rowSpec, data, editable);
     }
   }
 
@@ -6494,6 +6545,188 @@
       shape: { titleKey: "object.typedShape", hintKey: "object.structuredShapeHint", rows: 3 }
     };
     return specs[type] || null;
+  }
+
+  function structuredRowsSpec(type) {
+    var specs = {
+      cards: {
+        type: "cards",
+        dataKey: "cards",
+        fields: [
+          { key: "title", labelKey: "object.rowTitle" },
+          { key: "text", labelKey: "object.rowText", multiline: true }
+        ],
+        blank: function () { return { title: "", text: "" }; }
+      },
+      metrics: {
+        type: "metrics",
+        dataKey: "metrics",
+        fields: [
+          { key: "value", labelKey: "object.rowValue" },
+          { key: "label", labelKey: "object.rowLabel" },
+          { key: "detail", labelKey: "object.rowDetail", multiline: true }
+        ],
+        blank: function () { return { value: "", label: "", detail: "" }; }
+      },
+      timeline: {
+        type: "timeline",
+        dataKey: "items",
+        fields: [
+          { key: "title", labelKey: "object.rowTitle" },
+          { key: "text", labelKey: "object.rowText", multiline: true }
+        ],
+        blank: function () { return { title: "", text: "" }; }
+      }
+    };
+    return specs[type] || null;
+  }
+
+  function renderStructuredObjectRows(spec, data, editable) {
+    if (!els.objectStructuredRows) return;
+    els.objectStructuredRows.innerHTML = "";
+    if (!spec) return;
+    structuredRowsSnapshot(spec, data).forEach(function (item, index) {
+      els.objectStructuredRows.appendChild(createStructuredRowElement(spec, item, index, editable));
+    });
+  }
+
+  function createStructuredRowElement(spec, item, index, editable) {
+    var row = document.createElement("section");
+    row.className = "structured-row";
+    row.setAttribute("data-structured-row", String(index));
+
+    var header = document.createElement("div");
+    header.className = "structured-row-header";
+    var title = document.createElement("span");
+    title.textContent = formatText(t("object.itemNumber"), { index: index + 1 });
+    header.appendChild(title);
+
+    var remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "mini-button structured-row-delete";
+    remove.disabled = !editable;
+    remove.setAttribute("data-structured-action", "delete");
+    remove.setAttribute("data-structured-index", String(index));
+    setTooltip(remove, t("object.deleteItem"));
+    var icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+    use.setAttribute("href", "#icon-trash");
+    icon.appendChild(use);
+    remove.appendChild(icon);
+    var removeText = document.createElement("span");
+    removeText.className = "sr-only";
+    removeText.textContent = t("object.deleteItem");
+    remove.appendChild(removeText);
+    header.appendChild(remove);
+    row.appendChild(header);
+
+    var fields = document.createElement("div");
+    fields.className = "structured-row-fields";
+    spec.fields.forEach(function (field) {
+      var label = document.createElement("label");
+      label.className = field.multiline ? "structured-field structured-field-wide" : "structured-field";
+      var labelText = document.createElement("span");
+      labelText.textContent = t(field.labelKey);
+      label.appendChild(labelText);
+
+      var control = field.multiline ? document.createElement("textarea") : document.createElement("input");
+      control.className = "structured-row-input";
+      if (!field.multiline) control.type = "text";
+      else control.rows = 2;
+      control.value = item[field.key] == null ? "" : String(item[field.key]);
+      control.disabled = !editable;
+      control.setAttribute("data-object-control", "");
+      control.setAttribute("data-object-typed-control", "");
+      control.setAttribute("data-structured-field", field.key);
+      control.setAttribute("data-structured-index", String(index));
+      control.setAttribute("aria-label", t(field.labelKey));
+      label.appendChild(control);
+      fields.appendChild(label);
+    });
+    row.appendChild(fields);
+    return row;
+  }
+
+  function structuredRowsSnapshot(spec, data) {
+    data = data && typeof data === "object" ? data : {};
+    var items = Array.isArray(data[spec.dataKey]) ? data[spec.dataKey] : [];
+    var normalized = items.map(function (item) {
+      return normalizeStructuredRowItem(spec, item);
+    });
+    return normalized.length ? normalized : [spec.blank()];
+  }
+
+  function normalizeStructuredRowItem(spec, item) {
+    var result = spec.blank();
+    if (typeof item === "string") {
+      if (spec.type === "metrics") {
+        result.value = item;
+      } else {
+        result.title = item;
+        result.text = item;
+      }
+      return result;
+    }
+    item = item && typeof item === "object" ? item : {};
+    spec.fields.forEach(function (field) {
+      result[field.key] = item[field.key] == null ? "" : String(item[field.key]);
+    });
+    return result;
+  }
+
+  function handleStructuredRowsChange(event) {
+    var control = event && event.target && event.target.closest
+      ? event.target.closest("[data-structured-field]")
+      : null;
+    if (!control || syncing) return;
+    var field = control.getAttribute("data-structured-field");
+    var index = Number(control.getAttribute("data-structured-index"));
+    if (!field || !isFinite(index)) return;
+    commitSelectedObjectMutation(function (object) {
+      var spec = structuredRowsSpec(object.type);
+      if (!spec || !spec.fields.some(function (item) { return item.key === field; })) return;
+      var rows = ensureStructuredRowsArray(ensureObjectData(object), spec, index + 1);
+      rows[index][field] = control.value;
+    });
+  }
+
+  function handleStructuredRowsClick(event) {
+    var button = event && event.target && event.target.closest
+      ? event.target.closest("[data-structured-action]")
+      : null;
+    if (!button || syncing) return;
+    event.preventDefault();
+    var action = button.getAttribute("data-structured-action");
+    var index = Number(button.getAttribute("data-structured-index"));
+    if (action === "delete" && isFinite(index)) mutateSelectedStructuredRows("delete", index);
+  }
+
+  function mutateSelectedStructuredRows(action, index) {
+    return commitSelectedObjectMutation(function (object) {
+      var spec = structuredRowsSpec(object.type);
+      if (!spec) return;
+      var data = ensureObjectData(object);
+      var rows = Array.isArray(data[spec.dataKey]) ? data[spec.dataKey].map(function (item) {
+        return normalizeStructuredRowItem(spec, item);
+      }) : [];
+      if (action === "add") {
+        rows.push(spec.blank());
+      }
+      if (action === "delete") {
+        if (!rows.length) return;
+        rows.splice(clamp(Math.round(Number(index) || 0), 0, rows.length - 1), 1);
+      }
+      data[spec.dataKey] = rows;
+    });
+  }
+
+  function ensureStructuredRowsArray(data, spec, minLength) {
+    var rows = Array.isArray(data[spec.dataKey]) ? data[spec.dataKey].map(function (item) {
+      return normalizeStructuredRowItem(spec, item);
+    }) : [];
+    while (rows.length < minLength) rows.push(spec.blank());
+    data[spec.dataKey] = rows;
+    return rows;
   }
 
   function stringifyStructuredObjectData(type, data) {

@@ -93,6 +93,10 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectTableGridAddRowBtn"/,
   /id="objectTableGridAddColumnBtn"/,
   /id="objectStructuredEditor"/,
+  /id="objectStructuredRowsBlock"/,
+  /id="objectStructuredRows"/,
+  /id="objectStructuredAddRowBtn"/,
+  /id="objectStructuredBulkEditor"/,
   /id="objectStructuredInput"/,
   /id="objectLayerList"/,
   /id="copyRepairPromptBtn"/,
@@ -172,10 +176,20 @@ assert.match(appJs, /function showSlideLayoutMenu/);
 assert.match(appJs, /function handleSlideLayoutMenuAction/);
 assert.match(appJs, /function createSlideForLayout/);
 assert.match(appJs, /function structuredObjectEditorSpec/);
+assert.match(appJs, /function structuredRowsSpec/);
+assert.match(appJs, /function renderStructuredObjectRows/);
+assert.match(appJs, /function handleStructuredRowsChange/);
+assert.match(appJs, /function mutateSelectedStructuredRows/);
 assert.match(appJs, /function applyStructuredObjectText/);
 assert.match(appJs, /function stringifyStructuredObjectData/);
 assert.match(appJs, /bindObjectDataInput\(els\.objectStructuredInput, applyStructuredObjectText\)/);
+assert.match(appJs, /objectStructuredRows\.addEventListener\("change", handleStructuredRowsChange\)/);
+assert.match(appJs, /cards:[\s\S]*dataKey: "cards"[\s\S]*metrics:[\s\S]*dataKey: "metrics"[\s\S]*timeline:[\s\S]*dataKey: "items"/);
 assert.match(appJs, /object\.typedStructured/);
+assert.match(appJs, /object\.structuredRows/);
+assert.match(stylesCss, /\.structured-row-editor/);
+assert.match(stylesCss, /\.structured-row/);
+assert.match(stylesCss, /\.structured-row-input/);
 assert.match(appJs, /addSlideBtn\.addEventListener\("click", function \(\) \{ showSlideLayoutMenuForButton\(els\.addSlideBtn, currentIndex\); \}\)/);
 assert.match(appJs, /deck\.slides\.splice\(insertIndex, 0, createSlideForLayout\(settings\.layout, insertIndex\)\)/);
 assert.match(appJs, /imageBackground: "image"/);

@@ -902,10 +902,22 @@
           </div>
           <div class="object-command-group typed-object-editor" id="objectStructuredEditor" role="group" aria-label="组件内容" data-i18n-group="object.typedStructured" hidden>
             <span id="objectStructuredTitle" data-i18n="object.typedStructured">组件内容</span>
-            <label>
-              <span id="objectStructuredHint" data-i18n="object.structuredHint">每行一项；用 | 分隔标题、正文或说明。</span>
-              <textarea id="objectStructuredInput" data-object-control data-object-typed-control rows="6" spellcheck="false"></textarea>
-            </label>
+            <div class="object-data-grid-block structured-row-block" id="objectStructuredRowsBlock" hidden>
+              <div class="object-data-grid-head">
+                <span data-i18n="object.structuredRows">逐项编辑</span>
+                <div class="object-grid-actions">
+                  <button type="button" id="objectStructuredAddRowBtn" class="mini-button" data-object-control data-i18n-title="object.addItem"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="object.addItem">新增一项</span></button>
+                </div>
+              </div>
+              <div id="objectStructuredRows" class="structured-row-editor" aria-live="polite"></div>
+            </div>
+            <details class="object-legacy-editor" id="objectStructuredBulkEditor">
+              <summary data-i18n="object.legacyText">文本批量编辑</summary>
+              <label>
+                <span id="objectStructuredHint" data-i18n="object.structuredHint">每行一项；用 | 分隔标题、正文或说明。</span>
+                <textarea id="objectStructuredInput" data-object-control data-object-typed-control rows="6" spellcheck="false"></textarea>
+              </label>
+            </details>
           </div>
           <div class="object-command-group" role="group" aria-label="对象数据" data-i18n-group="object.data">
             <label class="object-advanced-json">

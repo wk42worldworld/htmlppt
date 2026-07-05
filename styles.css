@@ -862,6 +862,11 @@ textarea:focus {
   line-height: 1;
 }
 
+.mini-button svg {
+  width: 15px;
+  height: 15px;
+}
+
 .full-width {
   width: 100%;
 }
@@ -1018,6 +1023,100 @@ textarea:focus {
   background: #fff;
 }
 
+.structured-row-editor {
+  display: grid;
+  gap: 8px;
+  max-height: 276px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.structured-row {
+  display: grid;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.structured-row-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.structured-row-header span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-weight: 780;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.structured-row-delete {
+  width: 25px;
+  height: 25px;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+.structured-row-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.structured-field {
+  min-width: 0;
+}
+
+.structured-field-wide {
+  grid-column: 1 / -1;
+}
+
+.structured-field span {
+  overflow: hidden;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.structured-row-input {
+  width: 100%;
+  min-width: 0;
+  height: 31px;
+  padding: 0 8px;
+  border: 1px solid var(--ui-line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ui-text);
+  font-size: 12px;
+}
+
+textarea.structured-row-input {
+  height: auto;
+  min-height: 52px;
+  padding: 7px 8px;
+  resize: vertical;
+}
+
+.structured-row-input:focus {
+  border-color: rgba(37, 99, 235, .42);
+  outline: 2px solid rgba(37, 99, 235, .14);
+}
+
+.structured-row-input:disabled {
+  background: #f8fafc;
+  color: var(--ui-muted);
+}
+
 .object-grid-table {
   width: max-content;
   min-width: 100%;
@@ -1117,6 +1216,11 @@ textarea:focus {
 
 .typed-object-editor textarea {
   min-height: 88px;
+}
+
+.object-panel textarea.structured-row-input {
+  min-height: 52px;
+  font-family: inherit;
 }
 
 .object-advanced-json textarea {
