@@ -23,6 +23,7 @@
   var activeCanvasDrag = null;
   var activeCanvasMarquee = null;
   var activeCanvasResize = null;
+  var canvasSnapGuideKey = "";
   var selectedCanvasPath = "";
   var selectedCanvasPaths = [];
   var canvasClipboard = null;
@@ -5644,6 +5645,7 @@
       frame: 0,
       pendingDx: 0,
       pendingDy: 0,
+      snapCandidates: null,
       moved: false
     };
     if (target.setPointerCapture && event.pointerId != null) {
@@ -5746,20 +5748,21 @@
       return { dx: drag.pendingDx, dy: drag.pendingDy, guides: [] };
     }
     var bounds = drag.startSelectionBounds || drag.startBox;
-    var snap = resolveCanvasSnap(bounds, drag.pendingDx, drag.pendingDy, drag.paths || [drag.path]);
+    if (!drag.snapCandidates) drag.snapCandidates = canvasSnapCandidates(drag.paths || [drag.path]);
+    var snap = resolveCanvasSnap(bounds, drag.pendingDx, drag.pendingDy, drag.snapCandidates);
     drag.snapDx = snap.dx;
     drag.snapDy = snap.dy;
     renderCanvasSnapGuides(snap.guides);
     return snap;
   }
 
-  function resolveCanvasSnap(bounds, dx, dy, selectedPaths) {
+  function resolveCanvasSnap(bounds, dx, dy, candidates) {
     if (!bounds || !isFinite(bounds.x) || !isFinite(bounds.y)) {
       clearCanvasSnapGuides();
       return { dx: dx, dy: dy, guides: [] };
     }
     var threshold = 6;
-    var candidates = canvasSnapCandidates(selectedPaths);
+    candidates = candidates || { x: [], y: [] };
     var snapX = nearestCanvasSnap([
       bounds.x + dx,
       bounds.x + bounds.w / 2 + dx,
@@ -5824,7 +5827,12 @@
   }
 
   function renderCanvasSnapGuides(guides) {
+    var key = (guides || []).map(function (guide) {
+      return guide.axis + ":" + Math.round(Number(guide.value) || 0);
+    }).join("|");
+    if (key === canvasSnapGuideKey) return;
     clearCanvasSnapGuides();
+    canvasSnapGuideKey = key;
     (guides || []).forEach(function (guide) {
       var line = document.createElement("div");
       line.className = "canvas-snap-guide canvas-snap-guide-" + guide.axis;
@@ -5836,6 +5844,7 @@
 
   function clearCanvasSnapGuides() {
     if (!els.stageFrame) return;
+    canvasSnapGuideKey = "";
     els.stageFrame.querySelectorAll(".canvas-snap-guide").forEach(function (guide) {
       guide.remove();
     });
