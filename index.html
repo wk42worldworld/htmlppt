@@ -137,6 +137,12 @@
       <path d="m9 8-4 4 4 4"></path>
       <path d="m15 8 4 4-4 4"></path>
     </symbol>
+    <symbol id="icon-shape" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="10" height="10" rx="2"></rect>
+      <circle cx="16.5" cy="15.5" r="3.5"></circle>
+      <path d="M14 7h6"></path>
+      <path d="m18 5 2 2-2 2"></path>
+    </symbol>
     <symbol id="icon-lang" viewBox="0 0 24 24">
       <path d="M4 5h9"></path>
       <path d="M8.5 5c-.5 4-2 7-4.5 9"></path>
@@ -220,6 +226,12 @@
           <button type="button" class="insert-tool" draggable="true" data-insert="image" data-i18n-title="insert.image.title"><svg><use href="#icon-image"></use></svg><span data-i18n="insert.image">图片</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="video" data-i18n-title="insert.video.title"><svg><use href="#icon-video"></use></svg><span data-i18n="insert.video">视频</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="audio" data-i18n-title="insert.audio.title"><svg><use href="#icon-audio"></use></svg><span data-i18n="insert.audio">音频</span></button>
+          <div class="insert-group-label" data-i18n="insert.group.shapes">形状</div>
+          <button type="button" class="insert-tool" draggable="true" data-insert="shape" data-variant="rectangle" data-i18n-title="insert.shape.rectangle.title"><svg><use href="#icon-shape"></use></svg><span data-i18n="insert.shape.rectangle">矩形</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="shape" data-variant="ellipse" data-i18n-title="insert.shape.ellipse.title"><svg><use href="#icon-shape"></use></svg><span data-i18n="insert.shape.ellipse">圆形</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="shape" data-variant="line" data-i18n-title="insert.shape.line.title"><svg><use href="#icon-shape"></use></svg><span data-i18n="insert.shape.line">线条</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="shape" data-variant="arrow" data-i18n-title="insert.shape.arrow.title"><svg><use href="#icon-shape"></use></svg><span data-i18n="insert.shape.arrow">箭头</span></button>
+          <button type="button" class="insert-tool" draggable="true" data-insert="shape" data-variant="callout" data-i18n-title="insert.shape.callout.title"><svg><use href="#icon-shape"></use></svg><span data-i18n="insert.shape.callout">标注</span></button>
           <div class="insert-group-label" data-i18n="insert.group.compare">对比</div>
           <button type="button" class="insert-tool" draggable="true" data-insert="compare" data-variant="beforeAfter" data-i18n-title="insert.compare.beforeAfter.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.compare.beforeAfter">前后</span></button>
           <button type="button" class="insert-tool" draggable="true" data-insert="compare" data-variant="decision" data-i18n-title="insert.compare.decision.title"><svg><use href="#icon-cards"></use></svg><span data-i18n="insert.compare.decision">决策</span></button>
@@ -387,6 +399,67 @@
             <input id="styleOpacityInput" data-style-control type="range" min="0.1" max="1" step="0.05" value="1">
           </label>
           <button type="button" id="styleResetBtn" class="secondary full-width" data-style-control data-i18n="style.reset" data-i18n-title="style.reset">清除样式</button>
+        </section>
+
+        <section class="panel-section object-panel" id="objectPanel">
+          <h2 data-i18n="panel.object">对象</h2>
+          <p class="style-target" id="objectTargetLabel" data-i18n="object.noSelection">选中画布对象后，可调整位置、尺寸、图层和数据。</p>
+          <div class="style-grid">
+            <label>
+              <span data-i18n="field.objectX">X</span>
+              <input id="objectXInput" data-object-control type="number" step="1">
+            </label>
+            <label>
+              <span data-i18n="field.objectY">Y</span>
+              <input id="objectYInput" data-object-control type="number" step="1">
+            </label>
+          </div>
+          <div class="style-grid">
+            <label>
+              <span data-i18n="field.objectW">宽</span>
+              <input id="objectWInput" data-object-control type="number" min="24" step="1">
+            </label>
+            <label>
+              <span data-i18n="field.objectH">高</span>
+              <input id="objectHInput" data-object-control type="number" min="24" step="1">
+            </label>
+          </div>
+          <div class="style-grid">
+            <label>
+              <span data-i18n="field.rotation">旋转</span>
+              <input id="objectRotationInput" data-object-control type="number" step="1">
+            </label>
+            <label>
+              <span data-i18n="field.layer">层级</span>
+              <input id="objectZInput" data-object-control type="number" step="1">
+            </label>
+          </div>
+          <div class="style-button-row">
+            <button type="button" id="objectDuplicateBtn" class="style-toggle" data-object-control data-i18n="object.duplicate" data-i18n-title="object.duplicate">复制</button>
+            <button type="button" id="objectBringForwardBtn" class="style-toggle" data-object-control data-i18n="object.forward" data-i18n-title="object.forward">上移一层</button>
+            <button type="button" id="objectSendBackwardBtn" class="style-toggle" data-object-control data-i18n="object.backward" data-i18n-title="object.backward">下移一层</button>
+          </div>
+          <div class="style-button-row">
+            <button type="button" id="objectBringFrontBtn" class="style-toggle" data-object-control data-i18n="object.front" data-i18n-title="object.front">置顶</button>
+            <button type="button" id="objectSendBackBtn" class="style-toggle" data-object-control data-i18n="object.back" data-i18n-title="object.back">置底</button>
+          </div>
+          <div class="object-command-group">
+            <span data-i18n="object.align">对齐</span>
+            <div class="style-button-row object-align-grid">
+              <button type="button" id="objectAlignLeftBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignLeft" data-i18n-title="object.alignLeft">左对齐</button>
+              <button type="button" id="objectAlignCenterBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignCenter" data-i18n-title="object.alignCenter">水平居中</button>
+              <button type="button" id="objectAlignRightBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignRight" data-i18n-title="object.alignRight">右对齐</button>
+              <button type="button" id="objectAlignTopBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignTop" data-i18n-title="object.alignTop">顶对齐</button>
+              <button type="button" id="objectAlignMiddleBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignMiddle" data-i18n-title="object.alignMiddle">垂直居中</button>
+              <button type="button" id="objectAlignBottomBtn" class="style-toggle" data-object-control data-align-control data-i18n="object.alignBottom" data-i18n-title="object.alignBottom">底对齐</button>
+              <button type="button" id="objectDistributeHBtn" class="style-toggle" data-object-control data-distribute-control data-i18n="object.distributeH" data-i18n-title="object.distributeH">横向分布</button>
+              <button type="button" id="objectDistributeVBtn" class="style-toggle" data-object-control data-distribute-control data-i18n="object.distributeV" data-i18n-title="object.distributeV">纵向分布</button>
+            </div>
+          </div>
+          <label>
+            <span data-i18n="field.objectData">对象数据</span>
+            <textarea id="objectDataInput" data-object-control rows="7" spellcheck="false"></textarea>
+          </label>
         </section>
 
         <section class="panel-section field-group" data-layouts="hero,imageRight,imageLeft,imageFull,imageBackground">
@@ -620,6 +693,19 @@
       </footer>
     </form>
   </dialog>
+
+  <div class="context-menu" id="canvasContextMenu" hidden>
+    <button type="button" data-context-action="copy" data-i18n="context.copy">复制</button>
+    <button type="button" data-context-action="paste" data-i18n="context.paste">粘贴</button>
+    <button type="button" data-context-action="duplicate" data-i18n="context.duplicate">重复</button>
+    <hr>
+    <button type="button" data-context-action="bringForward" data-i18n="object.forward">上移一层</button>
+    <button type="button" data-context-action="sendBackward" data-i18n="object.backward">下移一层</button>
+    <button type="button" data-context-action="bringFront" data-i18n="object.front">置顶</button>
+    <button type="button" data-context-action="sendBack" data-i18n="object.back">置底</button>
+    <hr>
+    <button type="button" data-context-action="delete" data-i18n="context.delete">删除</button>
+  </div>
 
   <dialog class="validation-dialog" id="validationDialog">
     <form method="dialog">

@@ -17,11 +17,12 @@
   "scripts": {
     "start": "electron .",
     "serve": "python3 -m http.server 5173",
-    "check": "node --check app.js && node --check renderer.js && node --check electron/main.js && node --check electron/preload.js && node --check scripts/build-sample.js && node --check scripts/generate-icons.js",
+    "check": "node --check app.js && node --check renderer.js && node --check electron/main.js && node --check electron/preload.js && node --check scripts/build-sample.js && node --check scripts/generate-icons.js && node --check scripts/object-smoke-test.js",
     "icon:generate": "node scripts/generate-icons.js",
     "build:sample": "node scripts/build-sample.js",
-    "test": "npm run check && npm run smoke && npm run build:sample",
+    "test": "npm run check && npm run smoke && npm run object-smoke && npm run build:sample",
     "smoke": "node scripts/smoke-test.js",
+    "object-smoke": "node scripts/object-smoke-test.js",
     "dist": "electron-builder"
   },
   "devDependencies": {

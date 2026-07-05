@@ -6,6 +6,7 @@
   var BASE_HEIGHT = 720;
   var THEMES = ["paper", "launch", "studio", "boardroom"];
   var CHART_KINDS = ["bar", "line", "donut"];
+  var SHAPE_KINDS = ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"];
   var TRANSITIONS = ["none", "fade", "slide", "push", "zoom"];
   var STANDALONE_FAVICON_SVG = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 64 64\"><defs><linearGradient id=\"g\" x1=\"8\" y1=\"6\" x2=\"56\" y2=\"58\" gradientUnits=\"userSpaceOnUse\"><stop stop-color=\"#121a23\"/><stop offset=\".62\" stop-color=\"#0f8b8d\"/><stop offset=\"1\" stop-color=\"#356dff\"/></linearGradient></defs><rect width=\"64\" height=\"64\" rx=\"14\" fill=\"url(#g)\"/><rect x=\"12\" y=\"12\" width=\"40\" height=\"38\" rx=\"7\" fill=\"#f8fbff\"/><rect x=\"16\" y=\"16\" width=\"32\" height=\"7\" rx=\"3\" fill=\"#0f8b8d\"/><path d=\"m27 29-6 6 6 6m10-12 6 6-6 6\" fill=\"none\" stroke=\"#17202a\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M42 29 51 35 42 41z\" fill=\"#ffb000\"/></svg>";
   var STANDALONE_FAVICON = "data:image/svg+xml," + encodeURIComponent(STANDALONE_FAVICON_SVG);
@@ -62,6 +63,11 @@
     ".ppt-object .ppt-card,.ppt-object .ppt-metric{min-height:0;padding:20px}",
     ".ppt-object .ppt-timeline{height:100%;gap:10px}",
     ".ppt-object .ppt-code{width:100%;height:100%;margin:0;overflow:auto}",
+    ".ppt-object-shape{overflow:visible;border-radius:0;font-size:24px;font-weight:700;text-align:center}",
+    ".ppt-shape{position:relative;width:100%;height:100%;min-width:0;min-height:0;color:inherit}",
+    ".ppt-shape svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible}",
+    ".ppt-shape-text{position:absolute;inset:10px 14px;display:grid;place-items:center;color:inherit;font-size:inherit;line-height:1.2;font-weight:inherit;text-align:inherit;white-space:pre-wrap;overflow:hidden;pointer-events:none}",
+    ".ppt-shape-line .ppt-shape-text,.ppt-shape-arrow .ppt-shape-text{inset:0 12px;font-size:20px}",
     ".ppt-object-quote{align-content:center;padding:28px 34px;border:1px solid var(--ppt-line);background:var(--ppt-surface);box-shadow:0 14px 34px rgba(18,24,38,.12)}",
     ".ppt-object-quote .ppt-quote{font-size:30px;line-height:1.28}.ppt-object-quote .ppt-author{margin-top:18px;color:var(--ppt-muted);font-size:18px}",
     ".ppt-object-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ppt-object-compare .ppt-compare-card{min-height:0;padding:20px}",
@@ -236,7 +242,13 @@
     var object = rawObject && typeof rawObject === "object" ? clone(rawObject) : {};
     var type = safeText(object.type || "shape");
     var allowed = ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "compare", "shape"];
-    if (allowed.indexOf(type) === -1) type = "shape";
+    if (allowed.indexOf(type) === -1) {
+      if (isShapeKindInput(type)) {
+        object.data = object.data && typeof object.data === "object" ? object.data : {};
+        if (!object.data.kind) object.data.kind = type;
+      }
+      type = "shape";
+    }
 
     var x = Number(object.x);
     var y = Number(object.y);
@@ -244,22 +256,24 @@
     var h = Number(object.h);
     var z = Number(object.zIndex);
     var rotation = Number(object.rotation);
+    var data = normalizeObjectData(type, object.data);
+    var defaultSize = defaultObjectSize(type, data.kind);
 
     return {
       id: safeText(object.id || "object-" + (index + 1)),
       type: type,
       x: isFinite(x) ? x : 160 + index * 24,
       y: isFinite(y) ? y : 170 + index * 24,
-      w: isFinite(w) && w > 0 ? w : defaultObjectSize(type).w,
-      h: isFinite(h) && h > 0 ? h : defaultObjectSize(type).h,
+      w: isFinite(w) && w > 0 ? w : defaultSize.w,
+      h: isFinite(h) && h > 0 ? h : defaultSize.h,
       rotation: isFinite(rotation) ? rotation : 0,
       zIndex: isFinite(z) ? Math.round(z) : index + 8,
-      data: normalizeObjectData(type, object.data),
+      data: data,
       style: normalizeElementStyle(object.style)
     };
   }
 
-  function defaultObjectSize(type) {
+  function defaultObjectSize(type, shapeKind) {
     var sizes = {
       image: { w: 520, h: 300 },
       video: { w: 560, h: 320 },
@@ -273,6 +287,10 @@
       code: { w: 600, h: 260 },
       compare: { w: 620, h: 260 }
     };
+    if (type === "shape") {
+      if (shapeKind === "line" || shapeKind === "arrow") return { w: 360, h: 64 };
+      if (shapeKind === "callout") return { w: 360, h: 180 };
+    }
     return sizes[type] || { w: 320, h: 180 };
   }
 
@@ -313,8 +331,52 @@
       data.right = data.right && typeof data.right === "object" ? data.right : { title: "After", text: "" };
       return data;
     }
+    if (type === "shape") return normalizeShapeData(data);
     data.label = safeText(data.label || "");
     return data;
+  }
+
+  function normalizeShapeData(rawData) {
+    var data = rawData && typeof rawData === "object" ? clone(rawData) : {};
+    data.kind = normalizeShapeKind(data.kind || data.shape || data.type);
+    data.text = safeText(data.text == null ? data.label : data.text);
+
+    var lineLike = data.kind === "line" || data.kind === "arrow";
+    var strokeWidth = Number(data.strokeWidth);
+    data.fill = normalizeShapePaint(data.fill, lineLike ? "none" : "rgba(15,139,141,.14)");
+    data.stroke = normalizeShapePaint(data.stroke, "var(--ppt-accent)");
+    data.strokeWidth = isFinite(strokeWidth) && strokeWidth >= 0 ? clamp(Math.round(strokeWidth), 0, 48) : (lineLike ? 4 : 3);
+    return data;
+  }
+
+  function normalizeShapeKind(value) {
+    var kind = safeText(value || "rectangle").trim();
+    var aliases = {
+      rect: "rectangle",
+      roundRect: "roundedRectangle",
+      rounded: "roundedRectangle",
+      "rounded-rectangle": "roundedRectangle",
+      oval: "ellipse",
+      circle: "ellipse",
+      speechBubble: "callout",
+      "speech-bubble": "callout"
+    };
+    kind = aliases[kind] || kind;
+    return SHAPE_KINDS.indexOf(kind) === -1 ? "rectangle" : kind;
+  }
+
+  function isShapeKindInput(value) {
+    var kind = safeText(value).trim();
+    var aliases = ["rect", "roundRect", "rounded", "rounded-rectangle", "oval", "circle", "speechBubble", "speech-bubble"];
+    return SHAPE_KINDS.indexOf(kind) !== -1 || aliases.indexOf(kind) !== -1;
+  }
+
+  function normalizeShapePaint(value, fallback) {
+    var paint = safeText(value).trim();
+    if (!paint) return fallback;
+    if (paint === "none" || paint === "transparent" || paint === "currentColor") return paint;
+    if (/^var\(--ppt-[a-z0-9-]+\)$/i.test(paint)) return paint;
+    return normalizeStyleColor(paint) || fallback;
   }
 
   function normalizeChart(rawChart) {
@@ -476,6 +538,82 @@
       if (attrs[key] != null) node.setAttribute(key, attrs[key]);
     });
     return node;
+  }
+
+  function mergeAttrs(base, extra) {
+    var attrs = {};
+    Object.keys(base || {}).forEach(function (key) {
+      attrs[key] = base[key];
+    });
+    Object.keys(extra || {}).forEach(function (key) {
+      attrs[key] = extra[key];
+    });
+    return attrs;
+  }
+
+  function createShape(rawData, index) {
+    var shape = normalizeShapeData(rawData);
+    var lineLike = shape.kind === "line" || shape.kind === "arrow";
+    var box = el("div", "ppt-shape ppt-shape-" + shape.kind);
+    var svg = svgEl("svg", {
+      class: "ppt-shape-svg",
+      viewBox: "0 0 100 100",
+      preserveAspectRatio: "none",
+      role: shape.text ? "img" : null,
+      "aria-label": shape.text || null,
+      "aria-hidden": shape.text ? null : "true"
+    });
+    var attrs = {
+      fill: lineLike ? "none" : shape.fill,
+      stroke: shape.stroke,
+      "stroke-width": shape.strokeWidth,
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      "vector-effect": "non-scaling-stroke"
+    };
+
+    if (shape.kind === "ellipse") {
+      svg.appendChild(svgEl("ellipse", mergeAttrs(attrs, { cx: 50, cy: 50, rx: 47, ry: 47 })));
+    } else if (shape.kind === "line" || shape.kind === "arrow") {
+      if (shape.kind === "arrow") {
+        var markerId = uid("ppt-arrow-" + (index + 1));
+        var defs = svgEl("defs");
+        var marker = svgEl("marker", {
+          id: markerId,
+          markerWidth: 8,
+          markerHeight: 8,
+          refX: 7,
+          refY: 4,
+          orient: "auto",
+          markerUnits: "strokeWidth"
+        });
+        marker.appendChild(svgEl("path", {
+          d: "M0,0 L8,4 L0,8 Z",
+          fill: shape.stroke,
+          stroke: "none"
+        }));
+        defs.appendChild(marker);
+        svg.appendChild(defs);
+        attrs["marker-end"] = "url(#" + markerId + ")";
+      }
+      svg.appendChild(svgEl("line", mergeAttrs(attrs, { x1: 4, y1: 50, x2: 96, y2: 50 })));
+    } else if (shape.kind === "callout") {
+      svg.appendChild(svgEl("path", mergeAttrs(attrs, {
+        d: "M8 8 H92 Q96 8 96 12 V68 Q96 72 92 72 H58 L44 92 L44 72 H8 Q4 72 4 68 V12 Q4 8 8 8 Z"
+      })));
+    } else {
+      svg.appendChild(svgEl("rect", mergeAttrs(attrs, {
+        x: 3,
+        y: 3,
+        width: 94,
+        height: 94,
+        rx: shape.kind === "roundedRectangle" ? 12 : 0
+      })));
+    }
+
+    box.appendChild(svg);
+    if (shape.text) box.appendChild(el("div", "ppt-shape-text", shape.text));
+    return box;
   }
 
   function chartSeriesClass(index) {
@@ -741,6 +879,7 @@
     else if (object.type === "cards") node.appendChild(createObjectCards(object.data));
     else if (object.type === "metrics") node.appendChild(createObjectMetrics(object.data));
     else if (object.type === "timeline") node.appendChild(createObjectTimeline(object.data));
+    else if (object.type === "shape") node.appendChild(createShape(object.data, index));
     else if (object.type === "quote") {
       appendText(node, "p", "ppt-quote", object.data.quote);
       appendText(node, "p", "ppt-author", object.data.author);
@@ -1735,11 +1874,15 @@
       "function leg(c){var l=e('div','ppt-chart-legend');if(c.kind==='donut'){var vals=c.series[0]?c.series[0].values:[];c.labels.forEach(function(x,j){li(l,j,x,vals[j],c.unit)});return l}c.series.forEach(function(s,j){li(l,j,s.name||('系列 '+(j+1)),null,c.unit)});return l}" +
       "function chart(ch){var c=norm(ch);if(!c.labels.length||!c.series.length)return e('div','ppt-chart-empty','添加图表标签和数据后预览');var wr=e('div','ppt-chart-wrap ppt-chart-kind-'+c.kind);wr.appendChild(c.kind==='line'?lineChart(c):c.kind==='donut'?donutChart(c):barChart(c));wr.appendChild(leg(c));return wr}" +
       "function sty(x,s){if(!s||typeof s!=='object')return;if(s.fontSize)x.style.fontSize=num(s.fontSize)+'px';if(s.color)x.style.color=s.color;if(s.backgroundColor)x.style.backgroundColor=s.backgroundColor;if(s.textAlign)x.style.textAlign=s.textAlign;if(s.fontWeight)x.style.fontWeight=s.fontWeight;if(s.fontStyle)x.style.fontStyle=s.fontStyle;if(s.borderColor){x.style.borderColor=s.borderColor;x.style.borderStyle='solid';if(s.borderWidth==null)x.style.borderWidth='1px'}if(s.borderWidth!=null){x.style.borderWidth=num(s.borderWidth)+'px';x.style.borderStyle=num(s.borderWidth)?'solid':''}if(s.borderRadius!=null)x.style.borderRadius=num(s.borderRadius)+'px';if(s.opacity!=null)x.style.opacity=s.opacity}" +
+      "function sk(k){k=String(k||'rectangle');if(k==='rect')return'rectangle';if(k==='roundRect'||k==='rounded'||k==='rounded-rectangle')return'roundedRectangle';if(k==='ellipse'||k==='oval'||k==='circle')return'ellipse';if(k==='line'||k==='arrow'||k==='callout')return k;if(k==='speechBubble'||k==='speech-bubble')return'callout';return'rectangle'}" +
+      "function pt(v,f){v=String(v==null?'':v).trim();return v||f}" +
+      "function sa(b,x){var o={},k;for(k in b)o[k]=b[k];for(k in x)o[k]=x[k];return o}" +
+      "function shape(d,j){d=d||{};var k=sk(d.kind||d.shape||d.type),tx=d.text==null?(d.label==null?'':String(d.label)):String(d.text),ln=k==='line'||k==='arrow',sw=d.strokeWidth==null?(ln?4:3):Math.max(0,Math.min(48,Math.round(num(d.strokeWidth)))),fl=pt(d.fill,ln?'none':'rgba(15,139,141,.14)'),st=pt(d.stroke,'var(--ppt-accent)'),bx=e('div','ppt-shape ppt-shape-'+k),s=se('svg',{class:'ppt-shape-svg',viewBox:'0 0 100 100',preserveAspectRatio:'none'}),at={fill:ln?'none':fl,stroke:st,'stroke-width':sw,'stroke-linecap':'round','stroke-linejoin':'round','vector-effect':'non-scaling-stroke'};if(tx){s.setAttribute('role','img');s.setAttribute('aria-label',tx)}else s.setAttribute('aria-hidden','true');if(k==='ellipse')s.appendChild(se('ellipse',sa(at,{cx:50,cy:50,rx:47,ry:47})));else if(k==='line'||k==='arrow'){if(k==='arrow'){var id='ppt-arrow-'+j+'-'+Math.random().toString(36).slice(2,7),df=se('defs',{}),mk=se('marker',{id:id,markerWidth:8,markerHeight:8,refX:7,refY:4,orient:'auto',markerUnits:'strokeWidth'});mk.appendChild(se('path',{d:'M0,0 L8,4 L0,8 Z',fill:st,stroke:'none'}));df.appendChild(mk);s.appendChild(df);at['marker-end']='url(#'+id+')'}s.appendChild(se('line',sa(at,{x1:4,y1:50,x2:96,y2:50})))}else if(k==='callout')s.appendChild(se('path',sa(at,{d:'M8 8 H92 Q96 8 96 12 V68 Q96 72 92 72 H58 L44 92 L44 72 H8 Q4 72 4 68 V12 Q4 8 8 8 Z'})));else s.appendChild(se('rect',sa(at,{x:3,y:3,width:94,height:94,rx:k==='roundedRectangle'?12:0})));bx.appendChild(s);if(tx)bx.appendChild(e('div','ppt-shape-text',tx));return bx}" +
       "function tbl(t){t=t||{};var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr(t.columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr(t.rows).slice(0,8).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);return tb}" +
       "function ocards(d){var g=e('div','ppt-card-grid');arr((d||{}).cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});return g}" +
       "function ometrics(d){var g=e('div','ppt-metric-grid');arr((d||{}).metrics).slice(0,3).forEach(function(o){var m=e('section','ppt-metric');a(m,'strong','',o.value);a(m,'span','',o.label);a(m,'p','',o.detail);g.appendChild(m)});return g}" +
       "function otimeline(d){var tl=e('div','ppt-timeline');arr((d||{}).items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});return tl}" +
-      "function obj(o,j,s){o=o||{};var d=o.data||{},ty=o.type||'shape',n=e('div','ppt-object ppt-object-'+ty);n.setAttribute('data-ppt-path','objects.'+j);n.style.left=Math.round(num(o.x))+'px';n.style.top=Math.round(num(o.y))+'px';n.style.width=Math.max(24,Math.round(num(o.w)||320))+'px';n.style.height=Math.max(24,Math.round(num(o.h)||180))+'px';n.style.zIndex=String(num(o.zIndex)||8);if(num(o.rotation))n.style.rotate=num(o.rotation)+'deg';sty(n,o.style||{});sty(n,(s.styles&&s.styles['objects.'+j])||{});if(ty==='image')n.appendChild(media(d));else if(ty==='video')n.appendChild(vid(d));else if(ty==='audio')n.appendChild(aud(d));else if(ty==='chart')n.appendChild(chart(d));else if(ty==='table')n.appendChild(tbl(d));else if(ty==='cards')n.appendChild(ocards(d));else if(ty==='metrics')n.appendChild(ometrics(d));else if(ty==='timeline')n.appendChild(otimeline(d));else if(ty==='quote'){a(n,'p','ppt-quote',d.quote);a(n,'p','ppt-author',d.author)}else if(ty==='code')n.appendChild(e('pre','ppt-code',d.code||''));else if(ty==='compare'){[d.left||{},d.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);n.appendChild(ca)})}else n.appendChild(e('div','ppt-image-placeholder',d.label||'Object'));return n}" +
+      "function obj(o,j,s){o=o||{};var d=o.data||{},ty=o.type||'shape';if(ty==='line'||ty==='arrow'||ty==='rectangle'||ty==='roundedRectangle'||ty==='ellipse'||ty==='callout'){if(!d.kind)d.kind=ty;ty='shape'}var n=e('div','ppt-object ppt-object-'+ty);n.setAttribute('data-ppt-path','objects.'+j);n.style.left=Math.round(num(o.x))+'px';n.style.top=Math.round(num(o.y))+'px';n.style.width=Math.max(24,Math.round(num(o.w)||320))+'px';n.style.height=Math.max(24,Math.round(num(o.h)||180))+'px';n.style.zIndex=String(num(o.zIndex)||8);if(num(o.rotation))n.style.rotate=num(o.rotation)+'deg';sty(n,o.style||{});sty(n,(s.styles&&s.styles['objects.'+j])||{});if(ty==='image')n.appendChild(media(d));else if(ty==='video')n.appendChild(vid(d));else if(ty==='audio')n.appendChild(aud(d));else if(ty==='chart')n.appendChild(chart(d));else if(ty==='table')n.appendChild(tbl(d));else if(ty==='cards')n.appendChild(ocards(d));else if(ty==='metrics')n.appendChild(ometrics(d));else if(ty==='timeline')n.appendChild(otimeline(d));else if(ty==='shape')n.appendChild(shape(d,j));else if(ty==='quote'){a(n,'p','ppt-quote',d.quote);a(n,'p','ppt-author',d.author)}else if(ty==='code')n.appendChild(e('pre','ppt-code',d.code||''));else if(ty==='compare'){[d.left||{},d.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);n.appendChild(ca)})}else n.appendChild(e('div','ppt-image-placeholder',d.label||'Object'));return n}" +
       "function objs(n,s){arr(s.objects).forEach(function(o,j){n.appendChild(obj(o,j,s||{}))})}" +
       "function tp(n,p){if(n)n.setAttribute('data-ppt-path',p)}function off(n,s){tp(n.querySelector('.ppt-kicker'),'kicker');tp(n.querySelector('.ppt-title'),'title');tp(n.querySelector('.ppt-subtitle'),'subtitle');tp(n.querySelector('.ppt-body'),'body');tp(n.querySelector('.ppt-media'),'image');tp(n.querySelector('.ppt-caption'),'image.caption');tp(n.querySelector('.ppt-video'),'video');if(n.querySelector('.ppt-video .ppt-caption'))tp(n.querySelector('.ppt-video .ppt-caption'),'video.caption');tp(n.querySelector('.ppt-audio'),'audio');if(n.querySelector('.ppt-audio .ppt-caption'))tp(n.querySelector('.ppt-audio .ppt-caption'),'audio.caption');tp(n.querySelector('.ppt-chart-wrap'),'chart');tp(n.querySelector('.ppt-table'),'table');tp(n.querySelector('.ppt-card-grid'),'cards');tp(n.querySelector('.ppt-metric-grid'),'metrics');tp(n.querySelector('.ppt-timeline'),'timeline');n.querySelectorAll('.ppt-textbox').forEach(function(x,j){tp(x,'textBoxes.'+j+'.text')});if(s.layout==='quote'){tp(n.querySelector('.ppt-quote'),'quote');tp(n.querySelector('.ppt-author'),'author')}n.querySelectorAll('.ppt-list li').forEach(function(x,j){tp(x,'items.'+j+'.text')});['left','right'].forEach(function(side,j){var c=n.querySelectorAll('.ppt-compare-card')[j];if(c){tp(c.querySelector('h2'),side+'.title');tp(c.querySelector('p'),side+'.text')}});n.querySelectorAll('.ppt-card').forEach(function(c,j){tp(c.querySelector('h2'),'cards.'+j+'.title');tp(c.querySelector('p'),'cards.'+j+'.text')});n.querySelectorAll('.ppt-time-item').forEach(function(c,j){tp(c.querySelector('h2'),'items.'+j+'.title');tp(c.querySelector('p'),'items.'+j+'.text')});n.querySelectorAll('.ppt-metric').forEach(function(c,j){tp(c.querySelector('strong'),'metrics.'+j+'.value');tp(c.querySelector('span'),'metrics.'+j+'.label');tp(c.querySelector('p'),'metrics.'+j+'.detail')});n.querySelectorAll('.ppt-table th').forEach(function(c,j){tp(c,'table.columns.'+j)});n.querySelectorAll('.ppt-table tbody tr').forEach(function(r,ri){r.querySelectorAll('td').forEach(function(c,ci){tp(c,'table.rows.'+ri+'.'+ci)})});n.querySelectorAll('.ppt-chart-legend-item strong').forEach(function(x,j){tp(x,s.chart&&s.chart.kind==='donut'?'chart.labels.'+j:'chart.series.'+j+'.name')});if(s.chart&&s.chart.kind==='donut')n.querySelectorAll('.ppt-chart-legend-item small').forEach(function(x,j){tp(x,'chart.series.0.values.'+j)});tp(n.querySelector('.ppt-code'),'code');var st=s.styles&&typeof s.styles==='object'?s.styles:{},cv=s.canvas&&typeof s.canvas==='object'?s.canvas:{};n.querySelectorAll('[data-ppt-path]').forEach(function(x){var p=x.getAttribute('data-ppt-path'),o=cv[p]||{},dx=num(o.x),dy=num(o.y),ww=Math.max(0,num(o.w)),hh=Math.max(0,num(o.h));sty(x,st[p]||{});if(!dx&&!dy&&!ww&&!hh)return;if(!x.classList.contains('ppt-textbox')&&getComputedStyle(x).position==='static')x.style.position='relative';x.style.zIndex='5';if(dx||dy)x.style.transform='translate('+dx+'px, '+dy+'px)';if(ww){x.style.width=ww+'px';x.style.maxWidth=ww+'px'}if(hh)x.style.minHeight=hh+'px'})}" +
       "function slide(s){s=s||{};var n=e('article','ppt-slide ppt-theme-'+(d.theme||'paper')+' ppt-layout-'+(s.layout||'text'));if(s.layout==='hero'){a(n,'div','ppt-kicker',s.kicker);a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);if(s.image&&s.image.src){var hi=media(s.image);hi.classList.add('ppt-hero-image');n.appendChild(hi)}return n}if(s.layout==='section'){n.appendChild(e('div','ppt-section-number',String(i+1).padStart(2,'0')));n.appendChild(stack(s,false));return n}if(s.layout==='imageRight'||s.layout==='imageLeft'){var c=stack(s,true),m=media(s.image);if(s.layout==='imageLeft'){n.appendChild(m);n.appendChild(c)}else{n.appendChild(c);n.appendChild(m)}return n}if(s.layout==='imageFull'){var fm=media(s.image);fm.classList.add('ppt-full-media');n.appendChild(fm);if(s.title||s.subtitle){var ov=e('div','ppt-image-overlay');a(ov,'h1','ppt-title',s.title);a(ov,'p','ppt-subtitle',s.subtitle);n.appendChild(ov)}return n}if(s.layout==='imageBackground'){var bm=media(s.image);bm.classList.add('ppt-background-media');n.appendChild(bm);n.appendChild(stack(s,true));return n}if(s.layout==='compare'){n.appendChild(stack(s,false));var g=e('div','ppt-compare-grid');[s.left||{},s.right||{}].forEach(function(o){var ca=e('section','ppt-compare-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);g.appendChild(ca)});n.appendChild(g);return n}if(s.layout==='threeCards'){n.appendChild(stack(s,false));var cg=e('div','ppt-card-grid');arr(s.cards).slice(0,3).forEach(function(o){var ca=e('section','ppt-card');a(ca,'h2','',o.title);a(ca,'p','',o.text);cg.appendChild(ca)});n.appendChild(cg);return n}if(s.layout==='quote'){n.appendChild(e('div','ppt-quote-mark','“'));a(n,'p','ppt-quote',s.quote||s.title);a(n,'p','ppt-author',s.author||s.subtitle);return n}if(s.layout==='timeline'){n.appendChild(stack(s,false));var tl=e('div','ppt-timeline');arr(s.items).slice(0,5).forEach(function(o){var r=e('section','ppt-time-item');a(r,'h2','',o.title||o.text||'');a(r,'p','',o.text&&o.title?o.text:'');tl.appendChild(r)});n.appendChild(tl);return n}if(s.layout==='data'){n.appendChild(stack(s,false));var mg=e('div','ppt-metric-grid');arr(s.metrics).slice(0,3).forEach(function(o){var b=e('section','ppt-metric');a(b,'strong','',o.value);a(b,'span','',o.label);a(b,'p','',o.detail);mg.appendChild(b)});n.appendChild(mg);return n}if(s.layout==='chart'){n.appendChild(stack(s,false));n.appendChild(chart(s.chart));return n}if(s.layout==='video'){n.appendChild(stack(s,false));n.appendChild(vid(s.video));return n}if(s.layout==='audio'){n.appendChild(stack(s,false));n.appendChild(aud(s.audio));return n}if(s.layout==='table'){n.appendChild(stack(s,false));var tb=e('table','ppt-table'),th=document.createElement('thead'),hr=document.createElement('tr');arr((s.table||{}).columns).forEach(function(c){hr.appendChild(e('th','',c))});th.appendChild(hr);tb.appendChild(th);var bd=document.createElement('tbody');arr((s.table||{}).rows).slice(0,6).forEach(function(r){var tr=document.createElement('tr');arr(r).forEach(function(c){tr.appendChild(e('td','',c))});bd.appendChild(tr)});tb.appendChild(bd);n.appendChild(tb);return n}if(s.layout==='code'){n.appendChild(stack(s,false));n.appendChild(e('pre','ppt-code',s.code||''));return n}if(s.layout==='ending'){n.appendChild(e('div','ppt-ending-line'));a(n,'h1','ppt-title',s.title);a(n,'p','ppt-subtitle',s.subtitle);return n}n.appendChild(stack(s,true));return n}" +

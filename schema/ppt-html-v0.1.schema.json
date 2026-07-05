@@ -233,6 +233,70 @@
         }
       }
     },
+    "shape": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"],
+          "default": "rectangle"
+        },
+        "text": {
+          "type": "string"
+        },
+        "fill": {
+          "type": "string"
+        },
+        "stroke": {
+          "type": "string"
+        },
+        "strokeWidth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 48
+        }
+      }
+    },
+    "slideObject": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["image", "video", "audio", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "compare", "shape"]
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "w": {
+          "type": "number"
+        },
+        "h": {
+          "type": "number"
+        },
+        "rotation": {
+          "type": "number"
+        },
+        "zIndex": {
+          "type": "number"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "style": {
+          "$ref": "#/$defs/styleOverride"
+        }
+      }
+    },
     "transition": {
       "type": "string",
       "enum": ["none", "fade", "slide", "push", "zoom"],
@@ -383,6 +447,12 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/textBox"
+          }
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slideObject"
           }
         },
         "items": {

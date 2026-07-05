@@ -23,6 +23,9 @@
   var activeCanvasDrag = null;
   var activeCanvasResize = null;
   var selectedCanvasPath = "";
+  var selectedCanvasPaths = [];
+  var canvasClipboard = null;
+  var canvasContextPoint = null;
   var presenterUiTimer = 0;
   var presenterTransitionTimer = 0;
   var presenterFullscreenActive = false;
@@ -1596,6 +1599,198 @@
     "align.justify": "양쪽"
   });
 
+  Object.assign(I18N["zh-CN"], {
+    "insert.group.shapes": "形状",
+    "insert.shape.rectangle": "矩形",
+    "insert.shape.rectangle.title": "插入矩形",
+    "insert.shape.ellipse": "圆形",
+    "insert.shape.ellipse.title": "插入圆形或椭圆",
+    "insert.shape.line": "线条",
+    "insert.shape.line.title": "插入线条",
+    "insert.shape.arrow": "箭头",
+    "insert.shape.arrow.title": "插入箭头",
+    "insert.shape.callout": "标注",
+    "insert.shape.callout.title": "插入标注框",
+    "panel.object": "对象",
+    "object.noSelection": "选中画布对象后，可调整位置、尺寸、图层和数据。",
+    "object.target": "{name} · ID {id}",
+    "object.duplicate": "重复",
+    "object.forward": "上移一层",
+    "object.backward": "下移一层",
+    "object.front": "置顶",
+    "object.back": "置底",
+    "object.align": "对齐",
+    "object.alignLeft": "左对齐",
+    "object.alignCenter": "水平居中",
+    "object.alignRight": "右对齐",
+    "object.alignTop": "顶对齐",
+    "object.alignMiddle": "垂直居中",
+    "object.alignBottom": "底对齐",
+    "object.distributeH": "横向分布",
+    "object.distributeV": "纵向分布",
+    "selection.multiple": "已选 {count} 个对象",
+    "field.objectX": "X",
+    "field.objectY": "Y",
+    "field.objectW": "宽",
+    "field.objectH": "高",
+    "field.rotation": "旋转",
+    "field.layer": "层级",
+    "field.objectData": "对象数据",
+    "context.copy": "复制",
+    "context.paste": "粘贴",
+    "context.duplicate": "重复",
+    "context.delete": "删除",
+    "canvas.shape": "形状",
+    "toast.objectCopied": "对象已复制",
+    "toast.objectPasted": "对象已粘贴",
+    "toast.layerChanged": "图层已调整",
+    "toast.objectDataInvalid": "对象数据不是有效 JSON"
+  });
+
+  Object.assign(I18N["en-US"], {
+    "insert.group.shapes": "Shapes",
+    "insert.shape.rectangle": "Rect",
+    "insert.shape.rectangle.title": "Insert rectangle",
+    "insert.shape.ellipse": "Oval",
+    "insert.shape.ellipse.title": "Insert oval or circle",
+    "insert.shape.line": "Line",
+    "insert.shape.line.title": "Insert line",
+    "insert.shape.arrow": "Arrow",
+    "insert.shape.arrow.title": "Insert arrow",
+    "insert.shape.callout": "Callout",
+    "insert.shape.callout.title": "Insert callout",
+    "panel.object": "Object",
+    "object.noSelection": "Select a canvas object to edit position, size, layer, and data.",
+    "object.target": "{name} · ID {id}",
+    "object.duplicate": "Duplicate",
+    "object.forward": "Bring forward",
+    "object.backward": "Send backward",
+    "object.front": "Bring to front",
+    "object.back": "Send to back",
+    "object.align": "Align",
+    "object.alignLeft": "Align left",
+    "object.alignCenter": "Align center",
+    "object.alignRight": "Align right",
+    "object.alignTop": "Align top",
+    "object.alignMiddle": "Align middle",
+    "object.alignBottom": "Align bottom",
+    "object.distributeH": "Distribute horizontally",
+    "object.distributeV": "Distribute vertically",
+    "selection.multiple": "{count} objects selected",
+    "field.objectX": "X",
+    "field.objectY": "Y",
+    "field.objectW": "W",
+    "field.objectH": "H",
+    "field.rotation": "Rotation",
+    "field.layer": "Layer",
+    "field.objectData": "Object data",
+    "context.copy": "Copy",
+    "context.paste": "Paste",
+    "context.duplicate": "Duplicate",
+    "context.delete": "Delete",
+    "canvas.shape": "Shape",
+    "toast.objectCopied": "Object copied",
+    "toast.objectPasted": "Object pasted",
+    "toast.layerChanged": "Layer changed",
+    "toast.objectDataInvalid": "Object data is not valid JSON"
+  });
+
+  Object.assign(I18N["ja-JP"], {
+    "insert.group.shapes": "図形",
+    "insert.shape.rectangle": "四角",
+    "insert.shape.rectangle.title": "四角形を挿入",
+    "insert.shape.ellipse": "円",
+    "insert.shape.ellipse.title": "円または楕円を挿入",
+    "insert.shape.line": "線",
+    "insert.shape.line.title": "線を挿入",
+    "insert.shape.arrow": "矢印",
+    "insert.shape.arrow.title": "矢印を挿入",
+    "insert.shape.callout": "吹き出し",
+    "insert.shape.callout.title": "吹き出しを挿入",
+    "panel.object": "オブジェクト",
+    "object.noSelection": "キャンバス上のオブジェクトを選択すると、位置、サイズ、レイヤー、データを編集できます。",
+    "object.target": "{name} · ID {id}",
+    "object.duplicate": "複製",
+    "object.forward": "前面へ",
+    "object.backward": "背面へ",
+    "object.front": "最前面",
+    "object.back": "最背面",
+    "object.align": "整列",
+    "object.alignLeft": "左揃え",
+    "object.alignCenter": "左右中央",
+    "object.alignRight": "右揃え",
+    "object.alignTop": "上揃え",
+    "object.alignMiddle": "上下中央",
+    "object.alignBottom": "下揃え",
+    "object.distributeH": "左右に分布",
+    "object.distributeV": "上下に分布",
+    "selection.multiple": "{count} 個を選択中",
+    "field.objectX": "X",
+    "field.objectY": "Y",
+    "field.objectW": "幅",
+    "field.objectH": "高さ",
+    "field.rotation": "回転",
+    "field.layer": "階層",
+    "field.objectData": "データ",
+    "context.copy": "コピー",
+    "context.paste": "貼り付け",
+    "context.duplicate": "複製",
+    "context.delete": "削除",
+    "canvas.shape": "図形",
+    "toast.objectCopied": "コピーしました",
+    "toast.objectPasted": "貼り付けました",
+    "toast.layerChanged": "レイヤーを変更しました",
+    "toast.objectDataInvalid": "オブジェクトデータが有効な JSON ではありません"
+  });
+
+  Object.assign(I18N["ko-KR"], {
+    "insert.group.shapes": "도형",
+    "insert.shape.rectangle": "사각형",
+    "insert.shape.rectangle.title": "사각형 삽입",
+    "insert.shape.ellipse": "원",
+    "insert.shape.ellipse.title": "원 또는 타원 삽입",
+    "insert.shape.line": "선",
+    "insert.shape.line.title": "선 삽입",
+    "insert.shape.arrow": "화살표",
+    "insert.shape.arrow.title": "화살표 삽입",
+    "insert.shape.callout": "말풍선",
+    "insert.shape.callout.title": "말풍선 삽입",
+    "panel.object": "개체",
+    "object.noSelection": "캔버스 개체를 선택하면 위치, 크기, 레이어, 데이터를 편집할 수 있습니다.",
+    "object.target": "{name} · ID {id}",
+    "object.duplicate": "복제",
+    "object.forward": "앞으로",
+    "object.backward": "뒤로",
+    "object.front": "맨 앞으로",
+    "object.back": "맨 뒤로",
+    "object.align": "정렬",
+    "object.alignLeft": "왼쪽 정렬",
+    "object.alignCenter": "가로 가운데",
+    "object.alignRight": "오른쪽 정렬",
+    "object.alignTop": "위 정렬",
+    "object.alignMiddle": "세로 가운데",
+    "object.alignBottom": "아래 정렬",
+    "object.distributeH": "가로 분배",
+    "object.distributeV": "세로 분배",
+    "selection.multiple": "{count}개 선택됨",
+    "field.objectX": "X",
+    "field.objectY": "Y",
+    "field.objectW": "너비",
+    "field.objectH": "높이",
+    "field.rotation": "회전",
+    "field.layer": "레이어",
+    "field.objectData": "개체 데이터",
+    "context.copy": "복사",
+    "context.paste": "붙여넣기",
+    "context.duplicate": "복제",
+    "context.delete": "삭제",
+    "canvas.shape": "도형",
+    "toast.objectCopied": "개체를 복사했습니다",
+    "toast.objectPasted": "개체를 붙여넣었습니다",
+    "toast.layerChanged": "레이어를 변경했습니다",
+    "toast.objectDataInvalid": "개체 데이터가 올바른 JSON이 아닙니다"
+  });
+
   document.addEventListener("DOMContentLoaded", init);
 
   function init() {
@@ -1621,13 +1816,16 @@
       "deckTitleInput", "deckThemeInput", "deckTransitionInput", "slideLayoutInput", "slideTransitionInput", "kickerInput", "titleInput", "subtitleInput", "bodyInput",
       "stylePanel", "styleTargetLabel", "styleFontSizeInput", "styleAlignInput", "styleBoldBtn", "styleItalicBtn", "styleColorInput", "styleColorResetBtn",
       "styleBackgroundInput", "styleBackgroundResetBtn", "styleBorderColorInput", "styleBorderColorResetBtn", "styleBorderWidthInput", "styleRadiusInput", "styleOpacityInput", "styleResetBtn",
+      "objectPanel", "objectTargetLabel", "objectXInput", "objectYInput", "objectWInput", "objectHInput", "objectRotationInput", "objectZInput",
+      "objectDuplicateBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
+      "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
       "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
-      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "toast"
+      "templateDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "canvasContextMenu", "toast"
     ].forEach(function (id) {
       els[id] = document.getElementById(id);
     });
@@ -1936,6 +2134,7 @@
 
     els.stageFrame.addEventListener("pointerdown", handleCanvasPointerDown);
     els.stageFrame.addEventListener("dblclick", handleCanvasDblClick);
+    els.stageFrame.addEventListener("contextmenu", handleCanvasContextMenu);
     els.stageViewport.addEventListener("pointerdown", handleCanvasViewportPointerDown);
     els.stageViewport.addEventListener("dragover", handleCanvasDragOver);
     els.stageViewport.addEventListener("dragenter", handleCanvasDragEnter);
@@ -2069,6 +2268,28 @@
       resetSelectedStyle();
     });
 
+    bindObjectGeometryInput(els.objectXInput, "x", { min: -900, max: PPTHtml.baseWidth });
+    bindObjectGeometryInput(els.objectYInput, "y", { min: -600, max: PPTHtml.baseHeight });
+    bindObjectGeometryInput(els.objectWInput, "w", { min: 24, max: PPTHtml.baseWidth * 2 });
+    bindObjectGeometryInput(els.objectHInput, "h", { min: 24, max: PPTHtml.baseHeight * 2 });
+    bindObjectGeometryInput(els.objectRotationInput, "rotation", { min: -360, max: 360 });
+    bindObjectGeometryInput(els.objectZInput, "zIndex", { min: 0, max: 999 });
+    els.objectDataInput.addEventListener("focus", captureEditStart);
+    els.objectDataInput.addEventListener("change", commitObjectDataFromPanel);
+    els.objectDuplicateBtn.addEventListener("click", duplicateSelectedCanvas);
+    els.objectBringForwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("forward"); });
+    els.objectSendBackwardBtn.addEventListener("click", function () { moveSelectedObjectLayer("backward"); });
+    els.objectBringFrontBtn.addEventListener("click", function () { moveSelectedObjectLayer("front"); });
+    els.objectSendBackBtn.addEventListener("click", function () { moveSelectedObjectLayer("back"); });
+    els.objectAlignLeftBtn.addEventListener("click", function () { alignSelectedCanvasTargets("left"); });
+    els.objectAlignCenterBtn.addEventListener("click", function () { alignSelectedCanvasTargets("center"); });
+    els.objectAlignRightBtn.addEventListener("click", function () { alignSelectedCanvasTargets("right"); });
+    els.objectAlignTopBtn.addEventListener("click", function () { alignSelectedCanvasTargets("top"); });
+    els.objectAlignMiddleBtn.addEventListener("click", function () { alignSelectedCanvasTargets("middle"); });
+    els.objectAlignBottomBtn.addEventListener("click", function () { alignSelectedCanvasTargets("bottom"); });
+    els.objectDistributeHBtn.addEventListener("click", function () { distributeSelectedCanvasTargets("horizontal"); });
+    els.objectDistributeVBtn.addEventListener("click", function () { distributeSelectedCanvasTargets("vertical"); });
+
     els.imageFileBtn.addEventListener("click", function () {
       openImagePicker();
     });
@@ -2132,6 +2353,17 @@
     els.presenter.addEventListener("dblclick", togglePresenterFullscreen);
     document.addEventListener("fullscreenchange", handleDocumentFullscreenChange);
 
+    if (els.canvasContextMenu) {
+      els.canvasContextMenu.addEventListener("pointerdown", function (event) {
+        event.stopPropagation();
+      });
+      els.canvasContextMenu.addEventListener("click", handleCanvasContextMenuAction);
+    }
+    document.addEventListener("pointerdown", function (event) {
+      if (els.canvasContextMenu && !event.target.closest("#canvasContextMenu")) hideCanvasContextMenu();
+    });
+    window.addEventListener("resize", hideCanvasContextMenu);
+    window.addEventListener("scroll", hideCanvasContextMenu, true);
     document.addEventListener("keydown", handleGlobalKeydown);
   }
 
@@ -2225,7 +2457,7 @@
       var nextPath = "";
       commit(function () {
         nextPath = addTextBoxToSlide(currentSlide(), settings.point);
-        selectedCanvasPath = nextPath;
+        setCanvasSelection([nextPath]);
       });
       toast(formatText(t("toast.componentInserted"), { name: insertLabel(type, variant) }));
       window.setTimeout(function () {
@@ -2255,14 +2487,14 @@
   }
 
   function shouldCreateComponentSlide(type) {
-    return ["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1;
+    return ["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "shape"].indexOf(type) !== -1;
   }
 
   function insertObjectToCurrentSlide(type, variant, point) {
     var nextPath = "";
     commit(function () {
       nextPath = addObjectToSlide(currentSlide(), type, variant, point);
-      selectedCanvasPath = nextPath;
+      setCanvasSelection([nextPath]);
     });
     window.setTimeout(function () {
       var node = canvasNodeByPath(nextPath);
@@ -2281,7 +2513,7 @@
 
   function createSlideObject(type, variant, point, index) {
     var objectType = normalizeInsertObjectType(type);
-    var size = defaultObjectSize(objectType);
+    var size = defaultObjectSize(objectType, variant);
     var center = point || defaultObjectCenter(index);
     var x = clamp(center.x - size.w / 2, 32, PPTHtml.baseWidth - size.w - 32);
     var y = clamp(center.y - size.h / 2, 36, PPTHtml.baseHeight - size.h - 36);
@@ -2299,13 +2531,13 @@
   }
 
   function normalizeInsertObjectType(type) {
-    if (["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code"].indexOf(type) !== -1) {
+    if (["image", "video", "audio", "compare", "chart", "table", "cards", "metrics", "timeline", "quote", "code", "shape"].indexOf(type) !== -1) {
       return type;
     }
     return "shape";
   }
 
-  function defaultObjectSize(type) {
+  function defaultObjectSize(type, variant) {
     var sizes = {
       image: { w: 520, h: 300 },
       video: { w: 560, h: 320 },
@@ -2319,6 +2551,11 @@
       code: { w: 600, h: 260 },
       compare: { w: 620, h: 260 }
     };
+    if (type === "shape") {
+      if (variant === "line" || variant === "arrow") return { w: 420, h: 72 };
+      if (variant === "ellipse") return { w: 240, h: 240 };
+      if (variant === "callout") return { w: 360, h: 180 };
+    }
     return sizes[type] || { w: 320, h: 180 };
   }
 
@@ -2352,7 +2589,20 @@
       left: JSON.parse(JSON.stringify(slide.left || {})),
       right: JSON.parse(JSON.stringify(slide.right || {}))
     };
+    if (type === "shape") return createShapeData(variant);
     return { label: insertLabel(type, variant) };
+  }
+
+  function createShapeData(variant) {
+    var kind = ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"].indexOf(variant) !== -1 ? variant : "rectangle";
+    var lineLike = kind === "line" || kind === "arrow";
+    return {
+      kind: kind,
+      text: kind === "callout" ? t("insert.shape.callout") : "",
+      fill: lineLike ? "none" : "rgba(15,139,141,.14)",
+      stroke: "#0f8b8d",
+      strokeWidth: lineLike ? 4 : 3
+    };
   }
 
   function createComponentSlide() {
@@ -2370,7 +2620,7 @@
     commit(function () {
       var slide = createComponentSlide();
       applyComponentToSlide(slide, type);
-      selectedCanvasPath = "";
+      clearCanvasSelection();
     });
     toast(formatText(t("toast.componentInserted"), { name: insertLabel(type) }));
   }
@@ -2675,6 +2925,7 @@
 
     if (presenting && handlePresenterShortcut(event)) return;
     if (isTextEditingTarget(event.target)) return;
+    if (handleCanvasClipboardShortcut(event, commandKey, lowerKey)) return;
     if (handleCanvasShortcut(event)) return;
 
     if (commandKey && lowerKey === "z") {
@@ -2790,6 +3041,44 @@
       if (syncing) return;
       updateSelectedStyleCommit(prop, input.value, options || {});
     });
+  }
+
+  function bindObjectGeometryInput(input, prop, options) {
+    input.addEventListener("focus", captureEditStart);
+    input.addEventListener("change", function () {
+      if (syncing) return;
+      var value = normalizeObjectNumberInput(input.value, options || {});
+      if (value == null) {
+        syncObjectPanel();
+        return;
+      }
+      commitSelectedObjectMutation(function (object) {
+        if (prop === "x" || prop === "y" || prop === "w" || prop === "h") {
+          var next = clampObjectGeometry({
+            x: prop === "x" ? value : object.x,
+            y: prop === "y" ? value : object.y,
+            w: prop === "w" ? value : object.w,
+            h: prop === "h" ? value : object.h
+          });
+          object.x = Math.round(next.x);
+          object.y = Math.round(next.y);
+          object.w = Math.round(next.w);
+          object.h = Math.round(next.h);
+          return;
+        }
+        object[prop] = prop === "zIndex" ? Math.round(value) : value;
+      });
+    });
+  }
+
+  function normalizeObjectNumberInput(rawValue, options) {
+    if (rawValue === "") return null;
+    var value = Number(rawValue);
+    if (!isFinite(value)) return null;
+    if (options.min != null || options.max != null) {
+      value = clamp(value, options.min != null ? options.min : value, options.max != null ? options.max : value);
+    }
+    return Math.round(value * 100) / 100;
   }
 
   function bindStyleButton(button, prop, activeValue) {
@@ -2962,7 +3251,7 @@
     future.push(JSON.stringify(deck));
     deck = PPTHtml.normalizeDeck(JSON.parse(history.pop()));
     currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     markDirty();
     renderAll();
     persist();
@@ -2973,7 +3262,7 @@
     history.push(JSON.stringify(deck));
     deck = PPTHtml.normalizeDeck(JSON.parse(future.pop()));
     currentIndex = clamp(currentIndex, 0, deck.slides.length - 1);
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     markDirty();
     renderAll();
     persist();
@@ -3038,7 +3327,7 @@
 
   function selectSlide(index) {
     if (index === currentIndex) return;
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     currentIndex = index;
     renderAll();
   }
@@ -3190,7 +3479,8 @@
       timeline: "canvas.timeline",
       quote: "insert.quote",
       code: "insert.code",
-      compare: "insert.compare"
+      compare: "insert.compare",
+      shape: "canvas.shape"
     };
     els.stageFrame.querySelectorAll(".ppt-object").forEach(function (node, index) {
       var type = node.dataset.objectType || objectTypeFromPath("objects." + index);
@@ -3222,10 +3512,17 @@
     if (event.target.closest(".canvas-selection-box")) return;
     var target = event.target.closest("[data-canvas-edit]");
     if (!target || !els.stageFrame.contains(target)) return;
-    selectCanvasTarget(target);
+    selectCanvasTarget(target, { toggle: event.shiftKey });
+    if (!selectedCanvasPath) return;
+    var dragPaths = currentCanvasSelectionPaths();
+    var targetPath = target.getAttribute("data-canvas-edit");
+    if (dragPaths.indexOf(targetPath) === -1) dragPaths = [targetPath];
     activeCanvasDrag = {
       node: target,
-      path: target.getAttribute("data-canvas-edit"),
+      path: targetPath,
+      paths: dragPaths,
+      nodes: dragPaths.map(canvasNodeByPath),
+      origins: dragPaths.map(function (path) { return getCanvasOffset(path); }),
       before: JSON.stringify(deck),
       startX: event.clientX,
       startY: event.clientY,
@@ -3274,6 +3571,10 @@
 
   function applyCanvasDragPreview(drag) {
     if (!drag || !drag.node) return;
+    if (drag.paths && drag.paths.length > 1) {
+      applyMultiCanvasDragPreview(drag);
+      return;
+    }
     var nextOffset = {
       x: clamp(drag.origin.x + drag.pendingDx, -420, 420),
       y: clamp(drag.origin.y + drag.pendingDy, -240, 240),
@@ -3311,6 +3612,30 @@
     node.style.transform = "translate3d(" + dx + "px, " + dy + "px, 0)";
   }
 
+  function applyMultiCanvasDragPreview(drag) {
+    var dx = drag.pendingDx;
+    var dy = drag.pendingDy;
+    drag.paths.forEach(function (path, index) {
+      var node = drag.nodes[index];
+      var origin = drag.origins[index];
+      if (!node || !origin) return;
+      var nextOffset = getObjectByPath(path)
+        ? clampObjectGeometry({ x: origin.x + dx, y: origin.y + dy, w: origin.w, h: origin.h })
+        : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h };
+      if (getObjectByPath(path)) setObjectDragPreviewStyle(node, origin, nextOffset);
+      else setCanvasOffsetStyle(node, nextOffset);
+    });
+    var bounds = getSelectionBounds(drag.paths);
+    if (bounds) {
+      positionCanvasSelectionBoxFromBounds({
+        x: bounds.x + dx,
+        y: bounds.y + dy,
+        w: bounds.w,
+        h: bounds.h
+      });
+    }
+  }
+
   function flushCanvasDragPreview(drag) {
     if (!drag || !drag.moved) return;
     if (drag.frame) {
@@ -3341,6 +3666,11 @@
     if (!drag.moved) return;
     event.preventDefault();
 
+    if (drag.paths && drag.paths.length > 1) {
+      commitMultiCanvasDrag(drag);
+      return;
+    }
+
     var offset = parseCanvasOffsetStyle(drag.node);
     if (sameOffset(drag.origin, offset)) return;
     history.push(drag.before);
@@ -3360,18 +3690,81 @@
     schedulePersist();
   }
 
+  function commitMultiCanvasDrag(drag) {
+    history.push(drag.before);
+    if (history.length > 80) history.shift();
+    future = [];
+    var dx = drag.pendingDx;
+    var dy = drag.pendingDy;
+    drag.paths.forEach(function (path, index) {
+      var origin = drag.origins[index];
+      if (!origin) return;
+      if (foldTextBoxGeometry(path, { x: dx, y: dy })) return;
+      var next = getObjectByPath(path)
+        ? clampObjectGeometry({ x: origin.x + dx, y: origin.y + dy, w: origin.w, h: origin.h })
+        : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h };
+      setCanvasOffset(path, next);
+    });
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+  }
+
   function handleCanvasViewportPointerDown(event) {
     if (event.target.closest("[data-canvas-edit]") || event.target.closest(".canvas-selection-box")) return;
     if (!selectedCanvasPath) return;
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     renderCanvasControls();
   }
 
-  function selectCanvasTarget(node) {
+  function selectCanvasTarget(node, options) {
     var path = node.getAttribute("data-canvas-edit");
     if (!path) return;
-    selectedCanvasPath = path;
+    var settings = options || {};
+    if (settings.toggle) {
+      var paths = currentCanvasSelectionPaths();
+      var index = paths.indexOf(path);
+      if (index === -1) {
+        paths.push(path);
+        setCanvasSelection(paths, path);
+      } else {
+        paths.splice(index, 1);
+        setCanvasSelection(paths, paths[paths.length - 1] || "");
+      }
+    } else {
+      setCanvasSelection([path], path);
+    }
     renderCanvasControls();
+  }
+
+  function setCanvasSelection(paths, primaryPath) {
+    var unique = [];
+    (paths || []).forEach(function (path) {
+      if (path && unique.indexOf(path) === -1) unique.push(path);
+    });
+    selectedCanvasPaths = unique;
+    selectedCanvasPath = primaryPath && unique.indexOf(primaryPath) !== -1 ? primaryPath : (unique[unique.length - 1] || "");
+  }
+
+  function clearCanvasSelection() {
+    selectedCanvasPath = "";
+    selectedCanvasPaths = [];
+  }
+
+  function currentCanvasSelectionPaths() {
+    var paths = selectedCanvasPaths.length ? selectedCanvasPaths.slice() : (selectedCanvasPath ? [selectedCanvasPath] : []);
+    if (selectedCanvasPath && paths.indexOf(selectedCanvasPath) === -1) paths.push(selectedCanvasPath);
+    var unique = [];
+    paths.forEach(function (path) {
+      if (path && unique.indexOf(path) === -1 && canvasNodeByPath(path)) unique.push(path);
+    });
+    selectedCanvasPaths = unique;
+    if (!unique.length) selectedCanvasPath = "";
+    else if (unique.indexOf(selectedCanvasPath) === -1) selectedCanvasPath = unique[unique.length - 1];
+    return unique;
   }
 
   function canvasNodeByPath(path) {
@@ -3388,9 +3781,16 @@
       box.remove();
     });
 
+    var paths = currentCanvasSelectionPaths();
     var node = canvasNodeByPath(selectedCanvasPath);
     if (!node || activeCanvasEdit) {
-      if (!node) selectedCanvasPath = "";
+      if (!node) clearCanvasSelection();
+      syncStylePanel();
+      return;
+    }
+
+    if (paths.length > 1) {
+      renderMultiCanvasSelection(paths);
       syncStylePanel();
       return;
     }
@@ -3434,6 +3834,40 @@
     syncStylePanel();
   }
 
+  function renderMultiCanvasSelection(paths) {
+    var bounds = getSelectionBounds(paths);
+    if (!bounds) return;
+    var box = document.createElement("div");
+    box.className = "canvas-selection-box is-multi";
+    box.setAttribute("data-canvas-selection", paths.join(","));
+
+    var label = document.createElement("span");
+    label.className = "canvas-selection-label";
+    label.textContent = formatText(t("selection.multiple"), { count: paths.length });
+    box.appendChild(label);
+
+    els.stageFrame.appendChild(box);
+    positionCanvasSelectionBoxFromBounds(bounds, box);
+  }
+
+  function getSelectionBounds(paths) {
+    var bounds = (paths || []).map(function (path) {
+      var node = canvasNodeByPath(path);
+      return node ? getNodeFrameBounds(node) : null;
+    }).filter(Boolean);
+    if (!bounds.length) return null;
+    var left = Math.min.apply(null, bounds.map(function (box) { return box.x; }));
+    var top = Math.min.apply(null, bounds.map(function (box) { return box.y; }));
+    var right = Math.max.apply(null, bounds.map(function (box) { return box.x + box.w; }));
+    var bottom = Math.max.apply(null, bounds.map(function (box) { return box.y + box.h; }));
+    return {
+      x: left,
+      y: top,
+      w: right - left,
+      h: bottom - top
+    };
+  }
+
   function canvasSelectionLabel(node, path) {
     var options = node ? parseCanvasOptions(node) : {};
     return canvasLabel(options, path);
@@ -3463,6 +3897,7 @@
       els.styleOpacityInput.value = "1";
       setStyleToggleState(els.styleBoldBtn, false);
       setStyleToggleState(els.styleItalicBtn, false);
+      syncObjectPanel();
       syncing = previousSyncing;
       return;
     }
@@ -3482,7 +3917,60 @@
     els.styleOpacityInput.value = style.opacity != null ? style.opacity : "1";
     setStyleToggleState(els.styleBoldBtn, String(style.fontWeight || "") === "800");
     setStyleToggleState(els.styleItalicBtn, style.fontStyle === "italic");
+    syncObjectPanel();
     syncing = previousSyncing;
+  }
+
+  function syncObjectPanel() {
+    if (!els.objectPanel) return;
+    var info = selectedObjectInfo();
+    var object = info && info.object;
+    var hasObject = Boolean(object && !activeCanvasEdit);
+    els.objectPanel.classList.toggle("is-disabled", !hasObject);
+    els.objectPanel.querySelectorAll("[data-object-control]").forEach(function (control) {
+      control.disabled = !hasObject;
+    });
+    updateObjectCommandControlState();
+
+    if (!hasObject) {
+      els.objectTargetLabel.textContent = t("object.noSelection");
+      els.objectXInput.value = "";
+      els.objectYInput.value = "";
+      els.objectWInput.value = "";
+      els.objectHInput.value = "";
+      els.objectRotationInput.value = "";
+      els.objectZInput.value = "";
+      els.objectDataInput.value = "";
+      return;
+    }
+
+    var node = canvasNodeByPath(selectedCanvasPath);
+    var paths = currentCanvasSelectionPaths();
+    els.objectTargetLabel.textContent = paths.length > 1
+      ? formatText(t("selection.multiple"), { count: paths.length })
+      : formatText(t("object.target"), {
+        name: canvasSelectionLabel(node, selectedCanvasPath),
+        id: object.id || "-"
+      });
+    els.objectXInput.value = Math.round(Number(object.x) || 0);
+    els.objectYInput.value = Math.round(Number(object.y) || 0);
+    els.objectWInput.value = Math.round(Number(object.w) || 0);
+    els.objectHInput.value = Math.round(Number(object.h) || 0);
+    els.objectRotationInput.value = Math.round(Number(object.rotation) || 0);
+    els.objectZInput.value = Math.round(Number(object.zIndex) || 0);
+    els.objectDataInput.value = JSON.stringify(object.data || {}, null, 2);
+    updateObjectCommandControlState();
+  }
+
+  function updateObjectCommandControlState() {
+    if (!els.objectPanel) return;
+    var geometryCount = selectedGeometryInfos().length;
+    els.objectPanel.querySelectorAll("[data-align-control]").forEach(function (control) {
+      control.disabled = geometryCount < 2;
+    });
+    els.objectPanel.querySelectorAll("[data-distribute-control]").forEach(function (control) {
+      control.disabled = geometryCount < 3;
+    });
   }
 
   function setStyleToggleState(button, active) {
@@ -3767,23 +4255,49 @@
     schedulePersist();
   }
 
+  function handleCanvasClipboardShortcut(event, commandKey, lowerKey) {
+    if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
+    if (commandKey && lowerKey === "c") {
+      if (!selectedCanvasPath) return false;
+      event.preventDefault();
+      return copySelectedCanvas();
+    }
+    if (commandKey && lowerKey === "v") {
+      if (!canvasClipboard) return false;
+      event.preventDefault();
+      return pasteCanvasClipboard();
+    }
+    if (commandKey && lowerKey === "d") {
+      if (!selectedCanvasPath) return false;
+      event.preventDefault();
+      return duplicateSelectedCanvas();
+    }
+    return false;
+  }
+
   function handleCanvasShortcut(event) {
     if (!selectedCanvasPath || presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
     var node = canvasNodeByPath(selectedCanvasPath);
     if (!node) {
-      selectedCanvasPath = "";
+      clearCanvasSelection();
       return false;
     }
 
+    var selectedPaths = currentCanvasSelectionPaths();
+
     if (event.key === "Escape") {
       event.preventDefault();
-      selectedCanvasPath = "";
+      clearCanvasSelection();
       renderCanvasControls();
       return true;
     }
 
     if (event.key === "Delete" || event.key === "Backspace") {
       event.preventDefault();
+      if (selectedPaths.length > 1) {
+        deleteSelectedCanvasTargets(selectedPaths);
+        return true;
+      }
       if (!deleteSelectedObject() && !deleteSelectedTextBox()) resetSelectedCanvasOffset();
       return true;
     }
@@ -3798,6 +4312,10 @@
 
     event.preventDefault();
     var step = event.shiftKey ? 10 : 1;
+    if (selectedPaths.length > 1) {
+      nudgeSelectedCanvasTargets(selectedPaths, arrowDelta[0] * step, arrowDelta[1] * step);
+      return true;
+    }
     var origin = getCanvasOffset(selectedCanvasPath);
     var next = {
       x: clamp(origin.x + arrowDelta[0] * step, -420, 420),
@@ -3833,6 +4351,504 @@
     updateFileStatus();
     schedulePersist();
     return true;
+  }
+
+  function nudgeSelectedCanvasTargets(paths, dx, dy) {
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+    paths.forEach(function (path) {
+      if (foldTextBoxGeometry(path, { x: dx, y: dy })) return;
+      var origin = getCanvasOffset(path);
+      var next = getObjectByPath(path)
+        ? clampObjectGeometry({ x: origin.x + dx, y: origin.y + dy, w: origin.w, h: origin.h })
+        : { x: clamp(origin.x + dx, -420, 420), y: clamp(origin.y + dy, -240, 240), w: origin.w, h: origin.h };
+      setCanvasOffset(path, next);
+    });
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    updateButtons();
+    updateFileStatus();
+    schedulePersist();
+  }
+
+  function deleteSelectedCanvasTargets(paths) {
+    var slide = currentSlide();
+    history.push(JSON.stringify(deck));
+    if (history.length > 80) history.shift();
+    future = [];
+
+    uniqueNumbers(paths.map(objectIndexFromPath)).sort(function (a, b) { return b - a; }).forEach(function (index) {
+      if (Array.isArray(slide.objects) && slide.objects[index]) {
+        slide.objects.splice(index, 1);
+        remapObjectCanvasPaths(slide, index);
+      }
+    });
+
+    uniqueNumbers(paths.map(textBoxIndexFromPath)).sort(function (a, b) { return b - a; }).forEach(function (index) {
+      if (Array.isArray(slide.textBoxes) && slide.textBoxes[index]) {
+        slide.textBoxes.splice(index, 1);
+        remapTextBoxCanvasPaths(slide, index);
+      }
+    });
+
+    paths.forEach(function (path) {
+      if (objectIndexFromPath(path) >= 0 || textBoxIndexFromPath(path) >= 0) return;
+      clearCanvasOffset(path);
+      if (slide.styles && slide.styles[path]) delete slide.styles[path];
+    });
+    if (slide.styles && !Object.keys(slide.styles).length) delete slide.styles;
+
+    clearCanvasSelection();
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderAll();
+    schedulePersist();
+  }
+
+  function uniqueNumbers(values) {
+    var unique = [];
+    values.forEach(function (value) {
+      if (value >= 0 && unique.indexOf(value) === -1) unique.push(value);
+    });
+    return unique;
+  }
+
+  function selectedGeometryInfos() {
+    return currentCanvasSelectionPaths().map(geometryInfoForPath).filter(Boolean);
+  }
+
+  function geometryInfoForPath(path) {
+    var object = getObjectByPath(path);
+    if (object) {
+      return {
+        path: path,
+        kind: "object",
+        target: object,
+        geometry: {
+          x: Number(object.x) || 0,
+          y: Number(object.y) || 0,
+          w: Math.max(44, Number(object.w) || 44),
+          h: Math.max(24, Number(object.h) || 24)
+        }
+      };
+    }
+    var box = getTextBoxByPath(path);
+    if (box) {
+      return {
+        path: path,
+        kind: "textBox",
+        target: box,
+        geometry: {
+          x: Number(box.x) || 0,
+          y: Number(box.y) || 0,
+          w: Math.max(44, Number(box.w) || 380),
+          h: Math.max(24, Number(box.h) || 96)
+        }
+      };
+    }
+    return null;
+  }
+
+  function alignSelectedCanvasTargets(action) {
+    var infos = selectedGeometryInfos();
+    if (infos.length < 2) return false;
+    return commitGeometryInfos(infos, function () {
+      var bounds = geometryBounds(infos);
+      infos.forEach(function (info) {
+        var geometry = Object.assign({}, info.geometry);
+        if (action === "left") geometry.x = bounds.left;
+        if (action === "center") geometry.x = bounds.left + bounds.w / 2 - geometry.w / 2;
+        if (action === "right") geometry.x = bounds.right - geometry.w;
+        if (action === "top") geometry.y = bounds.top;
+        if (action === "middle") geometry.y = bounds.top + bounds.h / 2 - geometry.h / 2;
+        if (action === "bottom") geometry.y = bounds.bottom - geometry.h;
+        setGeometryInfo(info, geometry);
+      });
+    });
+  }
+
+  function distributeSelectedCanvasTargets(axis) {
+    var infos = selectedGeometryInfos();
+    if (infos.length < 3) return false;
+    return commitGeometryInfos(infos, function () {
+      var horizontal = axis === "horizontal";
+      var sorted = infos.slice().sort(function (a, b) {
+        return horizontal ? a.geometry.x - b.geometry.x : a.geometry.y - b.geometry.y;
+      });
+      var first = sorted[0].geometry;
+      var last = sorted[sorted.length - 1].geometry;
+      var start = horizontal ? first.x : first.y;
+      var end = horizontal ? last.x + last.w : last.y + last.h;
+      var total = sorted.reduce(function (sum, info) {
+        return sum + (horizontal ? info.geometry.w : info.geometry.h);
+      }, 0);
+      var gap = Math.max(0, (end - start - total) / (sorted.length - 1));
+      var cursor = start;
+      sorted.forEach(function (info) {
+        var geometry = Object.assign({}, info.geometry);
+        if (horizontal) {
+          geometry.x = cursor;
+          cursor += geometry.w + gap;
+        } else {
+          geometry.y = cursor;
+          cursor += geometry.h + gap;
+        }
+        setGeometryInfo(info, geometry);
+      });
+    });
+  }
+
+  function commitGeometryInfos(infos, mutator) {
+    var before = JSON.stringify(deck);
+    mutator();
+    if (before === JSON.stringify(deck)) return false;
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+    return true;
+  }
+
+  function geometryBounds(infos) {
+    var left = Math.min.apply(null, infos.map(function (info) { return info.geometry.x; }));
+    var top = Math.min.apply(null, infos.map(function (info) { return info.geometry.y; }));
+    var right = Math.max.apply(null, infos.map(function (info) { return info.geometry.x + info.geometry.w; }));
+    var bottom = Math.max.apply(null, infos.map(function (info) { return info.geometry.y + info.geometry.h; }));
+    return { left: left, top: top, right: right, bottom: bottom, w: right - left, h: bottom - top };
+  }
+
+  function setGeometryInfo(info, geometry) {
+    if (info.kind === "object") {
+      var nextObject = clampObjectGeometry(geometry);
+      info.target.x = Math.round(nextObject.x);
+      info.target.y = Math.round(nextObject.y);
+      info.target.w = Math.round(nextObject.w);
+      info.target.h = Math.round(nextObject.h);
+      info.geometry = nextObject;
+      return;
+    }
+    info.target.x = Math.round(clamp(Number(geometry.x) || 0, 0, PPTHtml.baseWidth - 40));
+    info.target.y = Math.round(clamp(Number(geometry.y) || 0, 0, PPTHtml.baseHeight - 24));
+    info.target.w = Math.round(Math.max(44, Number(geometry.w) || 44));
+    info.target.h = Math.round(Math.max(24, Number(geometry.h) || 24));
+    info.geometry = {
+      x: info.target.x,
+      y: info.target.y,
+      w: info.target.w,
+      h: info.target.h
+    };
+  }
+
+  function selectedObjectInfo() {
+    var index = objectIndexFromPath(selectedCanvasPath);
+    var slide = currentSlide();
+    if (index < 0 || !Array.isArray(slide.objects) || !slide.objects[index]) return null;
+    return {
+      slide: slide,
+      index: index,
+      path: "objects." + index,
+      object: slide.objects[index]
+    };
+  }
+
+  function selectedTextBoxInfo() {
+    var index = textBoxIndexFromPath(selectedCanvasPath);
+    var slide = currentSlide();
+    if (index < 0 || !Array.isArray(slide.textBoxes) || !slide.textBoxes[index]) return null;
+    return {
+      slide: slide,
+      index: index,
+      path: "textBoxes." + index + ".text",
+      textBox: slide.textBoxes[index]
+    };
+  }
+
+  function createSelectionClipboard() {
+    var objectInfo = selectedObjectInfo();
+    if (objectInfo) {
+      return {
+        kind: "object",
+        value: clonePlain(objectInfo.object),
+        style: clonePathStyle(objectInfo.slide, objectInfo.path)
+      };
+    }
+    var textInfo = selectedTextBoxInfo();
+    if (textInfo) {
+      return {
+        kind: "textBox",
+        value: clonePlain(textInfo.textBox),
+        style: clonePathStyle(textInfo.slide, textInfo.path)
+      };
+    }
+    return null;
+  }
+
+  function copySelectedCanvas() {
+    var payload = createSelectionClipboard();
+    if (!payload) return false;
+    canvasClipboard = payload;
+    toast(t("toast.objectCopied"));
+    return true;
+  }
+
+  function pasteCanvasClipboard(point) {
+    if (!canvasClipboard) return false;
+    return pasteCanvasPayload(canvasClipboard, point || canvasContextPoint);
+  }
+
+  function duplicateSelectedCanvas() {
+    var payload = createSelectionClipboard();
+    if (!payload) return false;
+    return pasteCanvasPayload(payload);
+  }
+
+  function pasteCanvasPayload(payload, point) {
+    var nextPath = "";
+    commit(function () {
+      if (payload.kind === "object") nextPath = pasteObjectPayload(payload, point);
+      if (payload.kind === "textBox") nextPath = pasteTextBoxPayload(payload, point);
+      setCanvasSelection(nextPath ? [nextPath] : []);
+    });
+    if (!nextPath) return false;
+    toast(t("toast.objectPasted"));
+    window.setTimeout(function () {
+      var node = canvasNodeByPath(nextPath);
+      if (node) selectCanvasTarget(node);
+    }, 0);
+    return true;
+  }
+
+  function pasteObjectPayload(payload, point) {
+    var slide = currentSlide();
+    slide.objects = Array.isArray(slide.objects) ? slide.objects : [];
+    var object = clonePlain(payload.value);
+    object.id = PPTHtml.uid("object");
+    object.zIndex = nextObjectZIndex();
+    object.rotation = Number(object.rotation) || 0;
+    var geometry = offsetPastedGeometry(object, point, { w: 320, h: 180 });
+    object.x = geometry.x;
+    object.y = geometry.y;
+    object.w = geometry.w;
+    object.h = geometry.h;
+    slide.objects.push(object);
+    var path = "objects." + (slide.objects.length - 1);
+    applyPathStyle(slide, path, payload.style);
+    return path;
+  }
+
+  function pasteTextBoxPayload(payload, point) {
+    var slide = currentSlide();
+    slide.textBoxes = Array.isArray(slide.textBoxes) ? slide.textBoxes : [];
+    var box = clonePlain(payload.value);
+    box.id = PPTHtml.uid("textbox");
+    var width = Math.max(44, Number(box.w) || 380);
+    var height = Math.max(24, Number(box.h) || 96);
+    if (point && isFinite(point.x) && isFinite(point.y)) {
+      box.x = Math.round(clamp(point.x - width / 2, 0, PPTHtml.baseWidth - 40));
+      box.y = Math.round(clamp(point.y - height / 2, 0, PPTHtml.baseHeight - 24));
+    } else {
+      box.x = Math.round(clamp((Number(box.x) || 0) + 24, 0, PPTHtml.baseWidth - 40));
+      box.y = Math.round(clamp((Number(box.y) || 0) + 24, 0, PPTHtml.baseHeight - 24));
+    }
+    box.w = Math.round(width);
+    box.h = Math.round(height);
+    slide.textBoxes.push(box);
+    var path = "textBoxes." + (slide.textBoxes.length - 1) + ".text";
+    applyPathStyle(slide, path, payload.style);
+    return path;
+  }
+
+  function offsetPastedGeometry(object, point, fallbackSize) {
+    var width = Math.max(44, Number(object.w) || fallbackSize.w);
+    var height = Math.max(24, Number(object.h) || fallbackSize.h);
+    var x = Number(object.x) || 0;
+    var y = Number(object.y) || 0;
+    if (point && isFinite(point.x) && isFinite(point.y)) {
+      x = point.x - width / 2;
+      y = point.y - height / 2;
+    } else {
+      x += 24;
+      y += 24;
+    }
+    var next = clampObjectGeometry({ x: x, y: y, w: width, h: height });
+    return {
+      x: Math.round(next.x),
+      y: Math.round(next.y),
+      w: Math.round(next.w),
+      h: Math.round(next.h)
+    };
+  }
+
+  function clonePathStyle(slide, path) {
+    if (!slide.styles || typeof slide.styles !== "object" || !slide.styles[path]) return {};
+    return clonePlain(slide.styles[path]);
+  }
+
+  function applyPathStyle(slide, path, style) {
+    if (!style || !Object.keys(style).length) return;
+    slide.styles = slide.styles && typeof slide.styles === "object" && !Array.isArray(slide.styles) ? slide.styles : {};
+    slide.styles[path] = clonePlain(style);
+  }
+
+  function clonePlain(value) {
+    return JSON.parse(JSON.stringify(value || {}));
+  }
+
+  function commitSelectedObjectMutation(mutator) {
+    var info = selectedObjectInfo();
+    if (!info) return false;
+    var before = activeEditSnapshot || JSON.stringify(deck);
+    mutator(info.object, info.index, info.slide);
+    if (before === JSON.stringify(deck)) {
+      syncObjectPanel();
+      return false;
+    }
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    activeEditSnapshot = "";
+    activeEditPushed = false;
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+    return true;
+  }
+
+  function commitObjectDataFromPanel() {
+    if (syncing) return;
+    var parsed;
+    try {
+      parsed = JSON.parse(els.objectDataInput.value || "{}");
+    } catch (error) {
+      toast(t("toast.objectDataInvalid"));
+      syncObjectPanel();
+      return;
+    }
+    commitSelectedObjectMutation(function (object) {
+      object.data = parsed && typeof parsed === "object" ? parsed : {};
+    });
+  }
+
+  function moveSelectedObjectLayer(action) {
+    var changed = commitSelectedObjectMutation(function (object, index, slide) {
+      var objects = Array.isArray(slide.objects) ? slide.objects : [];
+      var current = Number(object.zIndex) || 0;
+      if (action === "front") {
+        object.zIndex = objects.reduce(function (max, item) {
+          return Math.max(max, Number(item.zIndex) || 0);
+        }, current) + 1;
+        return;
+      }
+      if (action === "back") {
+        var lowest = objects.reduce(function (min, item) {
+          return Math.min(min, Number(item.zIndex) || 0);
+        }, current) - 1;
+        if (lowest < 1) {
+          objects.forEach(function (item, itemIndex) {
+            if (itemIndex !== index) item.zIndex = (Number(item.zIndex) || 0) + 1;
+          });
+          object.zIndex = 1;
+        } else {
+          object.zIndex = lowest;
+        }
+        return;
+      }
+
+      var candidates = objects.map(function (item, itemIndex) {
+        return { object: item, index: itemIndex, z: Number(item.zIndex) || 0 };
+      }).filter(function (item) {
+        if (item.index === index) return false;
+        return action === "forward" ? item.z > current : item.z < current;
+      }).sort(function (a, b) {
+        return action === "forward" ? a.z - b.z : b.z - a.z;
+      });
+      if (!candidates.length) return;
+      var target = candidates[0];
+      object.zIndex = target.z;
+      target.object.zIndex = current;
+    });
+    if (changed) toast(t("toast.layerChanged"));
+    return changed;
+  }
+
+  function handleCanvasContextMenu(event) {
+    if (presenting || activeCanvasEdit) return;
+    event.preventDefault();
+    event.stopPropagation();
+    hideTooltip();
+    canvasContextPoint = canvasPointFromEvent(event);
+    var target = event.target.closest("[data-canvas-edit]");
+    if (target && els.stageFrame.contains(target)) {
+      setCanvasSelection([target.getAttribute("data-canvas-edit")]);
+      renderCanvasControls();
+    } else if (!event.target.closest(".canvas-selection-box")) {
+      clearCanvasSelection();
+      renderCanvasControls();
+    }
+    showCanvasContextMenu(event.clientX, event.clientY);
+  }
+
+  function showCanvasContextMenu(x, y) {
+    if (!els.canvasContextMenu) return;
+    updateCanvasContextMenuState();
+    els.canvasContextMenu.hidden = false;
+    els.canvasContextMenu.style.left = "0px";
+    els.canvasContextMenu.style.top = "0px";
+    var rect = els.canvasContextMenu.getBoundingClientRect();
+    var left = clamp(x, 8, Math.max(8, window.innerWidth - rect.width - 8));
+    var top = clamp(y, 8, Math.max(8, window.innerHeight - rect.height - 8));
+    els.canvasContextMenu.style.left = Math.round(left) + "px";
+    els.canvasContextMenu.style.top = Math.round(top) + "px";
+  }
+
+  function hideCanvasContextMenu() {
+    canvasContextPoint = null;
+    if (els.canvasContextMenu) els.canvasContextMenu.hidden = true;
+  }
+
+  function updateCanvasContextMenuState() {
+    if (!els.canvasContextMenu) return;
+    var hasSelection = Boolean(selectedCanvasPath);
+    var hasObject = Boolean(selectedObjectInfo());
+    Array.prototype.forEach.call(els.canvasContextMenu.querySelectorAll("[data-context-action]"), function (button) {
+      var action = button.getAttribute("data-context-action");
+      var enabled = true;
+      if (action === "paste") enabled = Boolean(canvasClipboard);
+      if (action === "copy" || action === "duplicate" || action === "delete") enabled = hasSelection;
+      if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject;
+      button.disabled = !enabled;
+    });
+  }
+
+  function handleCanvasContextMenuAction(event) {
+    var button = event.target.closest("[data-context-action]");
+    if (!button || button.disabled) return;
+    event.preventDefault();
+    event.stopPropagation();
+    var action = button.getAttribute("data-context-action");
+    if (action === "copy") copySelectedCanvas();
+    if (action === "paste") pasteCanvasClipboard(canvasContextPoint);
+    if (action === "duplicate") duplicateSelectedCanvas();
+    if (action === "bringForward") moveSelectedObjectLayer("forward");
+    if (action === "sendBackward") moveSelectedObjectLayer("backward");
+    if (action === "bringFront") moveSelectedObjectLayer("front");
+    if (action === "sendBack") moveSelectedObjectLayer("back");
+    if (action === "delete") {
+      deleteSelectedObject() || deleteSelectedTextBox() || resetSelectedCanvasOffset();
+    }
+    hideCanvasContextMenu();
   }
 
   function resetSelectedCanvasOffset() {
@@ -3871,7 +4887,7 @@
     future = [];
     slide.textBoxes.splice(index, 1);
     remapTextBoxCanvasPaths(slide, index);
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderAll();
@@ -3890,7 +4906,7 @@
     future = [];
     slide.objects.splice(index, 1);
     remapObjectCanvasPaths(slide, index);
-    selectedCanvasPath = "";
+    clearCanvasSelection();
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderAll();
@@ -4050,7 +5066,7 @@
     object.data.src = src;
     if (type === "image" && !object.data.alt) object.data.alt = file.name.replace(/\.[^.]+$/, "");
     if ((type === "video" || type === "audio") && !object.data.caption) object.data.caption = file.name.replace(/\.[^.]+$/, "");
-    selectedCanvasPath = path;
+    setCanvasSelection([path]);
     return true;
   }
 
