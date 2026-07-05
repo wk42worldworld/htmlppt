@@ -83,7 +83,12 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /data-context-action="tableInsertRowAbove"/,
   /data-context-action="tableInsertColumnRight"/,
   /data-context-action="tableClearCell"/,
+  /data-context-action="replaceMedia"/,
+  /data-context-action="clearMedia"/,
+  /data-context-media/,
   /id="objectMediaEditor"/,
+  /id="objectMediaReplaceBtn"/,
+  /id="objectMediaClearBtn"/,
   /id="objectChartEditor"/,
   /id="objectChartGrid"/,
   /id="objectChartAddLabelBtn"/,
@@ -300,6 +305,20 @@ assert.match(appJs, /function textBoxPreset/);
 assert.match(appJs, /function fontFamilyStack/);
 assert.match(appJs, /function syncTypedObjectPanel/);
 assert.match(appJs, /function bindObjectDataInput/);
+assert.match(appJs, /function openSlideImagePicker/);
+assert.match(appJs, /function openSlideVideoPicker/);
+assert.match(appJs, /function openSlideAudioPicker/);
+assert.match(appJs, /function replaceSelectedObjectMedia/);
+assert.match(appJs, /function clearSelectedObjectMedia/);
+assert.match(appJs, /imageFileBtn\.addEventListener\("click", function \(\) \{\s+openSlideImagePicker\(\);/);
+assert.match(appJs, /objectMediaReplaceBtn\.addEventListener\("click", replaceSelectedObjectMedia\)/);
+assert.match(appJs, /objectMediaClearBtn\.addEventListener\("click", clearSelectedObjectMedia\)/);
+assert.match(appJs, /data-context-media/);
+assert.match(appJs, /action === "replaceMedia"\) replaceSelectedObjectMedia\(\)/);
+assert.match(appJs, /action === "clearMedia"\) clearSelectedObjectMedia\(\)/);
+assert.match(appJs, /"object\.replaceMedia"/);
+assert.match(appJs, /"object\.clearMedia"/);
+assert.match(appJs, /"toast\.mediaCleared"/);
 assert.match(appJs, /function renderObjectChartGrid/);
 assert.match(appJs, /function renderObjectTableGrid/);
 assert.match(appJs, /function renderSlideChartGrid/);
@@ -598,16 +617,26 @@ const externalAssetDeck = ppt.normalizeDeck({
         src: "media/demo.mp4",
         poster: "https://example.com/poster.png"
       },
-      audio: { src: "file:///tmp/narration.mp3" }
+      audio: { src: "file:///tmp/narration.mp3" },
+      objects: [
+        { type: "image", data: { src: "assets/object.png" } },
+        { type: "video", data: { src: "assets/object.mp4", poster: "assets/object-poster.jpg" } },
+        { type: "audio", data: { src: "assets/object.mp3" } },
+        { type: "image", data: { src: "data:image/png;base64,BBBB" } }
+      ]
     }
   ]
 });
 const externalRefs = ppt.collectExternalAssetReferences(externalAssetDeck);
-assert.equal(externalRefs.length, 3);
+assert.equal(externalRefs.length, 7);
 assert.equal(JSON.stringify(externalRefs.map((item) => item.path)), JSON.stringify([
   "slides[0].video.src",
   "slides[0].video.poster",
-  "slides[0].audio.src"
+  "slides[0].audio.src",
+  "slides[0].objects.0.data.src",
+  "slides[0].objects.1.data.src",
+  "slides[0].objects.1.data.poster",
+  "slides[0].objects.2.data.src"
 ]));
 assert.equal(ppt.collectExternalAssetReferences(audioDeck).length, 0);
 

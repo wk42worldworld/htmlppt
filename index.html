@@ -810,6 +810,10 @@
           </div>
           <div class="object-command-group typed-object-editor" id="objectMediaEditor" role="group" aria-label="媒体数据" data-i18n-group="object.typedMedia" hidden>
             <span data-i18n="object.typedMedia">媒体内容</span>
+            <div class="style-button-row">
+              <button type="button" id="objectMediaReplaceBtn" class="style-toggle" data-object-control data-i18n-title="object.replaceMedia"><svg><use href="#icon-open"></use></svg><span data-i18n="object.replaceMedia">替换本地文件</span></button>
+              <button type="button" id="objectMediaClearBtn" class="style-toggle danger" data-object-control data-i18n-title="object.clearMedia"><svg><use href="#icon-trash"></use></svg><span data-i18n="object.clearMedia">清除来源</span></button>
+            </div>
             <label>
               <span data-i18n="field.mediaSrc">媒体 URL 或 Data URI</span>
               <input id="objectMediaSrcInput" data-object-control data-object-typed-control type="text">
@@ -1336,6 +1340,8 @@
     <button type="button" data-context-action="copy" data-i18n="context.copy">复制</button>
     <button type="button" data-context-action="paste" data-i18n="context.paste">粘贴</button>
     <button type="button" data-context-action="duplicate" data-i18n="context.duplicate">重复</button>
+    <button type="button" data-context-action="replaceMedia" data-context-media data-i18n="object.replaceMedia">替换本地文件</button>
+    <button type="button" data-context-action="clearMedia" data-context-media data-i18n="object.clearMedia">清除来源</button>
     <hr>
     <button type="button" data-context-action="bringForward" data-i18n="object.forward">上移一层</button>
     <button type="button" data-context-action="sendBackward" data-i18n="object.backward">下移一层</button>

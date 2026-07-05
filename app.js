@@ -2064,6 +2064,8 @@
     "object.typedQuote": "引用内容",
     "object.typedCode": "代码内容",
     "object.typedShape": "形状文字",
+    "object.replaceMedia": "替换本地文件",
+    "object.clearMedia": "清除来源",
     "object.structuredHint": "每行一项；用 | 分隔标题、正文或说明。",
     "object.structuredCompareHint": "两行：左侧标题 | 左侧内容；右侧标题 | 右侧内容。",
     "object.structuredQuoteHint": "输入引文；最后一行可写 -- 作者。",
@@ -2082,7 +2084,8 @@
     "toast.objectHidden": "对象已隐藏",
     "toast.objectShown": "对象已显示",
     "toast.lockedSelection": "选区包含锁定对象",
-    "toast.objectDataInvalid": "对象数据不是有效 JSON"
+    "toast.objectDataInvalid": "对象数据不是有效 JSON",
+    "toast.mediaCleared": "媒体来源已清除"
   });
 
   Object.assign(I18N["en-US"], {
@@ -2172,6 +2175,8 @@
     "object.typedQuote": "Quote content",
     "object.typedCode": "Code content",
     "object.typedShape": "Shape text",
+    "object.replaceMedia": "Replace local file",
+    "object.clearMedia": "Clear source",
     "object.structuredHint": "One item per line; separate title, body, or detail with |.",
     "object.structuredCompareHint": "Two lines: left title | left body, then right title | right body.",
     "object.structuredQuoteHint": "Enter the quote; optionally use -- Author on the last line.",
@@ -2190,7 +2195,8 @@
     "toast.objectHidden": "Object hidden",
     "toast.objectShown": "Object shown",
     "toast.lockedSelection": "Selection includes a locked object",
-    "toast.objectDataInvalid": "Object data is not valid JSON"
+    "toast.objectDataInvalid": "Object data is not valid JSON",
+    "toast.mediaCleared": "Media source cleared"
   });
 
   Object.assign(I18N["ja-JP"], {
@@ -2280,6 +2286,8 @@
     "object.typedQuote": "引用内容",
     "object.typedCode": "コード内容",
     "object.typedShape": "図形テキスト",
+    "object.replaceMedia": "ローカルファイルを置換",
+    "object.clearMedia": "ソースを消去",
     "object.structuredHint": "1行に1項目。タイトル、本文、説明は | で区切ります。",
     "object.structuredCompareHint": "2行: 左タイトル | 左本文、右タイトル | 右本文。",
     "object.structuredQuoteHint": "引用文を入力。最後の行に -- 作者 を書けます。",
@@ -2298,7 +2306,8 @@
     "toast.objectHidden": "オブジェクトを非表示にしました",
     "toast.objectShown": "オブジェクトを表示しました",
     "toast.lockedSelection": "選択範囲にロック中のオブジェクトがあります",
-    "toast.objectDataInvalid": "オブジェクトデータが有効な JSON ではありません"
+    "toast.objectDataInvalid": "オブジェクトデータが有効な JSON ではありません",
+    "toast.mediaCleared": "メディアソースを消去しました"
   });
 
   Object.assign(I18N["ko-KR"], {
@@ -2388,6 +2397,8 @@
     "object.typedQuote": "인용 내용",
     "object.typedCode": "코드 내용",
     "object.typedShape": "도형 텍스트",
+    "object.replaceMedia": "로컬 파일 교체",
+    "object.clearMedia": "소스 지우기",
     "object.structuredHint": "한 줄에 하나씩 입력하고 제목, 본문, 설명은 | 로 구분합니다.",
     "object.structuredCompareHint": "두 줄: 왼쪽 제목 | 왼쪽 내용, 오른쪽 제목 | 오른쪽 내용.",
     "object.structuredQuoteHint": "인용문을 입력하고 마지막 줄에 -- 작성자를 쓸 수 있습니다.",
@@ -2406,7 +2417,8 @@
     "toast.objectHidden": "개체를 숨겼습니다",
     "toast.objectShown": "개체를 표시했습니다",
     "toast.lockedSelection": "선택 항목에 잠긴 개체가 있습니다",
-    "toast.objectDataInvalid": "개체 데이터가 올바른 JSON이 아닙니다"
+    "toast.objectDataInvalid": "개체 데이터가 올바른 JSON이 아닙니다",
+    "toast.mediaCleared": "미디어 소스를 지웠습니다"
   });
 
   Object.assign(I18N["zh-CN"], {
@@ -2672,7 +2684,7 @@
       "objectDuplicateBtn", "objectDeleteBtn", "objectBringForwardBtn", "objectSendBackwardBtn", "objectBringFrontBtn", "objectSendBackBtn", "objectDataInput",
       "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
       "objectTableTools", "objectTableAddRowBtn", "objectTableDeleteRowBtn", "objectTableAddColumnBtn", "objectTableDeleteColumnBtn",
-      "objectMediaEditor", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
+      "objectMediaEditor", "objectMediaReplaceBtn", "objectMediaClearBtn", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
       "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartGrid", "objectChartAddLabelBtn", "objectChartDeleteLabelBtn", "objectChartAddSeriesBtn", "objectChartDeleteSeriesBtn", "objectChartLabelsInput", "objectChartSeriesInput",
       "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
       "objectStructuredEditor", "objectStructuredTitle", "objectStructuredRowsBlock", "objectStructuredRows", "objectStructuredAddRowBtn", "objectStructuredBulkEditor", "objectStructuredHint", "objectStructuredInput",
@@ -3217,6 +3229,8 @@
     bindObjectDataInput(els.objectMediaCaptionInput, function (object, value) { ensureObjectData(object).caption = value; });
     bindObjectDataInput(els.objectMediaAltInput, function (object, value) { ensureObjectData(object).alt = value; });
     bindObjectDataInput(els.objectMediaFitInput, function (object, value) { ensureObjectData(object).fit = value; });
+    els.objectMediaReplaceBtn.addEventListener("click", replaceSelectedObjectMedia);
+    els.objectMediaClearBtn.addEventListener("click", clearSelectedObjectMedia);
     bindObjectDataInput(els.objectChartKindInput, function (object, value) { ensureObjectData(object).kind = value; });
     bindObjectDataInput(els.objectChartUnitInput, function (object, value) { ensureObjectData(object).unit = value; });
     bindObjectDataInput(els.objectChartLabelsInput, function (object, value) { ensureObjectData(object).labels = splitCells(value); });
@@ -3292,7 +3306,7 @@
     els.objectTableDeleteColumnBtn.addEventListener("click", function () { mutateSelectedTable("deleteColumn"); });
 
     els.imageFileBtn.addEventListener("click", function () {
-      openImagePicker();
+      openSlideImagePicker();
     });
 
     els.imageFileInput.addEventListener("change", function (event) {
@@ -3307,7 +3321,7 @@
     els.imageFileInput.addEventListener("cancel", cancelPendingMediaInsert);
 
     els.videoFileBtn.addEventListener("click", function () {
-      openVideoPicker();
+      openSlideVideoPicker();
     });
 
     els.videoFileInput.addEventListener("change", function (event) {
@@ -3327,7 +3341,7 @@
     bindSlideInput(els.videoCaptionInput, function (slide, value) { slide.video.caption = value; });
 
     els.audioFileBtn.addEventListener("click", function () {
-      openAudioPicker();
+      openSlideAudioPicker();
     });
 
     els.audioFileInput.addEventListener("change", function (event) {
@@ -3471,6 +3485,30 @@
     });
   }
 
+  function openSlideImagePicker() {
+    pendingMediaPlaceholderPath = "";
+    pendingMediaObjectPath = "";
+    pendingMediaInsertType = "";
+    els.imageFileInput.value = "";
+    els.imageFileInput.click();
+  }
+
+  function openSlideVideoPicker() {
+    pendingMediaPlaceholderPath = "";
+    pendingMediaObjectPath = "";
+    pendingMediaInsertType = "";
+    els.videoFileInput.value = "";
+    els.videoFileInput.click();
+  }
+
+  function openSlideAudioPicker() {
+    pendingMediaPlaceholderPath = "";
+    pendingMediaObjectPath = "";
+    pendingMediaInsertType = "";
+    els.audioFileInput.value = "";
+    els.audioFileInput.click();
+  }
+
   function openImagePicker(insertType) {
     pendingMediaPlaceholderPath = "";
     if (!insertType && selectedCanvasPath && objectTypeFromPath(selectedCanvasPath) === "image") {
@@ -3499,6 +3537,38 @@
     pendingMediaInsertType = insertType === "component" ? "audio" : "";
     els.audioFileInput.value = "";
     els.audioFileInput.click();
+  }
+
+  function replaceSelectedObjectMedia() {
+    var info = selectedObjectInfo();
+    var object = info && info.object;
+    if (!object || isLockedCanvasPath(selectedCanvasPath)) return false;
+    if (object.type === "image") {
+      openImagePicker();
+      return true;
+    }
+    if (object.type === "video") {
+      openVideoPicker();
+      return true;
+    }
+    if (object.type === "audio") {
+      openAudioPicker();
+      return true;
+    }
+    return false;
+  }
+
+  function clearSelectedObjectMedia() {
+    var info = selectedObjectInfo();
+    if (!info || !info.object || isLockedCanvasPath(selectedCanvasPath)) return false;
+    if (["image", "video", "audio"].indexOf(info.object.type) === -1) return false;
+    var changed = commitSelectedObjectMutation(function (object) {
+      var data = ensureObjectData(object);
+      data.src = "";
+      if (object.type === "video") data.poster = "";
+    });
+    if (changed) toast(t("toast.mediaCleared"));
+    return changed;
   }
 
   function insertComponent(type, options) {
@@ -9328,7 +9398,9 @@
   function updateCanvasContextMenuState() {
     if (!els.canvasContextMenu) return;
     var hasSelection = Boolean(selectedCanvasPath);
-    var hasObject = Boolean(selectedObjectInfo());
+    var objectInfo = selectedObjectInfo();
+    var hasObject = Boolean(objectInfo);
+    var hasMediaObject = Boolean(objectInfo && ["image", "video", "audio"].indexOf(objectInfo.object.type) !== -1);
     var hasLockedSelection = hasLockedCanvasSelection();
     var hasClipboardSource = hasCopyableCanvasSelection();
     var tableInfo = selectedCanvasPath ? selectedExplicitTableInfo() : null;
@@ -9343,6 +9415,10 @@
       "tableDeleteColumn",
       "tableClearCell"
     ];
+    var mediaActions = ["replaceMedia", "clearMedia"];
+    Array.prototype.forEach.call(els.canvasContextMenu.querySelectorAll("[data-context-media]"), function (item) {
+      item.hidden = !hasMediaObject;
+    });
     Array.prototype.forEach.call(els.canvasContextMenu.querySelectorAll("[data-context-table]"), function (item) {
       item.hidden = !hasTable;
     });
@@ -9353,6 +9429,7 @@
       if (action === "copy" || action === "duplicate") enabled = hasClipboardSource;
       if (action === "delete") enabled = hasSelection && !hasLockedSelection;
       if (["bringForward", "sendBackward", "bringFront", "sendBack"].indexOf(action) !== -1) enabled = hasObject && !hasLockedSelection;
+      if (mediaActions.indexOf(action) !== -1) enabled = hasMediaObject && !hasLockedSelection;
       if (tableActions.indexOf(action) !== -1) enabled = hasTable && !hasLockedTable;
       if (action === "tableClearCell") enabled = hasTable && !hasLockedTable && isTableCellPath(selectedCanvasPath);
       button.disabled = !enabled;
@@ -9372,6 +9449,8 @@
     if (action === "sendBackward") moveSelectedObjectLayer("backward");
     if (action === "bringFront") moveSelectedObjectLayer("front");
     if (action === "sendBack") moveSelectedObjectLayer("back");
+    if (action === "replaceMedia") replaceSelectedObjectMedia();
+    if (action === "clearMedia") clearSelectedObjectMedia();
     if (action === "tableInsertRowAbove") mutateSelectedTable("addRowBefore");
     if (action === "tableInsertRowBelow") mutateSelectedTable("addRowAfter");
     if (action === "tableInsertColumnLeft") mutateSelectedTable("addColumnBefore");
