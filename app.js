@@ -1988,6 +1988,20 @@
     "object.hidden": "已隐藏",
     "object.layerTop": "最上层",
     "object.layerNumber": "第 {level} 层",
+    "object.chartGrid": "可视化数据表",
+    "object.tableGrid": "可视化表格",
+    "object.legacyText": "文本批量编辑",
+    "grid.series": "系列",
+    "grid.header": "表头",
+    "grid.value": "数值",
+    "grid.addLabel": "增加一列标签",
+    "grid.deleteLabel": "删除最后一列标签",
+    "grid.addSeries": "增加一个系列",
+    "grid.deleteSeries": "删除最后一个系列",
+    "grid.addRow": "增加一行",
+    "grid.deleteRow": "删除最后一行",
+    "grid.addColumn": "增加一列",
+    "grid.deleteColumn": "删除最后一列",
     "object.duplicate": "重复",
     "object.forward": "上移一层",
     "object.backward": "下移一层",
@@ -2055,6 +2069,20 @@
     "object.hidden": "Hidden",
     "object.layerTop": "Top layer",
     "object.layerNumber": "Layer {level}",
+    "object.chartGrid": "Visual data table",
+    "object.tableGrid": "Visual table",
+    "object.legacyText": "Bulk text editor",
+    "grid.series": "Series",
+    "grid.header": "Header",
+    "grid.value": "Value",
+    "grid.addLabel": "Add label column",
+    "grid.deleteLabel": "Delete last label column",
+    "grid.addSeries": "Add series",
+    "grid.deleteSeries": "Delete last series",
+    "grid.addRow": "Add row",
+    "grid.deleteRow": "Delete last row",
+    "grid.addColumn": "Add column",
+    "grid.deleteColumn": "Delete last column",
     "object.duplicate": "Duplicate",
     "object.forward": "Bring forward",
     "object.backward": "Send backward",
@@ -2122,6 +2150,20 @@
     "object.hidden": "非表示",
     "object.layerTop": "最前面",
     "object.layerNumber": "レイヤー {level}",
+    "object.chartGrid": "ビジュアルデータ表",
+    "object.tableGrid": "ビジュアル表",
+    "object.legacyText": "テキスト一括編集",
+    "grid.series": "系列",
+    "grid.header": "見出し",
+    "grid.value": "値",
+    "grid.addLabel": "ラベル列を追加",
+    "grid.deleteLabel": "最後のラベル列を削除",
+    "grid.addSeries": "系列を追加",
+    "grid.deleteSeries": "最後の系列を削除",
+    "grid.addRow": "行を追加",
+    "grid.deleteRow": "最後の行を削除",
+    "grid.addColumn": "列を追加",
+    "grid.deleteColumn": "最後の列を削除",
     "object.duplicate": "複製",
     "object.forward": "前面へ",
     "object.backward": "背面へ",
@@ -2189,6 +2231,20 @@
     "object.hidden": "숨김",
     "object.layerTop": "맨 앞",
     "object.layerNumber": "{level} 레이어",
+    "object.chartGrid": "시각 데이터 표",
+    "object.tableGrid": "시각 표",
+    "object.legacyText": "텍스트 일괄 편집",
+    "grid.series": "시리즈",
+    "grid.header": "헤더",
+    "grid.value": "값",
+    "grid.addLabel": "라벨 열 추가",
+    "grid.deleteLabel": "마지막 라벨 열 삭제",
+    "grid.addSeries": "시리즈 추가",
+    "grid.deleteSeries": "마지막 시리즈 삭제",
+    "grid.addRow": "행 추가",
+    "grid.deleteRow": "마지막 행 삭제",
+    "grid.addColumn": "열 추가",
+    "grid.deleteColumn": "마지막 열 삭제",
     "object.duplicate": "복제",
     "object.forward": "앞으로",
     "object.backward": "뒤로",
@@ -2494,8 +2550,8 @@
       "objectAlignLeftBtn", "objectAlignCenterBtn", "objectAlignRightBtn", "objectAlignTopBtn", "objectAlignMiddleBtn", "objectAlignBottomBtn", "objectDistributeHBtn", "objectDistributeVBtn",
       "objectTableTools", "objectTableAddRowBtn", "objectTableDeleteRowBtn", "objectTableAddColumnBtn", "objectTableDeleteColumnBtn",
       "objectMediaEditor", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
-      "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartLabelsInput", "objectChartSeriesInput",
-      "objectTableEditor", "objectTableColumnsInput", "objectTableRowsInput",
+      "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartGrid", "objectChartAddLabelBtn", "objectChartDeleteLabelBtn", "objectChartAddSeriesBtn", "objectChartDeleteSeriesBtn", "objectChartLabelsInput", "objectChartSeriesInput",
+      "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
@@ -2958,6 +3014,24 @@
     bindObjectDataInput(els.objectChartSeriesInput, function (object, value) { ensureObjectData(object).series = parseChartSeries(value); });
     bindObjectDataInput(els.objectTableColumnsInput, function (object, value) { ensureObjectData(object).columns = splitTableCells(value); }, { fitTable: true });
     bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
+    if (els.objectChartGrid) {
+      els.objectChartGrid.addEventListener("focusin", captureEditStart);
+      els.objectChartGrid.addEventListener("change", handleObjectChartGridChange);
+      els.objectChartGrid.addEventListener("paste", handleObjectChartGridPaste);
+    }
+    if (els.objectTableGrid) {
+      els.objectTableGrid.addEventListener("focusin", captureEditStart);
+      els.objectTableGrid.addEventListener("change", handleObjectTableGridChange);
+      els.objectTableGrid.addEventListener("paste", handleObjectTableGridPaste);
+    }
+    els.objectChartAddLabelBtn.addEventListener("click", function () { mutateSelectedChartGrid("addLabel"); });
+    els.objectChartDeleteLabelBtn.addEventListener("click", function () { mutateSelectedChartGrid("deleteLabel"); });
+    els.objectChartAddSeriesBtn.addEventListener("click", function () { mutateSelectedChartGrid("addSeries"); });
+    els.objectChartDeleteSeriesBtn.addEventListener("click", function () { mutateSelectedChartGrid("deleteSeries"); });
+    els.objectTableGridAddRowBtn.addEventListener("click", function () { mutateSelectedTableGrid("addRow"); });
+    els.objectTableGridDeleteRowBtn.addEventListener("click", function () { mutateSelectedTableGrid("deleteRow"); });
+    els.objectTableGridAddColumnBtn.addEventListener("click", function () { mutateSelectedTableGrid("addColumn"); });
+    els.objectTableGridDeleteColumnBtn.addEventListener("click", function () { mutateSelectedTableGrid("deleteColumn"); });
     els.objectDuplicateBtn.addEventListener("click", duplicateSelectedCanvas);
     els.objectDeleteBtn.addEventListener("click", function () {
       deleteSelectedCanvasContent(currentCanvasSelectionPaths());
@@ -5936,7 +6010,7 @@
       els.objectRotationInput.value = "";
       els.objectZInput.value = "";
       els.objectDataInput.value = "";
-      syncTypedObjectPanel(null);
+      syncTypedObjectPanel(null, false);
       return;
     }
 
@@ -5955,7 +6029,7 @@
     els.objectHInput.value = Math.round(Number(object.h) || 0);
     els.objectRotationInput.value = Math.round(Number(object.rotation) || 0);
     els.objectZInput.value = Math.round(Number(object.zIndex) || 0);
-    syncTypedObjectPanel(object);
+    syncTypedObjectPanel(object, canEditObject);
     els.objectDataInput.value = JSON.stringify(object.data || {}, null, 2);
     updateObjectCommandControlState();
   }
@@ -6146,10 +6220,11 @@
     return true;
   }
 
-  function syncTypedObjectPanel(object) {
+  function syncTypedObjectPanel(object, canEditObject) {
     var type = object && object.type;
     var data = object && object.data && typeof object.data === "object" ? object.data : {};
     var mediaType = type === "image" || type === "video" || type === "audio";
+    var editable = Boolean(canEditObject);
 
     if (els.objectMediaEditor) {
       els.objectMediaEditor.hidden = !mediaType;
@@ -6170,6 +6245,7 @@
       els.objectChartUnitInput.value = isChart ? data.unit || "" : "";
       els.objectChartLabelsInput.value = isChart ? asTextCells(data.labels).join(" | ") : "";
       els.objectChartSeriesInput.value = isChart ? stringifyChartSeries(data.series || []) : "";
+      renderObjectChartGrid(isChart ? data : null, editable);
     }
 
     if (els.objectTableEditor) {
@@ -6177,7 +6253,423 @@
       els.objectTableEditor.hidden = !isTable;
       els.objectTableColumnsInput.value = isTable ? asTextCells(data.columns).join(" | ") : "";
       els.objectTableRowsInput.value = isTable ? stringifyTableRows(data.rows || []) : "";
+      renderObjectTableGrid(isTable ? data : null, editable);
     }
+  }
+
+  function renderObjectChartGrid(data, editable) {
+    if (!els.objectChartGrid) return;
+    els.objectChartGrid.innerHTML = "";
+    if (!data) return;
+    var model = chartGridSnapshot(data);
+    var table = document.createElement("table");
+    table.className = "object-grid-table object-chart-grid-table";
+    var thead = document.createElement("thead");
+    var headerRow = document.createElement("tr");
+    headerRow.appendChild(gridHeadingCell(t("grid.series")));
+    model.labels.forEach(function (label, columnIndex) {
+      var cell = document.createElement("th");
+      cell.appendChild(createObjectGridInput({
+        value: label,
+        role: "label",
+        column: columnIndex,
+        disabled: !editable,
+        label: t("field.chartLabels")
+      }));
+      headerRow.appendChild(cell);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    model.series.forEach(function (series, rowIndex) {
+      var row = document.createElement("tr");
+      var nameCell = document.createElement("th");
+      nameCell.appendChild(createObjectGridInput({
+        value: series.name,
+        role: "seriesName",
+        row: rowIndex,
+        disabled: !editable,
+        label: t("grid.series")
+      }));
+      row.appendChild(nameCell);
+      model.labels.forEach(function (label, columnIndex) {
+        var cell = document.createElement("td");
+        cell.appendChild(createObjectGridInput({
+          value: series.values[columnIndex],
+          role: "value",
+          row: rowIndex,
+          column: columnIndex,
+          number: true,
+          disabled: !editable,
+          label: label || t("grid.value")
+        }));
+        row.appendChild(cell);
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    els.objectChartGrid.appendChild(table);
+  }
+
+  function renderObjectTableGrid(data, editable) {
+    if (!els.objectTableGrid) return;
+    els.objectTableGrid.innerHTML = "";
+    if (!data) return;
+    var model = tableGridSnapshot(data);
+    var table = document.createElement("table");
+    table.className = "object-grid-table object-table-grid-table";
+    var thead = document.createElement("thead");
+    var headerRow = document.createElement("tr");
+    model.columns.forEach(function (column, columnIndex) {
+      var cell = document.createElement("th");
+      cell.appendChild(createObjectGridInput({
+        value: column,
+        role: "header",
+        column: columnIndex,
+        disabled: !editable,
+        label: t("grid.header")
+      }));
+      headerRow.appendChild(cell);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+
+    var tbody = document.createElement("tbody");
+    model.rows.forEach(function (cells, rowIndex) {
+      var row = document.createElement("tr");
+      model.columns.forEach(function (column, columnIndex) {
+        var cell = document.createElement("td");
+        cell.appendChild(createObjectGridInput({
+          value: cells[columnIndex],
+          role: "cell",
+          row: rowIndex,
+          column: columnIndex,
+          disabled: !editable,
+          label: column || t("grid.header")
+        }));
+        row.appendChild(cell);
+      });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    els.objectTableGrid.appendChild(table);
+  }
+
+  function gridHeadingCell(text) {
+    var cell = document.createElement("th");
+    cell.className = "object-grid-corner";
+    cell.textContent = text;
+    return cell;
+  }
+
+  function createObjectGridInput(options) {
+    var input = document.createElement("input");
+    input.className = "object-grid-input";
+    input.type = "text";
+    input.value = options.value == null ? "" : String(options.value);
+    input.disabled = Boolean(options.disabled);
+    input.setAttribute("data-object-grid-role", options.role);
+    if (options.row != null) input.setAttribute("data-grid-row", String(options.row));
+    if (options.column != null) input.setAttribute("data-grid-column", String(options.column));
+    if (options.number) input.setAttribute("inputmode", "decimal");
+    if (options.label) input.setAttribute("aria-label", options.label);
+    return input;
+  }
+
+  function chartGridSnapshot(data) {
+    var labels = asTextCells(data && data.labels);
+    var series = normalizeSeriesSnapshot(data && data.series);
+    var columnCount = Math.max(1, labels.length);
+    series.forEach(function (item) {
+      columnCount = Math.max(columnCount, item.values.length);
+    });
+    while (labels.length < columnCount) labels.push(defaultLabel(labels.length));
+    if (!series.length) series.push({ name: defaultSeriesName(0), values: [] });
+    series.forEach(function (item, rowIndex) {
+      if (!item.name) item.name = defaultSeriesName(rowIndex);
+      while (item.values.length < columnCount) item.values.push(0);
+    });
+    return { labels: labels, series: series };
+  }
+
+  function tableGridSnapshot(data) {
+    var columns = asTextCells(data && data.columns);
+    var rows = Array.isArray(data && data.rows) ? data.rows.map(asTextCells) : [];
+    var columnCount = Math.max(1, columns.length);
+    rows.forEach(function (row) {
+      columnCount = Math.max(columnCount, row.length);
+    });
+    while (columns.length < columnCount) columns.push("");
+    if (!rows.length) rows.push(new Array(columnCount).fill(""));
+    rows.forEach(function (row) {
+      while (row.length < columnCount) row.push("");
+    });
+    return { columns: columns, rows: rows };
+  }
+
+  function normalizeSeriesSnapshot(seriesList) {
+    return (Array.isArray(seriesList) ? seriesList : []).map(function (series, index) {
+      series = series && typeof series === "object" ? series : {};
+      return {
+        name: String(series.name || defaultSeriesName(index)),
+        values: Array.isArray(series.values) ? series.values.map(function (value) {
+          var number = Number(value);
+          return isFinite(number) ? number : 0;
+        }) : []
+      };
+    });
+  }
+
+  function defaultLabel(index) {
+    return "Item " + (index + 1);
+  }
+
+  function defaultSeriesName(index) {
+    return t("grid.series") + " " + (index + 1);
+  }
+
+  function handleObjectChartGridChange(event) {
+    var input = objectGridInputFromEvent(event);
+    if (!input) return;
+    commitSelectedObjectGridMutation("chart", function (data) {
+      setChartGridValue(data, input);
+    });
+  }
+
+  function handleObjectTableGridChange(event) {
+    var input = objectGridInputFromEvent(event);
+    if (!input) return;
+    commitSelectedObjectGridMutation("table", function (data) {
+      setTableGridValue(data, input);
+    }, { fitTable: true });
+  }
+
+  function handleObjectChartGridPaste(event) {
+    var input = objectGridInputFromEvent(event);
+    var matrix = parseClipboardMatrix(event.clipboardData && event.clipboardData.getData("text/plain"));
+    if (!input || !matrix.length) return;
+    event.preventDefault();
+    commitSelectedObjectGridMutation("chart", function (data) {
+      applyChartGridPaste(data, input, matrix);
+    });
+  }
+
+  function handleObjectTableGridPaste(event) {
+    var input = objectGridInputFromEvent(event);
+    var matrix = parseClipboardMatrix(event.clipboardData && event.clipboardData.getData("text/plain"));
+    if (!input || !matrix.length) return;
+    event.preventDefault();
+    commitSelectedObjectGridMutation("table", function (data) {
+      applyTableGridPaste(data, input, matrix);
+    }, { fitTable: true });
+  }
+
+  function objectGridInputFromEvent(event) {
+    return event && event.target && event.target.closest
+      ? event.target.closest("[data-object-grid-role]")
+      : null;
+  }
+
+  function commitSelectedObjectGridMutation(expectedType, mutator, options) {
+    return commitSelectedObjectMutation(function (object) {
+      if (!object || object.type !== expectedType) return;
+      var data = ensureObjectData(object);
+      mutator(data, object);
+      if (options && options.fitTable) fitTableObjectToData(object, { growOnly: true });
+    });
+  }
+
+  function mutateSelectedChartGrid(action) {
+    return commitSelectedObjectGridMutation("chart", function (data) {
+      var chart = ensureEditableChartData(data, 1, 1);
+      if (action === "addLabel") {
+        chart.labels.push(defaultLabel(chart.labels.length));
+        chart.series.forEach(function (series) { series.values.push(0); });
+      }
+      if (action === "deleteLabel") {
+        if (chart.labels.length > 1) {
+          chart.labels.pop();
+          chart.series.forEach(function (series) { series.values.pop(); });
+        } else {
+          chart.labels[0] = defaultLabel(0);
+          chart.series.forEach(function (series) { series.values[0] = 0; });
+        }
+      }
+      if (action === "addSeries") {
+        chart.series.push({ name: defaultSeriesName(chart.series.length), values: new Array(chart.labels.length).fill(0) });
+      }
+      if (action === "deleteSeries") {
+        if (chart.series.length > 1) chart.series.pop();
+        else chart.series[0] = { name: defaultSeriesName(0), values: new Array(chart.labels.length).fill(0) };
+      }
+    });
+  }
+
+  function mutateSelectedTableGrid(action) {
+    return commitSelectedObjectGridMutation("table", function (data, object) {
+      var table = ensureEditableTableData(data, 1, 1);
+      var columnCount = table.columns.length;
+      if (action === "addRow") {
+        table.rows.push(new Array(columnCount).fill(""));
+      }
+      if (action === "deleteRow") {
+        if (table.rows.length > 1) table.rows.pop();
+        else table.rows[0] = new Array(columnCount).fill("");
+      }
+      if (action === "addColumn") {
+        table.columns.push("");
+        table.rows.forEach(function (row) { row.push(""); });
+      }
+      if (action === "deleteColumn") {
+        if (table.columns.length > 1) {
+          table.columns.pop();
+          table.rows.forEach(function (row) { row.pop(); });
+        } else {
+          table.columns[0] = "";
+          table.rows.forEach(function (row) { row[0] = ""; });
+        }
+      }
+      fitTableObjectToData(object, { growOnly: false });
+    }, { fitTable: true });
+  }
+
+  function setChartGridValue(data, input) {
+    var role = input.getAttribute("data-object-grid-role");
+    var row = Number(input.getAttribute("data-grid-row"));
+    var column = Number(input.getAttribute("data-grid-column"));
+    var chart = ensureEditableChartData(data, isFinite(row) ? row + 1 : 1, isFinite(column) ? column + 1 : 1);
+    if (role === "label") chart.labels[column] = input.value || defaultLabel(column);
+    if (role === "seriesName") chart.series[row].name = input.value || defaultSeriesName(row);
+    if (role === "value") chart.series[row].values[column] = gridNumber(input.value);
+  }
+
+  function setTableGridValue(data, input) {
+    var role = input.getAttribute("data-object-grid-role");
+    var row = Number(input.getAttribute("data-grid-row"));
+    var column = Number(input.getAttribute("data-grid-column"));
+    var table = ensureEditableTableData(data, isFinite(row) ? row + 1 : 1, isFinite(column) ? column + 1 : 1);
+    if (role === "header") table.columns[column] = input.value;
+    if (role === "cell") table.rows[row][column] = input.value;
+  }
+
+  function applyChartGridPaste(data, input, matrix) {
+    var role = input.getAttribute("data-object-grid-role");
+    var startRow = Math.max(0, Number(input.getAttribute("data-grid-row")) || 0);
+    var startColumn = Math.max(0, Number(input.getAttribute("data-grid-column")) || 0);
+    var minSeries = role === "label" ? 1 : startRow + matrix.length;
+    var minLabels = startColumn + matrix.reduce(function (max, row) {
+      return Math.max(max, row.length);
+    }, 1);
+    if (role === "seriesName") minLabels = Math.max(1, matrix.reduce(function (max, row) {
+      return Math.max(max, row.length - 1);
+    }, 1));
+    var chart = ensureEditableChartData(data, minSeries, minLabels);
+
+    if (role === "label") {
+      matrix[0].forEach(function (value, offset) {
+        chart.labels[startColumn + offset] = value || defaultLabel(startColumn + offset);
+      });
+      return;
+    }
+
+    if (role === "seriesName") {
+      matrix.forEach(function (cells, rowOffset) {
+        var targetRow = startRow + rowOffset;
+        chart.series[targetRow].name = cells[0] || defaultSeriesName(targetRow);
+        cells.slice(1).forEach(function (value, columnOffset) {
+          chart.series[targetRow].values[columnOffset] = gridNumber(value);
+        });
+      });
+      return;
+    }
+
+    matrix.forEach(function (cells, rowOffset) {
+      var targetRow = startRow + rowOffset;
+      cells.forEach(function (value, columnOffset) {
+        chart.series[targetRow].values[startColumn + columnOffset] = gridNumber(value);
+      });
+    });
+  }
+
+  function applyTableGridPaste(data, input, matrix) {
+    var role = input.getAttribute("data-object-grid-role");
+    var startRow = Math.max(0, Number(input.getAttribute("data-grid-row")) || 0);
+    var startColumn = Math.max(0, Number(input.getAttribute("data-grid-column")) || 0);
+    var minRows = role === "header" ? Math.max(1, matrix.length - 1) : startRow + matrix.length;
+    var minColumns = startColumn + matrix.reduce(function (max, row) {
+      return Math.max(max, row.length);
+    }, 1);
+    var table = ensureEditableTableData(data, minRows, minColumns);
+
+    if (role === "header") {
+      matrix[0].forEach(function (value, offset) {
+        table.columns[startColumn + offset] = value;
+      });
+      matrix.slice(1).forEach(function (cells, rowOffset) {
+        cells.forEach(function (value, columnOffset) {
+          table.rows[rowOffset][startColumn + columnOffset] = value;
+        });
+      });
+      return;
+    }
+
+    matrix.forEach(function (cells, rowOffset) {
+      cells.forEach(function (value, columnOffset) {
+        table.rows[startRow + rowOffset][startColumn + columnOffset] = value;
+      });
+    });
+  }
+
+  function ensureEditableChartData(data, minSeries, minLabels) {
+    data.labels = asTextCells(data.labels);
+    data.series = normalizeSeriesSnapshot(data.series);
+    var labelCount = Math.max(1, Number(minLabels) || 0, data.labels.length);
+    data.series.forEach(function (series) {
+      labelCount = Math.max(labelCount, series.values.length);
+    });
+    while (data.labels.length < labelCount) data.labels.push(defaultLabel(data.labels.length));
+    while (data.series.length < Math.max(1, Number(minSeries) || 0)) {
+      data.series.push({ name: defaultSeriesName(data.series.length), values: [] });
+    }
+    data.series.forEach(function (series, index) {
+      if (!series.name) series.name = defaultSeriesName(index);
+      while (series.values.length < labelCount) series.values.push(0);
+      if (series.values.length > labelCount) series.values.length = labelCount;
+    });
+    return data;
+  }
+
+  function ensureEditableTableData(data, minRows, minColumns) {
+    data.columns = asTextCells(data.columns);
+    data.rows = Array.isArray(data.rows) ? data.rows.map(asTextCells) : [];
+    var columnCount = Math.max(1, Number(minColumns) || 0, data.columns.length);
+    data.rows.forEach(function (row) {
+      columnCount = Math.max(columnCount, row.length);
+    });
+    while (data.columns.length < columnCount) data.columns.push("");
+    while (data.rows.length < Math.max(1, Number(minRows) || 0)) data.rows.push([]);
+    data.rows.forEach(function (row) {
+      while (row.length < columnCount) row.push("");
+      if (row.length > columnCount) row.length = columnCount;
+    });
+    return data;
+  }
+
+  function parseClipboardMatrix(text) {
+    return String(text || "").replace(/\r/g, "").split("\n").filter(function (line, index, lines) {
+      return line !== "" || index < lines.length - 1;
+    }).map(function (line) {
+      var delimiter = line.indexOf("\t") !== -1 ? "\t" : "|";
+      return line.split(delimiter).map(function (cell) { return cell.trim(); });
+    }).filter(function (row) {
+      return row.some(function (cell) { return cell !== ""; });
+    });
+  }
+
+  function gridNumber(value) {
+    var number = Number(String(value || "").replace(/,/g, ""));
+    return isFinite(number) ? number : 0;
   }
 
   function tableContextLabel(info) {

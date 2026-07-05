@@ -82,7 +82,13 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /data-context-action="tableClearCell"/,
   /id="objectMediaEditor"/,
   /id="objectChartEditor"/,
+  /id="objectChartGrid"/,
+  /id="objectChartAddLabelBtn"/,
+  /id="objectChartAddSeriesBtn"/,
   /id="objectTableEditor"/,
+  /id="objectTableGrid"/,
+  /id="objectTableGridAddRowBtn"/,
+  /id="objectTableGridAddColumnBtn"/,
   /id="objectLayerList"/,
   /id="copyRepairPromptBtn"/,
   /id="presentFitBtn"/,
@@ -167,6 +173,13 @@ assert.match(appJs, /function textBoxPreset/);
 assert.match(appJs, /function fontFamilyStack/);
 assert.match(appJs, /function syncTypedObjectPanel/);
 assert.match(appJs, /function bindObjectDataInput/);
+assert.match(appJs, /function renderObjectChartGrid/);
+assert.match(appJs, /function renderObjectTableGrid/);
+assert.match(appJs, /function handleObjectChartGridPaste/);
+assert.match(appJs, /function handleObjectTableGridPaste/);
+assert.match(appJs, /function mutateSelectedChartGrid/);
+assert.match(appJs, /function mutateSelectedTableGrid/);
+assert.match(appJs, /function parseClipboardMatrix/);
 assert.match(appJs, /function buildRepairPrompt/);
 assert.match(appJs, /function togglePresenterScaleMode/);
 assert.match(appJs, /function showShortcutDialog/);
@@ -279,6 +292,9 @@ assert.match(stylesCss, /\.stage-frame \.canvas-snap-guide-y/);
 assert.match(stylesCss, /\.object-layer-list/);
 assert.match(stylesCss, /\.object-layer-row\.is-selected/);
 assert.match(stylesCss, /\.ppt-object\.is-canvas-locked/);
+assert.match(stylesCss, /\.object-data-grid/);
+assert.match(stylesCss, /\.object-grid-table/);
+assert.match(stylesCss, /\.object-grid-input:focus/);
 assert.match(stylesCss, /Presenter mobile controls/);
 assert.match(stylesCss, /grid-template-columns: 38px minmax\(52px, 1fr\) 38px repeat\(4, 34px\)/);
 assert.match(stylesCss, /\.presenter-controls button span/);

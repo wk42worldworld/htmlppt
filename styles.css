@@ -972,6 +972,127 @@ textarea:focus {
   outline: 1px dashed rgba(100, 116, 139, .45);
 }
 
+.object-data-grid-block {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.object-data-grid-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.object-data-grid-head > span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-muted);
+  font-size: 12px;
+  font-weight: 740;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.object-grid-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 4px;
+}
+
+.object-grid-actions .mini-button {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.object-data-grid {
+  max-width: 100%;
+  max-height: 214px;
+  overflow: auto;
+  border: 1px solid var(--ui-line);
+  border-radius: 7px;
+  background: #fff;
+}
+
+.object-grid-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.object-grid-table th,
+.object-grid-table td {
+  min-width: 82px;
+  max-width: 142px;
+  padding: 0;
+  border-right: 1px solid var(--ui-line);
+  border-bottom: 1px solid var(--ui-line);
+  background: #fff;
+}
+
+.object-grid-table th {
+  background: #f8fafc;
+}
+
+.object-grid-table tr > :last-child {
+  border-right: 0;
+}
+
+.object-grid-table tbody tr:last-child td,
+.object-grid-table tbody tr:last-child th {
+  border-bottom: 0;
+}
+
+.object-grid-corner {
+  width: 78px;
+  color: var(--ui-muted);
+  font-size: 11px;
+  font-weight: 740;
+  text-align: center;
+}
+
+.object-grid-input {
+  width: 100%;
+  height: 31px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ui-text);
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.object-grid-input:focus {
+  position: relative;
+  z-index: 1;
+  outline: 2px solid rgba(37, 99, 235, .42);
+  outline-offset: -2px;
+}
+
+.object-grid-input:disabled {
+  color: var(--ui-muted);
+  opacity: .62;
+}
+
+.object-legacy-editor {
+  display: grid;
+  gap: 8px;
+}
+
+.object-legacy-editor summary {
+  cursor: pointer;
+  color: var(--ui-muted);
+  font-size: 12px;
+  font-weight: 740;
+}
+
 .object-panel .object-align-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 0;

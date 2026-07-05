@@ -845,25 +845,55 @@
                 <input id="objectChartUnitInput" data-object-control data-object-typed-control type="text">
               </label>
             </div>
-            <label>
-              <span data-i18n="field.chartLabels">标签，用 | 分隔</span>
-              <input id="objectChartLabelsInput" data-object-control data-object-typed-control type="text" placeholder="Q1 | Q2 | Q3">
-            </label>
-            <label>
-              <span data-i18n="field.chartSeries">数据系列：每行一个系列，名称 | 数值 | 数值</span>
-              <textarea id="objectChartSeriesInput" data-object-control data-object-typed-control rows="4" spellcheck="false"></textarea>
-            </label>
+            <div class="object-data-grid-block">
+              <div class="object-data-grid-head">
+                <span data-i18n="object.chartGrid">可视化数据表</span>
+                <div class="object-grid-actions">
+                  <button type="button" id="objectChartAddLabelBtn" class="mini-button" data-object-control data-i18n-title="grid.addLabel">+</button>
+                  <button type="button" id="objectChartDeleteLabelBtn" class="mini-button" data-object-control data-i18n-title="grid.deleteLabel">-</button>
+                  <button type="button" id="objectChartAddSeriesBtn" class="mini-button" data-object-control data-i18n-title="grid.addSeries">+</button>
+                  <button type="button" id="objectChartDeleteSeriesBtn" class="mini-button" data-object-control data-i18n-title="grid.deleteSeries">-</button>
+                </div>
+              </div>
+              <div id="objectChartGrid" class="object-data-grid" aria-live="polite"></div>
+            </div>
+            <details class="object-legacy-editor">
+              <summary data-i18n="object.legacyText">文本批量编辑</summary>
+              <label>
+                <span data-i18n="field.chartLabels">标签，用 | 分隔</span>
+                <input id="objectChartLabelsInput" data-object-control data-object-typed-control type="text" placeholder="Q1 | Q2 | Q3">
+              </label>
+              <label>
+                <span data-i18n="field.chartSeries">数据系列：每行一个系列，名称 | 数值 | 数值</span>
+                <textarea id="objectChartSeriesInput" data-object-control data-object-typed-control rows="4" spellcheck="false"></textarea>
+              </label>
+            </details>
           </div>
           <div class="object-command-group typed-object-editor" id="objectTableEditor" role="group" aria-label="表格数据" data-i18n-group="object.typedTable" hidden>
             <span data-i18n="object.typedTable">表格内容</span>
-            <label>
-              <span data-i18n="field.tableColumns">表头，用 | 分隔</span>
-              <input id="objectTableColumnsInput" data-object-control data-object-typed-control type="text">
-            </label>
-            <label>
-              <span data-i18n="field.tableRows">每行一组单元格，用 | 分隔</span>
-              <textarea id="objectTableRowsInput" data-object-control data-object-typed-control rows="5" spellcheck="false"></textarea>
-            </label>
+            <div class="object-data-grid-block">
+              <div class="object-data-grid-head">
+                <span data-i18n="object.tableGrid">可视化表格</span>
+                <div class="object-grid-actions">
+                  <button type="button" id="objectTableGridAddRowBtn" class="mini-button" data-object-control data-i18n-title="grid.addRow">+</button>
+                  <button type="button" id="objectTableGridDeleteRowBtn" class="mini-button" data-object-control data-i18n-title="grid.deleteRow">-</button>
+                  <button type="button" id="objectTableGridAddColumnBtn" class="mini-button" data-object-control data-i18n-title="grid.addColumn">+</button>
+                  <button type="button" id="objectTableGridDeleteColumnBtn" class="mini-button" data-object-control data-i18n-title="grid.deleteColumn">-</button>
+                </div>
+              </div>
+              <div id="objectTableGrid" class="object-data-grid" aria-live="polite"></div>
+            </div>
+            <details class="object-legacy-editor">
+              <summary data-i18n="object.legacyText">文本批量编辑</summary>
+              <label>
+                <span data-i18n="field.tableColumns">表头，用 | 分隔</span>
+                <input id="objectTableColumnsInput" data-object-control data-object-typed-control type="text">
+              </label>
+              <label>
+                <span data-i18n="field.tableRows">每行一组单元格，用 | 分隔</span>
+                <textarea id="objectTableRowsInput" data-object-control data-object-typed-control rows="5" spellcheck="false"></textarea>
+              </label>
+            </details>
           </div>
           <div class="object-command-group" role="group" aria-label="对象数据" data-i18n-group="object.data">
             <label class="object-advanced-json">
