@@ -2656,10 +2656,14 @@
       "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
       "objectStructuredEditor", "objectStructuredTitle", "objectStructuredRowsBlock", "objectStructuredRows", "objectStructuredAddRowBtn", "objectStructuredBulkEditor", "objectStructuredHint", "objectStructuredInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
-      "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
+      "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput",
+      "itemsRowsBlock", "itemsRows", "itemsAddRowBtn", "itemsBulkEditor", "itemsInput",
+      "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
       "audioFileBtn", "audioSrcInput", "audioCaptionInput",
-      "cardsInput", "metricsInput", "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
+      "cardsRowsBlock", "cardsRows", "cardsAddRowBtn", "cardsBulkEditor", "cardsInput",
+      "metricsRowsBlock", "metricsRows", "metricsAddRowBtn", "metricsBulkEditor", "metricsInput",
+      "chartKindInput", "chartLabelsInput", "chartSeriesInput", "chartUnitInput", "tableAddRowBtn", "tableDeleteRowBtn", "tableAddColumnBtn", "tableDeleteColumnBtn", "tableColumnsInput", "tableRowsInput", "quoteInput", "authorInput", "codeInput", "notesInput",
       "presenter", "presenterStage", "presentPrevBtn", "presentCounter", "presentNextBtn", "presentFitBtn", "presentFitLabel", "presentShortcutsBtn", "presentFullscreenBtn", "presentExitBtn",
       "jsonDialog", "jsonTextarea", "copyJsonBtn", "loadJsonBtn",
       "templateDialog", "shortcutDialog", "validationDialog", "validationSummary", "validationReport", "copyValidationBtn", "copyRepairPromptBtn", "canvasContextMenu", "slideContextMenu", "slideLayoutMenu", "toast"
@@ -3115,12 +3119,15 @@
     bindSlideInput(els.imageAltInput, function (slide, value) { slide.image.alt = value; });
     bindSlideInput(els.imageCaptionInput, function (slide, value) { slide.image.caption = value; });
     bindSlideInput(els.itemsInput, function (slide, value) { slide.items = parseRows(value); });
+    bindSlideRowsEditor("items");
     bindSlideInput(els.leftTitleInput, function (slide, value) { slide.left.title = value; });
     bindSlideInput(els.leftTextInput, function (slide, value) { slide.left.text = value; });
     bindSlideInput(els.rightTitleInput, function (slide, value) { slide.right.title = value; });
     bindSlideInput(els.rightTextInput, function (slide, value) { slide.right.text = value; });
     bindSlideInput(els.cardsInput, function (slide, value) { slide.cards = parseRows(value); });
     bindSlideInput(els.metricsInput, function (slide, value) { slide.metrics = parseMetrics(value); });
+    bindSlideRowsEditor("cards");
+    bindSlideRowsEditor("metrics");
     bindSlideInput(els.chartKindInput, function (slide, value) { ensureChart(slide).kind = value; });
     bindSlideInput(els.chartLabelsInput, function (slide, value) { ensureChart(slide).labels = splitCells(value); });
     bindSlideInput(els.chartSeriesInput, function (slide, value) { ensureChart(slide).series = parseChartSeries(value); });
@@ -4453,6 +4460,21 @@
       });
       schedulePersist();
     });
+  }
+
+  function bindSlideRowsEditor(editorKey) {
+    var rows = els[editorKey + "Rows"];
+    var addButton = els[editorKey + "AddRowBtn"];
+    if (rows) {
+      rows.addEventListener("focusin", captureEditStart);
+      rows.addEventListener("change", handleSlideRowsChange);
+      rows.addEventListener("click", handleSlideRowsClick);
+    }
+    if (addButton) {
+      addButton.addEventListener("click", function () {
+        mutateSlideRows(editorKey, "add");
+      });
+    }
   }
 
   function bindStyleInput(input, prop, options) {
@@ -6590,10 +6612,19 @@
     });
   }
 
-  function createStructuredRowElement(spec, item, index, editable) {
+  function createStructuredRowElement(spec, item, index, editable, options) {
+    var settings = options || {};
+    var rowAttr = settings.rowAttr || "data-structured-row";
+    var fieldAttr = settings.fieldAttr || "data-structured-field";
+    var actionAttr = settings.actionAttr || "data-structured-action";
+    var indexAttr = settings.indexAttr || "data-structured-index";
+    var controlAttrs = settings.controlAttrs || {
+      "data-object-control": "",
+      "data-object-typed-control": ""
+    };
     var row = document.createElement("section");
-    row.className = "structured-row";
-    row.setAttribute("data-structured-row", String(index));
+    row.className = settings.rowClass || "structured-row";
+    row.setAttribute(rowAttr, String(index));
 
     var header = document.createElement("div");
     header.className = "structured-row-header";
@@ -6605,8 +6636,8 @@
     remove.type = "button";
     remove.className = "mini-button structured-row-delete";
     remove.disabled = !editable;
-    remove.setAttribute("data-structured-action", "delete");
-    remove.setAttribute("data-structured-index", String(index));
+    remove.setAttribute(actionAttr, "delete");
+    remove.setAttribute(indexAttr, String(index));
     setTooltip(remove, t("object.deleteItem"));
     var icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     var use = document.createElementNS("http://www.w3.org/2000/svg", "use");
@@ -6635,10 +6666,11 @@
       else control.rows = 2;
       control.value = item[field.key] == null ? "" : String(item[field.key]);
       control.disabled = !editable;
-      control.setAttribute("data-object-control", "");
-      control.setAttribute("data-object-typed-control", "");
-      control.setAttribute("data-structured-field", field.key);
-      control.setAttribute("data-structured-index", String(index));
+      Object.keys(controlAttrs).forEach(function (name) {
+        control.setAttribute(name, controlAttrs[name]);
+      });
+      control.setAttribute(fieldAttr, field.key);
+      control.setAttribute(indexAttr, String(index));
       control.setAttribute("aria-label", t(field.labelKey));
       label.appendChild(control);
       fields.appendChild(label);
@@ -6727,6 +6759,102 @@
     while (rows.length < minLength) rows.push(spec.blank());
     data[spec.dataKey] = rows;
     return rows;
+  }
+
+  function slideRowsSpec(editorKey) {
+    var map = {
+      items: "timeline",
+      cards: "cards",
+      metrics: "metrics"
+    };
+    return structuredRowsSpec(map[editorKey]);
+  }
+
+  function renderSlideRowsEditor(editorKey, slide) {
+    var rows = els[editorKey + "Rows"];
+    if (!rows) return;
+    var spec = slideRowsSpec(editorKey);
+    rows.innerHTML = "";
+    if (!spec) return;
+    structuredRowsSnapshot(spec, slide).forEach(function (item, index) {
+      rows.appendChild(createStructuredRowElement(spec, item, index, true, {
+        rowClass: "structured-row slide-structured-row",
+        rowAttr: "data-slide-row",
+        fieldAttr: "data-slide-row-field",
+        actionAttr: "data-slide-row-action",
+        indexAttr: "data-slide-row-index",
+        controlAttrs: {}
+      }));
+    });
+  }
+
+  function handleSlideRowsChange(event) {
+    var control = event && event.target && event.target.closest
+      ? event.target.closest("[data-slide-row-field]")
+      : null;
+    if (!control || syncing) return;
+    var editor = control.closest("[data-slide-row-editor]");
+    var editorKey = editor && editor.getAttribute("data-slide-row-editor");
+    var field = control.getAttribute("data-slide-row-field");
+    var index = Number(control.getAttribute("data-slide-row-index"));
+    if (!editorKey || !field || !isFinite(index)) return;
+    commitSlideRowsMutation(editorKey, function (slide, spec) {
+      if (!spec.fields.some(function (item) { return item.key === field; })) return;
+      var rows = ensureStructuredRowsArray(slide, spec, index + 1);
+      rows[index][field] = control.value;
+    });
+  }
+
+  function handleSlideRowsClick(event) {
+    var button = event && event.target && event.target.closest
+      ? event.target.closest("[data-slide-row-action]")
+      : null;
+    if (!button || syncing) return;
+    event.preventDefault();
+    var editor = button.closest("[data-slide-row-editor]");
+    var editorKey = editor && editor.getAttribute("data-slide-row-editor");
+    var action = button.getAttribute("data-slide-row-action");
+    var index = Number(button.getAttribute("data-slide-row-index"));
+    if (editorKey && action === "delete" && isFinite(index)) mutateSlideRows(editorKey, "delete", index);
+  }
+
+  function mutateSlideRows(editorKey, action, index) {
+    return commitSlideRowsMutation(editorKey, function (slide, spec) {
+      var rows = Array.isArray(slide[spec.dataKey]) ? slide[spec.dataKey].map(function (item) {
+        return normalizeStructuredRowItem(spec, item);
+      }) : [];
+      if (action === "add") rows.push(spec.blank());
+      if (action === "delete") {
+        if (!rows.length) return;
+        rows.splice(clamp(Math.round(Number(index) || 0), 0, rows.length - 1), 1);
+      }
+      slide[spec.dataKey] = rows;
+    });
+  }
+
+  function commitSlideRowsMutation(editorKey, mutator) {
+    var spec = slideRowsSpec(editorKey);
+    if (!spec) return false;
+    var before = activeEditSnapshot || JSON.stringify(deck);
+    mutator(currentSlide(), spec);
+    if (before === JSON.stringify(deck)) {
+      syncInspector();
+      return false;
+    }
+    history.push(before);
+    if (history.length > 80) history.shift();
+    future = [];
+    activeEditSnapshot = "";
+    activeEditPushed = false;
+    deck = PPTHtml.normalizeDeck(deck);
+    markDirty();
+    renderCanvas();
+    refreshSlideThumb(currentIndex);
+    syncInspector();
+    updateButtons();
+    updateFileStatus();
+    persist();
+    return true;
   }
 
   function stringifyStructuredObjectData(type, data) {
@@ -9682,12 +9810,15 @@
     els.audioSrcInput.value = slide.audio.src || "";
     els.audioCaptionInput.value = slide.audio.caption || "";
     els.itemsInput.value = stringifyRows(slide.items);
+    renderSlideRowsEditor("items", slide);
     els.leftTitleInput.value = slide.left.title || "";
     els.leftTextInput.value = slide.left.text || "";
     els.rightTitleInput.value = slide.right.title || "";
     els.rightTextInput.value = slide.right.text || "";
     els.cardsInput.value = stringifyRows(slide.cards);
     els.metricsInput.value = stringifyMetrics(slide.metrics);
+    renderSlideRowsEditor("cards", slide);
+    renderSlideRowsEditor("metrics", slide);
     els.chartKindInput.value = slide.chart.kind || "bar";
     els.chartLabelsInput.value = slide.chart.labels.join(" | ");
     els.chartSeriesInput.value = stringifyChartSeries(slide.chart.series);

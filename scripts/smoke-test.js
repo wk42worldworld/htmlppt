@@ -98,6 +98,18 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectStructuredAddRowBtn"/,
   /id="objectStructuredBulkEditor"/,
   /id="objectStructuredInput"/,
+  /id="itemsRowsBlock"/,
+  /id="itemsRows"/,
+  /id="itemsAddRowBtn"/,
+  /id="itemsBulkEditor"/,
+  /id="cardsRowsBlock"/,
+  /id="cardsRows"/,
+  /id="cardsAddRowBtn"/,
+  /id="cardsBulkEditor"/,
+  /id="metricsRowsBlock"/,
+  /id="metricsRows"/,
+  /id="metricsAddRowBtn"/,
+  /id="metricsBulkEditor"/,
   /id="objectLayerList"/,
   /id="copyRepairPromptBtn"/,
   /id="presentFitBtn"/,
@@ -180,10 +192,18 @@ assert.match(appJs, /function structuredRowsSpec/);
 assert.match(appJs, /function renderStructuredObjectRows/);
 assert.match(appJs, /function handleStructuredRowsChange/);
 assert.match(appJs, /function mutateSelectedStructuredRows/);
+assert.match(appJs, /function bindSlideRowsEditor/);
+assert.match(appJs, /function renderSlideRowsEditor/);
+assert.match(appJs, /function handleSlideRowsChange/);
+assert.match(appJs, /function mutateSlideRows/);
+assert.match(appJs, /function commitSlideRowsMutation/);
 assert.match(appJs, /function applyStructuredObjectText/);
 assert.match(appJs, /function stringifyStructuredObjectData/);
 assert.match(appJs, /bindObjectDataInput\(els\.objectStructuredInput, applyStructuredObjectText\)/);
 assert.match(appJs, /objectStructuredRows\.addEventListener\("change", handleStructuredRowsChange\)/);
+assert.match(appJs, /bindSlideRowsEditor\("items"\)/);
+assert.match(appJs, /bindSlideRowsEditor\("cards"\)/);
+assert.match(appJs, /bindSlideRowsEditor\("metrics"\)/);
 assert.match(appJs, /cards:[\s\S]*dataKey: "cards"[\s\S]*metrics:[\s\S]*dataKey: "metrics"[\s\S]*timeline:[\s\S]*dataKey: "items"/);
 assert.match(appJs, /object\.typedStructured/);
 assert.match(appJs, /object\.structuredRows/);

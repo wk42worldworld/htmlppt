@@ -996,10 +996,22 @@
 
         <section class="panel-section field-group" data-layouts="text,imageRight,imageLeft,timeline">
           <h2 data-i18n="panel.list">列表</h2>
-          <label>
-            <span data-i18n="field.listRows">每行一条；时间线可用 “标题 | 内容”</span>
-            <textarea id="itemsInput" rows="6"></textarea>
-          </label>
+          <div class="object-data-grid-block slide-row-block" id="itemsRowsBlock">
+            <div class="object-data-grid-head">
+              <span data-i18n="object.structuredRows">逐项编辑</span>
+              <div class="object-grid-actions">
+                <button type="button" id="itemsAddRowBtn" class="mini-button" data-i18n-title="object.addItem"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="object.addItem">新增一项</span></button>
+              </div>
+            </div>
+            <div id="itemsRows" class="structured-row-editor" data-slide-row-editor="items" aria-live="polite"></div>
+          </div>
+          <details class="object-legacy-editor" id="itemsBulkEditor">
+            <summary data-i18n="object.legacyText">文本批量编辑</summary>
+            <label>
+              <span data-i18n="field.listRows">每行一条；时间线可用 “标题 | 内容”</span>
+              <textarea id="itemsInput" rows="6"></textarea>
+            </label>
+          </details>
         </section>
 
         <section class="panel-section field-group" data-layouts="compare">
@@ -1024,18 +1036,42 @@
 
         <section class="panel-section field-group" data-layouts="threeCards">
           <h2 data-i18n="panel.cards">卡片</h2>
-          <label>
-            <span data-i18n="field.cardsRows">每行一张卡片：标题 | 内容</span>
-            <textarea id="cardsInput" rows="6"></textarea>
-          </label>
+          <div class="object-data-grid-block slide-row-block" id="cardsRowsBlock">
+            <div class="object-data-grid-head">
+              <span data-i18n="object.structuredRows">逐项编辑</span>
+              <div class="object-grid-actions">
+                <button type="button" id="cardsAddRowBtn" class="mini-button" data-i18n-title="object.addItem"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="object.addItem">新增一项</span></button>
+              </div>
+            </div>
+            <div id="cardsRows" class="structured-row-editor" data-slide-row-editor="cards" aria-live="polite"></div>
+          </div>
+          <details class="object-legacy-editor" id="cardsBulkEditor">
+            <summary data-i18n="object.legacyText">文本批量编辑</summary>
+            <label>
+              <span data-i18n="field.cardsRows">每行一张卡片：标题 | 内容</span>
+              <textarea id="cardsInput" rows="6"></textarea>
+            </label>
+          </details>
         </section>
 
         <section class="panel-section field-group" data-layouts="data">
           <h2 data-i18n="panel.metrics">数据</h2>
-          <label>
-            <span data-i18n="field.metricsRows">每行一个指标：数值 | 标签 | 说明</span>
-            <textarea id="metricsInput" rows="6"></textarea>
-          </label>
+          <div class="object-data-grid-block slide-row-block" id="metricsRowsBlock">
+            <div class="object-data-grid-head">
+              <span data-i18n="object.structuredRows">逐项编辑</span>
+              <div class="object-grid-actions">
+                <button type="button" id="metricsAddRowBtn" class="mini-button" data-i18n-title="object.addItem"><svg><use href="#icon-plus"></use></svg><span class="sr-only" data-i18n="object.addItem">新增一项</span></button>
+              </div>
+            </div>
+            <div id="metricsRows" class="structured-row-editor" data-slide-row-editor="metrics" aria-live="polite"></div>
+          </div>
+          <details class="object-legacy-editor" id="metricsBulkEditor">
+            <summary data-i18n="object.legacyText">文本批量编辑</summary>
+            <label>
+              <span data-i18n="field.metricsRows">每行一个指标：数值 | 标签 | 说明</span>
+              <textarea id="metricsInput" rows="6"></textarea>
+            </label>
+          </details>
         </section>
 
         <section class="panel-section field-group" data-layouts="chart">
