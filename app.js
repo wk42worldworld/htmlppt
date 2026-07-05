@@ -5618,7 +5618,7 @@
     }
     if (!selectedCanvasPath) return;
     var dragPaths = currentCanvasSelectionPaths();
-    var targetPath = target.getAttribute("data-canvas-edit");
+    var targetPath = canonicalCanvasSelectionPath(target.getAttribute("data-canvas-edit"));
     if (dragPaths.indexOf(targetPath) === -1) dragPaths = [targetPath];
     var dragNodes = dragPaths.map(canvasNodeByPath);
     var dragOrigins = dragPaths.map(function (path) { return getCanvasOffset(path); });
@@ -5634,7 +5634,7 @@
       before: JSON.stringify(deck),
       startX: event.clientX,
       startY: event.clientY,
-      origin: getCanvasOffset(target.getAttribute("data-canvas-edit")),
+      origin: getCanvasOffset(targetPath),
       startBox: getNodeFrameBounds(target),
       startSelectionBounds: dragPaths.length > 1 ? getSelectionBounds(dragPaths) : null,
       selectionBox: els.stageFrame.querySelector(".canvas-selection-box"),
@@ -6165,7 +6165,7 @@
   }
 
   function selectCanvasTarget(node, options) {
-    var path = node.getAttribute("data-canvas-edit");
+    var path = canonicalCanvasSelectionPath(node.getAttribute("data-canvas-edit"));
     if (!path) return;
     var settings = options || {};
     if (settings.toggle) {
@@ -6187,10 +6187,23 @@
   function setCanvasSelection(paths, primaryPath) {
     var unique = [];
     (paths || []).forEach(function (path) {
-      if (path && unique.indexOf(path) === -1) unique.push(path);
+      var normalized = canonicalCanvasSelectionPath(path);
+      if (normalized && unique.indexOf(normalized) === -1) unique.push(normalized);
     });
+    var normalizedPrimary = canonicalCanvasSelectionPath(primaryPath);
     selectedCanvasPaths = unique;
-    selectedCanvasPath = primaryPath && unique.indexOf(primaryPath) !== -1 ? primaryPath : (unique[unique.length - 1] || "");
+    selectedCanvasPath = normalizedPrimary && unique.indexOf(normalizedPrimary) !== -1 ? normalizedPrimary : (unique[unique.length - 1] || "");
+  }
+
+  function canonicalCanvasSelectionPath(path) {
+    var objectPath = objectRootPathFromContentPath(path);
+    return objectPath || path;
+  }
+
+  function objectRootPathFromContentPath(path) {
+    var objectIndex = objectIndexFromAnyPath(path);
+    if (objectIndex < 0 || objectIndexFromPath(path) >= 0) return "";
+    return "objects." + objectIndex;
   }
 
   function clearCanvasSelection() {
@@ -7940,7 +7953,7 @@
 
   function deleteSelectedCanvasContent(paths) {
     if (presenting || activeCanvasEdit || activeCanvasDrag || activeCanvasResize) return false;
-    var targets = uniqueStrings((paths && paths.length ? paths : currentCanvasSelectionPaths()).filter(Boolean));
+    var targets = uniqueStrings((paths && paths.length ? paths : currentCanvasSelectionPaths()).map(canonicalCanvasSelectionPath).filter(Boolean));
     if (!targets.length) return false;
     if (hasLockedCanvasSelection(targets)) {
       toast(t("toast.lockedSelection"));

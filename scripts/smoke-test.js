@@ -205,6 +205,8 @@ assert.match(appJs, /function handleStructuredRowsChange/);
 assert.match(appJs, /function mutateSelectedStructuredRows/);
 assert.match(appJs, /function bindObjectTextContent/);
 assert.match(appJs, /function objectDataPath/);
+assert.match(appJs, /function canonicalCanvasSelectionPath/);
+assert.match(appJs, /function objectRootPathFromContentPath/);
 assert.match(appJs, /function syncSpecialStructuredObjectEditors/);
 assert.match(appJs, /function ensureCompareSide/);
 assert.match(appJs, /function normalizeObjectShapeKind/);
@@ -225,6 +227,8 @@ assert.match(appJs, /objectDataPath\(objectIndex, "metrics\." \+ index \+ "\.val
 assert.match(appJs, /objectDataPath\(objectIndex, "items\." \+ index \+ "\.text"\)/);
 assert.match(appJs, /objectDataPath\(objectIndex, "quote"\)/);
 assert.match(appJs, /objectDataPath\(objectIndex, "text"\)/);
+assert.match(appJs, /canonicalCanvasSelectionPath\(node\.getAttribute\("data-canvas-edit"\)\)/);
+assert.match(appJs, /\.map\(canonicalCanvasSelectionPath\)\.filter\(Boolean\)/);
 assert.match(appJs, /bindSlideRowsEditor\("items"\)/);
 assert.match(appJs, /bindSlideRowsEditor\("cards"\)/);
 assert.match(appJs, /bindSlideRowsEditor\("metrics"\)/);
