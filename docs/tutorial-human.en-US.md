@@ -143,21 +143,24 @@ Delete is disabled when only one slide remains, so the deck cannot become empty.
 The main editor now includes an `Insert` component palette beside the canvas. You can click a component or drag it onto the canvas:
 
 - `Text`: adds a visible text box to the current slide; double-click to edit it or drag it to a specific canvas position.
-- `Image`: adds an image slide and opens the local image picker. If you cancel, the image placeholder slide remains so you can add a URL later.
-- `Video`: adds a video slide and opens the local video picker. If you cancel, the video placeholder slide remains.
-- `Audio`: adds an audio slide and opens the local audio picker. If you cancel, the audio placeholder slide remains.
+- `Image`: inserts an image object into the current slide and opens the local image picker. If you cancel, the placeholder object remains so you can add a URL later.
+- `Video`: inserts a video object into the current slide and opens the local video picker. If you cancel, the placeholder object remains.
+- `Audio`: inserts an audio object into the current slide and opens the local audio picker. If you cancel, the placeholder object remains.
 - `Before` and `Decision`: add comparison slides for before/after stories or option decisions.
-- `Bars`, `Trend`, and `Share`: add chart slides for category comparison, trend changes, or composition share.
-- `Plan`, `Compare`, and `Checklist`: add table slides for project plans, option comparison, or launch checks.
-- `3 Points`, `Features`, `Pros`, `KPI`, `Progress`, `Roadmap`, `Process`, `Milestones`, `Quote`, and `Code`: add matching layout slides after the current slide with editable starter content, without overwriting the current slide.
+- `Bars`, `Trend`, and `Share`: insert chart objects into the current slide for category comparison, trend changes, or composition share.
+- `Plan`, `Compare`, and `Checklist`: insert table objects into the current slide for project plans, option comparison, or launch checks.
+- `3 Points`, `Features`, `Pros`, `KPI`, `Progress`, `Roadmap`, `Process`, `Milestones`, `Quote`, and `Code`: insert matching components into the current slide without creating a new slide or overwriting existing content.
+
+To create a whole new layout slide, click the `+` button in the left slide rail, then choose a cover, chart, table, video, or other slide layout.
 
 After inserting a component, continue editing it in the right panel, or double-click text, drag components, and resize them directly on the canvas.
 
-When a canvas object is selected, the `Object` panel shows position, size, and layer controls. Image, video, audio, chart, and table objects also show typed editors:
+When a canvas object is selected, the `Object` panel shows position, size, and layer controls. Image, video, audio, chart, table, card, metric, timeline, compare, quote, code, and shape objects also show typed editors:
 
 - Media objects: edit media URL / Data URI, caption, alt text, poster, and fit mode.
 - Chart objects: edit chart type, labels, series, and unit.
 - Table objects: edit headers and rows, or use add/delete row and column buttons.
+- Structured component objects: bulk-edit with `Title | Body`, `Value | Label | Detail`, or raw code text without touching JSON.
 
 The `Object data JSON (advanced)` field remains available for AI or power users. Normal users should prefer the typed fields above it.
 

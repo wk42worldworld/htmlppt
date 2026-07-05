@@ -26,7 +26,7 @@ PPT.html Studio now tightens the presentation and editor basics that matter for 
 
 ## New in v0.2.14
 
-PPT.html Studio now has a stronger AI/human editing loop: inserted canvas objects receive object-level validation for duplicate ids, geometry, media, chart, table, card, metric, timeline, quote, code, and compare data; selected image/video/audio, chart, and table objects expose typed inspectors so users can edit common fields without touching JSON; the Quality Check dialog can copy a complete AI repair prompt containing the current deck and validation report; and the bundled `htmlppt` skill plus deck CLI are documented as the official handoff path for other agents.
+PPT.html Studio now has a stronger AI/human editing loop: inserted canvas objects receive object-level validation for duplicate ids, geometry, media, chart, table, card, metric, timeline, quote, code, and compare data; selected image/video/audio, chart, table, card, metric, timeline, compare, quote, code, and shape objects expose typed inspectors so users can edit common fields without touching JSON; the Quality Check dialog can copy a complete AI repair prompt containing the current deck and validation report; and the bundled `htmlppt` skill plus deck CLI are documented as the official handoff path for other agents.
 
 ## New in v0.2.13
 
@@ -204,7 +204,7 @@ AI writes the JSON. The renderer turns it into slides. Humans can edit it in PPT
 - Import local images into image slides as embedded data URIs.
 - Double-click canvas text to edit in place, drag or resize editable slide elements for structured `canvas` geometry, style selected elements through structured `styles`, nudge selection with arrow keys, reset a selected element, and drag thumbnails to reorder pages.
 - Create bar, line, and donut charts from structured labels and series.
-- Edit selected image/video/audio, chart, and table canvas objects through typed inspectors without touching raw JSON for common fields.
+- Edit selected image/video/audio, chart, table, card, metric, timeline, compare, quote, code, and shape canvas objects through typed inspectors without touching raw JSON for common fields.
 - Copy an AI repair prompt that includes the current deck JSON, validation report, and repair rules.
 - Use the bundled `htmlppt` Codex skill and deck CLI for agent handoff, validation, extraction, and standalone build workflows.
 - Run `Check` to get a human-readable and AI-readable validation report.

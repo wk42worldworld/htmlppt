@@ -90,6 +90,8 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectTableGrid"/,
   /id="objectTableGridAddRowBtn"/,
   /id="objectTableGridAddColumnBtn"/,
+  /id="objectStructuredEditor"/,
+  /id="objectStructuredInput"/,
   /id="objectLayerList"/,
   /id="copyRepairPromptBtn"/,
   /id="presentFitBtn"/,
@@ -144,6 +146,16 @@ assert.match(appJs, /replaceDeck\(PPTHtml\.createBlankDeck\(\)/);
 assert.match(appJs, /return PPTHtml\.normalizeDeck\(PPTHtml\.createBlankDeck\(\)\)/);
 assert.match(appJs, /function handleCanvasWheel/);
 assert.match(appJs, /function fitCanvasToViewport/);
+assert.match(appJs, /function refreshSlideThumb/);
+assert.match(appJs, /refreshSlideThumb\(currentIndex\)/);
+{
+  const objectMutationSource = appJsLf.match(/function commitSelectedObjectMutation[\s\S]*?\n  }\n\n  function commitObjectDataFromPanel/)[0];
+  assert.match(objectMutationSource, /renderCanvas\(\)[\s\S]*refreshSlideThumb\(currentIndex\)/);
+}
+{
+  const styleCommitSource = appJsLf.match(/function updateSelectedStyleCommit[\s\S]*?\n  }\n\n  function commitStyleMutation/)[0];
+  assert.match(styleCommitSource, /renderCanvas\(\)[\s\S]*refreshSlideThumb\(currentIndex\)/);
+}
 assert.match(appJs, /function deleteSelectedCanvasContent/);
 assert.match(appJs, /function deleteSlideAt/);
 assert.match(appJs, /function handleSlideShortcut/);
@@ -151,6 +163,11 @@ assert.match(appJs, /function handleSlideContextMenuAction/);
 assert.match(appJs, /function showSlideLayoutMenu/);
 assert.match(appJs, /function handleSlideLayoutMenuAction/);
 assert.match(appJs, /function createSlideForLayout/);
+assert.match(appJs, /function structuredObjectEditorSpec/);
+assert.match(appJs, /function applyStructuredObjectText/);
+assert.match(appJs, /function stringifyStructuredObjectData/);
+assert.match(appJs, /bindObjectDataInput\(els\.objectStructuredInput, applyStructuredObjectText\)/);
+assert.match(appJs, /object\.typedStructured/);
 assert.match(appJs, /addSlideBtn\.addEventListener\("click", function \(\) \{ showSlideLayoutMenuForButton\(els\.addSlideBtn, currentIndex\); \}\)/);
 assert.match(appJs, /deck\.slides\.splice\(insertIndex, 0, createSlideForLayout\(settings\.layout, insertIndex\)\)/);
 assert.match(appJs, /imageBackground: "image"/);

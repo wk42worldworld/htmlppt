@@ -2029,6 +2029,19 @@
     "object.typedMedia": "媒体内容",
     "object.typedChart": "图表内容",
     "object.typedTable": "表格内容",
+    "object.typedStructured": "组件内容",
+    "object.typedCards": "卡片内容",
+    "object.typedMetrics": "数据内容",
+    "object.typedTimeline": "时间线内容",
+    "object.typedCompare": "对比内容",
+    "object.typedQuote": "引用内容",
+    "object.typedCode": "代码内容",
+    "object.typedShape": "形状文字",
+    "object.structuredHint": "每行一项；用 | 分隔标题、正文或说明。",
+    "object.structuredCompareHint": "两行：左侧标题 | 左侧内容；右侧标题 | 右侧内容。",
+    "object.structuredQuoteHint": "输入引文；最后一行可写 -- 作者。",
+    "object.structuredCodeHint": "直接编辑代码内容。",
+    "object.structuredShapeHint": "标注文字；普通形状可留空。",
     "context.copy": "复制",
     "context.paste": "粘贴",
     "context.duplicate": "重复",
@@ -2110,6 +2123,19 @@
     "object.typedMedia": "Media content",
     "object.typedChart": "Chart content",
     "object.typedTable": "Table content",
+    "object.typedStructured": "Component content",
+    "object.typedCards": "Card content",
+    "object.typedMetrics": "Metric content",
+    "object.typedTimeline": "Timeline content",
+    "object.typedCompare": "Compare content",
+    "object.typedQuote": "Quote content",
+    "object.typedCode": "Code content",
+    "object.typedShape": "Shape text",
+    "object.structuredHint": "One item per line; separate title, body, or detail with |.",
+    "object.structuredCompareHint": "Two lines: left title | left body, then right title | right body.",
+    "object.structuredQuoteHint": "Enter the quote; optionally use -- Author on the last line.",
+    "object.structuredCodeHint": "Edit the code directly.",
+    "object.structuredShapeHint": "Callout text; leave empty for plain shapes.",
     "context.copy": "Copy",
     "context.paste": "Paste",
     "context.duplicate": "Duplicate",
@@ -2191,6 +2217,19 @@
     "object.typedMedia": "メディア内容",
     "object.typedChart": "グラフ内容",
     "object.typedTable": "表の内容",
+    "object.typedStructured": "コンポーネント内容",
+    "object.typedCards": "カード内容",
+    "object.typedMetrics": "指標内容",
+    "object.typedTimeline": "タイムライン内容",
+    "object.typedCompare": "比較内容",
+    "object.typedQuote": "引用内容",
+    "object.typedCode": "コード内容",
+    "object.typedShape": "図形テキスト",
+    "object.structuredHint": "1行に1項目。タイトル、本文、説明は | で区切ります。",
+    "object.structuredCompareHint": "2行: 左タイトル | 左本文、右タイトル | 右本文。",
+    "object.structuredQuoteHint": "引用文を入力。最後の行に -- 作者 を書けます。",
+    "object.structuredCodeHint": "コードを直接編集します。",
+    "object.structuredShapeHint": "吹き出しテキスト。通常の図形は空で構いません。",
     "context.copy": "コピー",
     "context.paste": "貼り付け",
     "context.duplicate": "複製",
@@ -2272,6 +2311,19 @@
     "object.typedMedia": "미디어 내용",
     "object.typedChart": "차트 내용",
     "object.typedTable": "표 내용",
+    "object.typedStructured": "컴포넌트 내용",
+    "object.typedCards": "카드 내용",
+    "object.typedMetrics": "지표 내용",
+    "object.typedTimeline": "타임라인 내용",
+    "object.typedCompare": "비교 내용",
+    "object.typedQuote": "인용 내용",
+    "object.typedCode": "코드 내용",
+    "object.typedShape": "도형 텍스트",
+    "object.structuredHint": "한 줄에 하나씩 입력하고 제목, 본문, 설명은 | 로 구분합니다.",
+    "object.structuredCompareHint": "두 줄: 왼쪽 제목 | 왼쪽 내용, 오른쪽 제목 | 오른쪽 내용.",
+    "object.structuredQuoteHint": "인용문을 입력하고 마지막 줄에 -- 작성자를 쓸 수 있습니다.",
+    "object.structuredCodeHint": "코드를 직접 편집합니다.",
+    "object.structuredShapeHint": "말풍선 텍스트입니다. 일반 도형은 비워둘 수 있습니다.",
     "context.copy": "복사",
     "context.paste": "붙여넣기",
     "context.duplicate": "복제",
@@ -2553,6 +2605,7 @@
       "objectMediaEditor", "objectMediaSrcInput", "objectMediaPosterField", "objectMediaPosterInput", "objectMediaCaptionInput", "objectMediaAltField", "objectMediaAltInput", "objectMediaFitField", "objectMediaFitInput",
       "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartGrid", "objectChartAddLabelBtn", "objectChartDeleteLabelBtn", "objectChartAddSeriesBtn", "objectChartDeleteSeriesBtn", "objectChartLabelsInput", "objectChartSeriesInput",
       "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
+      "objectStructuredEditor", "objectStructuredTitle", "objectStructuredHint", "objectStructuredInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput", "itemsInput", "leftTitleInput", "leftTextInput", "rightTitleInput", "rightTextInput",
       "videoFileBtn", "videoFitInput", "videoSrcInput", "videoPosterInput", "videoCaptionInput",
@@ -3015,6 +3068,7 @@
     bindObjectDataInput(els.objectChartSeriesInput, function (object, value) { ensureObjectData(object).series = parseChartSeries(value); });
     bindObjectDataInput(els.objectTableColumnsInput, function (object, value) { ensureObjectData(object).columns = splitTableCells(value); }, { fitTable: true });
     bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
+    bindObjectDataInput(els.objectStructuredInput, applyStructuredObjectText);
     if (els.objectChartGrid) {
       els.objectChartGrid.addEventListener("focusin", captureEditStart);
       els.objectChartGrid.addEventListener("change", handleObjectChartGridChange);
@@ -4380,6 +4434,7 @@
     activeEditPushed = false;
     if (before !== JSON.stringify(deck)) markDirty();
     renderCanvas();
+    refreshSlideThumb(currentIndex);
     syncInspector();
     updateButtons();
     updateFileStatus();
@@ -4407,6 +4462,7 @@
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderCanvas();
+    refreshSlideThumb(currentIndex);
     syncInspector();
     updateButtons();
     updateFileStatus();
@@ -4431,6 +4487,7 @@
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderCanvas();
+    refreshSlideThumb(currentIndex);
     syncInspector();
     updateButtons();
     updateFileStatus();
@@ -4740,6 +4797,27 @@
       thumb.classList.toggle("active", active);
       thumb.setAttribute("aria-current", active ? "true" : "false");
     });
+  }
+
+  function refreshSlideThumb(index) {
+    if (!els.slideList) return;
+    var slideIndex = clamp(Number(index) || 0, 0, deck.slides.length - 1);
+    var thumb = els.slideList.querySelector("[data-slide-index=\"" + slideIndex + "\"]");
+    var slide = deck.slides[slideIndex];
+    if (!thumb || !slide) return;
+    var oldPreview = thumb.querySelector(".slide-thumb-preview");
+    var nextPreview = createSlideThumbPreview(slide, slideIndex);
+    if (oldPreview) oldPreview.replaceWith(nextPreview);
+    var title = thumb.querySelector(".slide-thumb-meta strong");
+    var layout = thumb.querySelector(".slide-thumb-meta small");
+    if (title) title.textContent = slide.title || t("slide.untitled");
+    if (layout) layout.textContent = layoutLabel(slide.layout);
+    setTooltip(thumb, formatText(t("tooltip.slideThumb"), {
+      number: slideIndex + 1,
+      title: slide.title || t("slide.untitled"),
+      layout: layoutLabel(slide.layout)
+    }));
+    fitSlideThumbPreview(nextPreview, nextPreview.querySelector(".slide-thumb-frame"));
   }
 
   function selectSlide(index, options) {
@@ -6305,6 +6383,87 @@
       els.objectTableRowsInput.value = isTable ? stringifyTableRows(data.rows || []) : "";
       renderObjectTableGrid(isTable ? data : null, editable);
     }
+
+    if (els.objectStructuredEditor) {
+      var structuredSpec = structuredObjectEditorSpec(type);
+      els.objectStructuredEditor.hidden = !structuredSpec;
+      els.objectStructuredTitle.textContent = structuredSpec ? t(structuredSpec.titleKey) : t("object.typedStructured");
+      els.objectStructuredHint.textContent = structuredSpec ? t(structuredSpec.hintKey) : t("object.structuredHint");
+      els.objectStructuredInput.value = structuredSpec ? stringifyStructuredObjectData(type, data) : "";
+      els.objectStructuredInput.rows = structuredSpec && structuredSpec.rows ? structuredSpec.rows : 6;
+    }
+  }
+
+  function structuredObjectEditorSpec(type) {
+    var specs = {
+      cards: { titleKey: "object.typedCards", hintKey: "field.cardsRows", rows: 6 },
+      metrics: { titleKey: "object.typedMetrics", hintKey: "field.metricsRows", rows: 6 },
+      timeline: { titleKey: "object.typedTimeline", hintKey: "field.listRows", rows: 6 },
+      compare: { titleKey: "object.typedCompare", hintKey: "object.structuredCompareHint", rows: 4 },
+      quote: { titleKey: "object.typedQuote", hintKey: "object.structuredQuoteHint", rows: 5 },
+      code: { titleKey: "object.typedCode", hintKey: "object.structuredCodeHint", rows: 8 },
+      shape: { titleKey: "object.typedShape", hintKey: "object.structuredShapeHint", rows: 3 }
+    };
+    return specs[type] || null;
+  }
+
+  function stringifyStructuredObjectData(type, data) {
+    if (type === "cards") return stringifyRows(data.cards || []);
+    if (type === "metrics") return stringifyMetrics(data.metrics || []);
+    if (type === "timeline") return stringifyRows(data.items || []);
+    if (type === "compare") {
+      return [
+        stringifyCompareSide(data.left),
+        stringifyCompareSide(data.right)
+      ].join("\n");
+    }
+    if (type === "quote") {
+      var quote = String(data.quote || "");
+      var author = String(data.author || "");
+      return author ? quote + "\n-- " + author : quote;
+    }
+    if (type === "code") return String(data.code || "");
+    if (type === "shape") return String(data.text || "");
+    return "";
+  }
+
+  function stringifyCompareSide(side) {
+    side = side && typeof side === "object" ? side : {};
+    return [side.title || "", side.text || ""].filter(function (value) {
+      return value != null && value !== "";
+    }).join(" | ");
+  }
+
+  function applyStructuredObjectText(object, value) {
+    var data = ensureObjectData(object);
+    var type = object.type;
+    if (type === "cards") data.cards = parseRows(value);
+    if (type === "metrics") data.metrics = parseMetrics(value);
+    if (type === "timeline") data.items = parseRows(value);
+    if (type === "compare") {
+      var sides = parseRows(value);
+      data.left = sides[0] || { title: "", text: "" };
+      data.right = sides[1] || { title: "", text: "" };
+    }
+    if (type === "quote") {
+      var quoteParts = parseStructuredQuote(value);
+      data.quote = quoteParts.quote;
+      data.author = quoteParts.author;
+    }
+    if (type === "code") data.code = value;
+    if (type === "shape") data.text = value;
+  }
+
+  function parseStructuredQuote(value) {
+    var lines = String(value || "").replace(/\r/g, "").split("\n");
+    var author = "";
+    if (lines.length && /^\s*--\s*/.test(lines[lines.length - 1])) {
+      author = lines.pop().replace(/^\s*--\s*/, "").trim();
+    }
+    return {
+      quote: lines.join("\n").trim(),
+      author: author
+    };
   }
 
   function renderObjectChartGrid(data, editable) {
@@ -7579,6 +7738,7 @@
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderCanvas();
+    refreshSlideThumb(currentIndex);
     syncInspector();
     updateButtons();
     updateFileStatus();
@@ -7914,6 +8074,7 @@
     deck = PPTHtml.normalizeDeck(deck);
     markDirty();
     renderCanvas();
+    refreshSlideThumb(currentIndex);
     syncInspector();
     updateButtons();
     updateFileStatus();
