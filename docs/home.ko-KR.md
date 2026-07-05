@@ -45,6 +45,7 @@ v0.2.2에서는 전체 화면 발표 스케일링을 개선해 16:9 화면에서
 - 발표 모드와 내보낸 단일 파일 플레이어는 없음, 페이드, 슬라이드, 밀기, 줌 전환 효과를 지원
 - 앱 UI는 중국어, 영어, 일본어, 한국어 전환을 지원
 - AI JSON 가져오기
+- `.ppt.html` 검증, 추출, 빌드, 수정을 위한 Agent CLI 와 Codex skill
 - 사람과 AI가 모두 읽을 수 있는 검사 보고서
 - 17개 기본 레이아웃과 4개 테마
 - GitHub Actions로 Linux, macOS arm64, macOS x64, Windows 빌드, 선택적 macOS 서명 및 공증 지원
@@ -72,4 +73,5 @@ npm run serve
 
 - [사람을 위한 튜토리얼](tutorial-human.ko-KR.md)
 - [AI 작성 가이드](tutorial-ai.ko-KR.md)
+- [AI Agent 연동 가이드](agent-integration.ko-KR.md)
 - [macOS 서명 및 공증 가이드](macos-notarization.ko-KR.md)

@@ -93,6 +93,13 @@ AI and agent authoring guides cover the JSON contract, deck structure, layout se
 - [日本語 AI ガイド](docs/tutorial-ai.ja-JP.md)
 - [한국어 AI 가이드](docs/tutorial-ai.ko-KR.md)
 
+Agent integration guides explain how other agents should use the project skill, deck CLI, validation reports, extraction, build commands, and multi-agent handoff workflow:
+
+- [中文 Agent 接入方案](docs/agent-integration.zh-CN.md)
+- [English Agent Integration](docs/agent-integration.en-US.md)
+- [日本語 Agent 連携ガイド](docs/agent-integration.ja-JP.md)
+- [한국어 Agent 연동 가이드](docs/agent-integration.ko-KR.md)
+
 Product roadmap:
 
 - [中文路线图](docs/roadmap.zh-CN.md)
@@ -140,6 +147,29 @@ Build the desktop app locally:
 
 ```bash
 npm run dist
+```
+
+## Agent And Skill Workflow
+
+Install the bundled Codex skill:
+
+```bash
+npm run skill:install -- --force
+```
+
+Use the deck CLI from any agent or script:
+
+```bash
+npm run deck:validate -- path/to/deck.json
+npm run deck:validate -- path/to/deck.ppt.html --json
+npm run deck:extract -- path/to/deck.ppt.html path/to/deck.json
+npm run deck:build -- path/to/deck.json path/to/deck.ppt.html
+```
+
+Repository-level agent guidance lives in [AGENTS.md](AGENTS.md), and the reusable skill lives in [skills/htmlppt](skills/htmlppt). The default automated gate for agent handoffs is:
+
+```bash
+npm run test:readonly
 ```
 
 ## What Is PPT.html?

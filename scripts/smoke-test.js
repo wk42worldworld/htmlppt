@@ -1,7 +1,9 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const childProcess = require("node:child_process");
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const vm = require("node:vm");
 
@@ -442,5 +444,42 @@ assert.match(html, /is-blank-black/);
 
 const fencedDeck = ppt.parseFileText("```json\n" + JSON.stringify(ppt.createTemplateDeck("lesson")) + "\n```");
 assert.equal(fencedDeck.title, "实战工作坊：用 AI 做用户访谈分析");
+
+const agentCli = path.join(root, "scripts", "agent-deck.js");
+const agentTmp = fs.mkdtempSync(path.join(os.tmpdir(), "htmlppt-agent-"));
+const agentDeckPath = path.join(agentTmp, "deck.json");
+const agentHtmlPath = path.join(agentTmp, "deck.ppt.html");
+const agentExtractPath = path.join(agentTmp, "deck.extract.json");
+const agentBuiltPath = path.join(agentTmp, "deck.built.ppt.html");
+const validAgentDeck = ppt.createTemplateDeck("product-pitch");
+fs.writeFileSync(agentDeckPath, JSON.stringify(validAgentDeck, null, 2), "utf8");
+fs.writeFileSync(agentHtmlPath, ppt.exportStandalone(validAgentDeck), "utf8");
+
+function runAgentCli(args, options = {}) {
+  return childProcess.spawnSync(process.execPath, [agentCli, ...args], {
+    cwd: root,
+    encoding: "utf8",
+    input: options.input || ""
+  });
+}
+
+const agentValidate = runAgentCli(["validate", agentDeckPath, "--json"]);
+assert.equal(agentValidate.status, 0, agentValidate.stderr || agentValidate.stdout);
+assert.equal(JSON.parse(agentValidate.stdout).deck.slides, validAgentDeck.slides.length);
+
+const badAgentDeckPath = path.join(agentTmp, "bad.json");
+fs.writeFileSync(badAgentDeckPath, JSON.stringify({ title: "Broken", slides: [] }), "utf8");
+const badAgentValidate = runAgentCli(["validate", badAgentDeckPath]);
+assert.notEqual(badAgentValidate.status, 0);
+assert.match(badAgentValidate.stdout, /version 必须是 "0\.1"/);
+assert.match(badAgentValidate.stdout, /slides 必须是非空数组/);
+
+const agentExtract = runAgentCli(["extract", agentHtmlPath, agentExtractPath]);
+assert.equal(agentExtract.status, 0, agentExtract.stderr || agentExtract.stdout);
+assert.equal(JSON.parse(fs.readFileSync(agentExtractPath, "utf8")).title, validAgentDeck.title);
+
+const agentBuild = runAgentCli(["build", agentDeckPath, agentBuiltPath]);
+assert.equal(agentBuild.status, 0, agentBuild.stderr || agentBuild.stdout);
+assert.match(fs.readFileSync(agentBuiltPath, "utf8"), /id="ppt-html-data"/);
 
 console.log("smoke tests passed");
