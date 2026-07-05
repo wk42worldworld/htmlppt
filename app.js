@@ -3,7 +3,7 @@
 
   var STORAGE_KEY = "ppt-html-studio-draft-v01";
   var LANG_STORAGE_KEY = "ppt-html-studio-lang-v01";
-  var APP_VERSION_LABEL = "v0.2.10";
+  var APP_VERSION_LABEL = "v0.2.13";
   var desktop = window.htmlpptDesktop || null;
   var deck = PPTHtml.normalizeDeck(loadInitialDeck());
   var uiLang = loadLanguage();

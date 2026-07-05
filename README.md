@@ -2,6 +2,28 @@
 
 PPT.html Studio is an AI-friendly, human-editable presentation editor. It turns structured deck data into a single `.ppt.html` file that can be opened in a browser, edited again in the app, and shared like an ordinary HTML file.
 
+![PPT.html Studio editor overview](docs/assets/screenshots/editor-overview.png)
+
+## Core Positioning
+
+PPT.html Studio is built for the missing middle between plain HTML and traditional PPT.
+
+主打解决的问题：AI 可以稳定生成和修改结构化内容，人类可以继续像 Keynote / PowerPoint 一样直观编辑，最后交付的仍然是一个能播放、能分享、能再次打开编辑、并且能包含图片/视频/音频/图表等资源的单文件 `.ppt.html`。
+
+| Need | Plain HTML | Traditional PPT | PPT.html Studio |
+| --- | --- | --- | --- |
+| Easy to share | Good | Needs app/export | One browser-openable `.ppt.html` file |
+| Human visual editing | Hard for non-developers | Familiar | Canvas editing, direct text edits, drag/resize, style panel |
+| AI generation and repair | Too free-form | Opaque file internals | Structured JSON schema plus validation reports |
+| One-file delivery with assets | Possible but manual | Usually bundled in PPTX | Embeds deck data, renderer, images, video, audio, and charts |
+| Deterministic design | Requires hand-written CSS | Easy to drift slide by slide | Templates, themes, and structured layout constraints |
+
+In short: this is not “HTML pretending to be PPT” and not “another PPT clone.” It is a structured presentation container where AI edits the data, humans edit the visual result, and the renderer keeps the output portable and predictable.
+
+## New in v0.2.13
+
+PPT.html Studio now keeps the left slide thumbnails stable while changing pages. Selecting another slide updates the active state and canvas without rebuilding the entire thumbnail strip, so fonts, controls, and preview positions no longer jump. The release also fixes Windows CI line-ending handling in the smoke tests.
+
 ## New in v0.2.10
 
 PPT.html Studio now has a clearer first-run experience: a new recognizable HTML slide icon, real favicons in the editor and exported standalone `.ppt.html` files, a wider default desktop window, less cramped 1280px layout columns, a cleaner current-slide action bar, and earlier Electron app identity setup to reduce default Electron branding during launch.
