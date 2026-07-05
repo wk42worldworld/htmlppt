@@ -911,6 +911,62 @@
               </div>
               <div id="objectStructuredRows" class="structured-row-editor" aria-live="polite"></div>
             </div>
+            <div class="typed-object-fields" id="objectCompareFields" hidden>
+              <label>
+                <span data-i18n="field.leftTitle">左侧标题</span>
+                <input id="objectCompareLeftTitleInput" data-object-control data-object-typed-control type="text">
+              </label>
+              <label>
+                <span data-i18n="field.rightTitle">右侧标题</span>
+                <input id="objectCompareRightTitleInput" data-object-control data-object-typed-control type="text">
+              </label>
+              <label class="typed-object-wide">
+                <span data-i18n="field.leftText">左侧内容</span>
+                <textarea id="objectCompareLeftTextInput" data-object-control data-object-typed-control rows="3" spellcheck="false"></textarea>
+              </label>
+              <label class="typed-object-wide">
+                <span data-i18n="field.rightText">右侧内容</span>
+                <textarea id="objectCompareRightTextInput" data-object-control data-object-typed-control rows="3" spellcheck="false"></textarea>
+              </label>
+            </div>
+            <div class="typed-object-fields" id="objectQuoteFields" hidden>
+              <label class="typed-object-wide">
+                <span data-i18n="field.quote">引文</span>
+                <textarea id="objectQuoteInput" data-object-control data-object-typed-control rows="4" spellcheck="false"></textarea>
+              </label>
+              <label class="typed-object-wide">
+                <span data-i18n="field.author">作者</span>
+                <input id="objectQuoteAuthorInput" data-object-control data-object-typed-control type="text">
+              </label>
+            </div>
+            <div class="typed-object-fields" id="objectShapeFields" hidden>
+              <label>
+                <span data-i18n="object.shapeKind">形状</span>
+                <select id="objectShapeKindInput" data-object-control data-object-typed-control>
+                  <option value="rectangle" data-i18n="insert.shape.rectangle">矩形</option>
+                  <option value="ellipse" data-i18n="insert.shape.ellipse">圆形</option>
+                  <option value="line" data-i18n="insert.shape.line">线条</option>
+                  <option value="arrow" data-i18n="insert.shape.arrow">箭头</option>
+                  <option value="callout" data-i18n="insert.shape.callout">标注</option>
+                </select>
+              </label>
+              <label>
+                <span data-i18n="object.shapeStrokeWidth">线宽</span>
+                <input id="objectShapeStrokeWidthInput" data-object-control data-object-typed-control type="number" min="0" max="48" step="1">
+              </label>
+              <label>
+                <span data-i18n="object.shapeFill">填充</span>
+                <input id="objectShapeFillInput" data-object-control data-object-typed-control type="text">
+              </label>
+              <label>
+                <span data-i18n="object.shapeStroke">描边</span>
+                <input id="objectShapeStrokeInput" data-object-control data-object-typed-control type="text">
+              </label>
+              <label class="typed-object-wide">
+                <span data-i18n="object.shapeText">文字</span>
+                <textarea id="objectShapeTextInput" data-object-control data-object-typed-control rows="3" spellcheck="false"></textarea>
+              </label>
+            </div>
             <details class="object-legacy-editor" id="objectStructuredBulkEditor">
               <summary data-i18n="object.legacyText">文本批量编辑</summary>
               <label>

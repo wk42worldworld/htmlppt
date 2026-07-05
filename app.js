@@ -2013,6 +2013,11 @@
     "object.rowValue": "数值",
     "object.rowLabel": "标签",
     "object.rowDetail": "说明",
+    "object.shapeKind": "形状",
+    "object.shapeText": "文字",
+    "object.shapeFill": "填充",
+    "object.shapeStroke": "描边",
+    "object.shapeStrokeWidth": "线宽",
     "grid.series": "系列",
     "grid.header": "表头",
     "grid.value": "数值",
@@ -2116,6 +2121,11 @@
     "object.rowValue": "Value",
     "object.rowLabel": "Label",
     "object.rowDetail": "Detail",
+    "object.shapeKind": "Shape",
+    "object.shapeText": "Text",
+    "object.shapeFill": "Fill",
+    "object.shapeStroke": "Stroke",
+    "object.shapeStrokeWidth": "Line width",
     "grid.series": "Series",
     "grid.header": "Header",
     "grid.value": "Value",
@@ -2219,6 +2229,11 @@
     "object.rowValue": "値",
     "object.rowLabel": "ラベル",
     "object.rowDetail": "詳細",
+    "object.shapeKind": "図形",
+    "object.shapeText": "テキスト",
+    "object.shapeFill": "塗り",
+    "object.shapeStroke": "線",
+    "object.shapeStrokeWidth": "線幅",
     "grid.series": "系列",
     "grid.header": "見出し",
     "grid.value": "値",
@@ -2322,6 +2337,11 @@
     "object.rowValue": "값",
     "object.rowLabel": "라벨",
     "object.rowDetail": "설명",
+    "object.shapeKind": "도형",
+    "object.shapeText": "텍스트",
+    "object.shapeFill": "채우기",
+    "object.shapeStroke": "선",
+    "object.shapeStrokeWidth": "선 두께",
     "grid.series": "시리즈",
     "grid.header": "헤더",
     "grid.value": "값",
@@ -2655,6 +2675,9 @@
       "objectChartEditor", "objectChartKindInput", "objectChartUnitInput", "objectChartGrid", "objectChartAddLabelBtn", "objectChartDeleteLabelBtn", "objectChartAddSeriesBtn", "objectChartDeleteSeriesBtn", "objectChartLabelsInput", "objectChartSeriesInput",
       "objectTableEditor", "objectTableGrid", "objectTableGridAddRowBtn", "objectTableGridDeleteRowBtn", "objectTableGridAddColumnBtn", "objectTableGridDeleteColumnBtn", "objectTableColumnsInput", "objectTableRowsInput",
       "objectStructuredEditor", "objectStructuredTitle", "objectStructuredRowsBlock", "objectStructuredRows", "objectStructuredAddRowBtn", "objectStructuredBulkEditor", "objectStructuredHint", "objectStructuredInput",
+      "objectCompareFields", "objectCompareLeftTitleInput", "objectCompareLeftTextInput", "objectCompareRightTitleInput", "objectCompareRightTextInput",
+      "objectQuoteFields", "objectQuoteInput", "objectQuoteAuthorInput",
+      "objectShapeFields", "objectShapeKindInput", "objectShapeTextInput", "objectShapeFillInput", "objectShapeStrokeInput", "objectShapeStrokeWidthInput",
       "zoomOutBtn", "zoomFitBtn", "zoomInBtn", "zoomLabel",
       "imageFileBtn", "imageFitInput", "imageSrcInput", "imageAltInput", "imageCaptionInput",
       "itemsRowsBlock", "itemsRows", "itemsAddRowBtn", "itemsBulkEditor", "itemsInput",
@@ -3185,6 +3208,24 @@
     bindObjectDataInput(els.objectTableColumnsInput, function (object, value) { ensureObjectData(object).columns = splitTableCells(value); }, { fitTable: true });
     bindObjectDataInput(els.objectTableRowsInput, function (object, value) { ensureObjectData(object).rows = parseTableRows(value); }, { fitTable: true });
     bindObjectDataInput(els.objectStructuredInput, applyStructuredObjectText);
+    bindObjectDataInput(els.objectCompareLeftTitleInput, function (object, value) { ensureCompareSide(object, "left").title = value; });
+    bindObjectDataInput(els.objectCompareLeftTextInput, function (object, value) { ensureCompareSide(object, "left").text = value; });
+    bindObjectDataInput(els.objectCompareRightTitleInput, function (object, value) { ensureCompareSide(object, "right").title = value; });
+    bindObjectDataInput(els.objectCompareRightTextInput, function (object, value) { ensureCompareSide(object, "right").text = value; });
+    bindObjectDataInput(els.objectQuoteInput, function (object, value) { ensureObjectData(object).quote = value; });
+    bindObjectDataInput(els.objectQuoteAuthorInput, function (object, value) { ensureObjectData(object).author = value; });
+    bindObjectDataInput(els.objectShapeKindInput, function (object, value) {
+      var data = ensureObjectData(object);
+      data.kind = normalizeObjectShapeKind(value);
+      if (data.kind === "line" || data.kind === "arrow") data.fill = "none";
+    });
+    bindObjectDataInput(els.objectShapeTextInput, function (object, value) { ensureObjectData(object).text = value; });
+    bindObjectDataInput(els.objectShapeFillInput, function (object, value) { ensureObjectData(object).fill = value; });
+    bindObjectDataInput(els.objectShapeStrokeInput, function (object, value) { ensureObjectData(object).stroke = value; });
+    bindObjectDataInput(els.objectShapeStrokeWidthInput, function (object, value) {
+      var number = clamp(Math.round(Number(value) || 0), 0, 48);
+      ensureObjectData(object).strokeWidth = number;
+    });
     if (els.objectStructuredRows) {
       els.objectStructuredRows.addEventListener("focusin", captureEditStart);
       els.objectStructuredRows.addEventListener("change", handleStructuredRowsChange);
@@ -4533,6 +4574,25 @@
   function ensureObjectData(object) {
     object.data = object.data && typeof object.data === "object" && !Array.isArray(object.data) ? object.data : {};
     return object.data;
+  }
+
+  function compareSide(data, side) {
+    data = data && typeof data === "object" ? data : {};
+    var value = data[side] && typeof data[side] === "object" ? data[side] : {};
+    return {
+      title: value.title || "",
+      text: value.text || ""
+    };
+  }
+
+  function ensureCompareSide(object, side) {
+    var data = ensureObjectData(object);
+    data[side] = data[side] && typeof data[side] === "object" ? data[side] : {};
+    return data[side];
+  }
+
+  function normalizeObjectShapeKind(value) {
+    return ["rectangle", "roundedRectangle", "ellipse", "line", "arrow", "callout"].indexOf(value) !== -1 ? value : "rectangle";
   }
 
   function normalizeObjectNumberInput(rawValue, options) {
@@ -6550,10 +6610,47 @@
       els.objectStructuredInput.value = structuredSpec ? stringifyStructuredObjectData(type, data) : "";
       els.objectStructuredInput.rows = structuredSpec && structuredSpec.rows ? structuredSpec.rows : 6;
       if (els.objectStructuredRowsBlock) els.objectStructuredRowsBlock.hidden = !rowSpec;
-      if (els.objectStructuredBulkEditor && !rowSpec) els.objectStructuredBulkEditor.open = Boolean(structuredSpec);
+      if (els.objectStructuredBulkEditor) els.objectStructuredBulkEditor.open = Boolean(structuredSpec && !rowSpec && !specialStructuredObjectEditor(type));
       if (els.objectStructuredAddRowBtn) els.objectStructuredAddRowBtn.disabled = !editable || !rowSpec;
       renderStructuredObjectRows(rowSpec, data, editable);
+      syncSpecialStructuredObjectEditors(type, data, editable);
     }
+  }
+
+  function specialStructuredObjectEditor(type) {
+    return type === "compare" || type === "quote" || type === "shape";
+  }
+
+  function syncSpecialStructuredObjectEditors(type, data, editable) {
+    var compare = type === "compare";
+    var quote = type === "quote";
+    var shape = type === "shape";
+    if (els.objectCompareFields) {
+      els.objectCompareFields.hidden = !compare;
+      els.objectCompareLeftTitleInput.value = compare ? compareSide(data, "left").title : "";
+      els.objectCompareLeftTextInput.value = compare ? compareSide(data, "left").text : "";
+      els.objectCompareRightTitleInput.value = compare ? compareSide(data, "right").title : "";
+      els.objectCompareRightTextInput.value = compare ? compareSide(data, "right").text : "";
+    }
+    if (els.objectQuoteFields) {
+      els.objectQuoteFields.hidden = !quote;
+      els.objectQuoteInput.value = quote ? data.quote || "" : "";
+      els.objectQuoteAuthorInput.value = quote ? data.author || "" : "";
+    }
+    if (els.objectShapeFields) {
+      els.objectShapeFields.hidden = !shape;
+      els.objectShapeKindInput.value = shape ? normalizeObjectShapeKind(data.kind) : "rectangle";
+      els.objectShapeTextInput.value = shape ? data.text || "" : "";
+      els.objectShapeFillInput.value = shape ? data.fill || "" : "";
+      els.objectShapeStrokeInput.value = shape ? data.stroke || "" : "";
+      els.objectShapeStrokeWidthInput.value = shape && data.strokeWidth != null ? data.strokeWidth : "";
+    }
+    [els.objectCompareFields, els.objectQuoteFields, els.objectShapeFields].forEach(function (group) {
+      if (!group) return;
+      group.querySelectorAll("[data-object-control]").forEach(function (control) {
+        control.disabled = !editable;
+      });
+    });
   }
 
   function structuredObjectEditorSpec(type) {

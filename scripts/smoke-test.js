@@ -98,6 +98,17 @@ assert.equal(blankDeck.slides[0].objects.length, 0);
   /id="objectStructuredAddRowBtn"/,
   /id="objectStructuredBulkEditor"/,
   /id="objectStructuredInput"/,
+  /id="objectCompareFields"/,
+  /id="objectCompareLeftTitleInput"/,
+  /id="objectCompareRightTextInput"/,
+  /id="objectQuoteFields"/,
+  /id="objectQuoteInput"/,
+  /id="objectQuoteAuthorInput"/,
+  /id="objectShapeFields"/,
+  /id="objectShapeKindInput"/,
+  /id="objectShapeFillInput"/,
+  /id="objectShapeStrokeInput"/,
+  /id="objectShapeStrokeWidthInput"/,
   /id="itemsRowsBlock"/,
   /id="itemsRows"/,
   /id="itemsAddRowBtn"/,
@@ -192,6 +203,9 @@ assert.match(appJs, /function structuredRowsSpec/);
 assert.match(appJs, /function renderStructuredObjectRows/);
 assert.match(appJs, /function handleStructuredRowsChange/);
 assert.match(appJs, /function mutateSelectedStructuredRows/);
+assert.match(appJs, /function syncSpecialStructuredObjectEditors/);
+assert.match(appJs, /function ensureCompareSide/);
+assert.match(appJs, /function normalizeObjectShapeKind/);
 assert.match(appJs, /function bindSlideRowsEditor/);
 assert.match(appJs, /function renderSlideRowsEditor/);
 assert.match(appJs, /function handleSlideRowsChange/);
@@ -200,6 +214,9 @@ assert.match(appJs, /function commitSlideRowsMutation/);
 assert.match(appJs, /function applyStructuredObjectText/);
 assert.match(appJs, /function stringifyStructuredObjectData/);
 assert.match(appJs, /bindObjectDataInput\(els\.objectStructuredInput, applyStructuredObjectText\)/);
+assert.match(appJs, /bindObjectDataInput\(els\.objectCompareLeftTitleInput/);
+assert.match(appJs, /bindObjectDataInput\(els\.objectQuoteInput/);
+assert.match(appJs, /bindObjectDataInput\(els\.objectShapeKindInput/);
 assert.match(appJs, /objectStructuredRows\.addEventListener\("change", handleStructuredRowsChange\)/);
 assert.match(appJs, /bindSlideRowsEditor\("items"\)/);
 assert.match(appJs, /bindSlideRowsEditor\("cards"\)/);
@@ -210,6 +227,7 @@ assert.match(appJs, /object\.structuredRows/);
 assert.match(stylesCss, /\.structured-row-editor/);
 assert.match(stylesCss, /\.structured-row/);
 assert.match(stylesCss, /\.structured-row-input/);
+assert.match(stylesCss, /\.typed-object-fields/);
 assert.match(appJs, /addSlideBtn\.addEventListener\("click", function \(\) \{ showSlideLayoutMenuForButton\(els\.addSlideBtn, currentIndex\); \}\)/);
 assert.match(appJs, /deck\.slides\.splice\(insertIndex, 0, createSlideForLayout\(settings\.layout, insertIndex\)\)/);
 assert.match(appJs, /imageBackground: "image"/);

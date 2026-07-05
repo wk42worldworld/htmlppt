@@ -1192,6 +1192,29 @@ textarea.structured-row-input {
   font-weight: 740;
 }
 
+.typed-object-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.typed-object-fields[hidden] {
+  display: none !important;
+}
+
+.typed-object-fields label {
+  min-width: 0;
+}
+
+.typed-object-wide {
+  grid-column: 1 / -1;
+}
+
+.object-panel .typed-object-fields textarea {
+  min-height: 76px;
+  font-family: inherit;
+}
+
 .object-panel .object-align-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-bottom: 0;
